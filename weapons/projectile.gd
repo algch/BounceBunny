@@ -1,12 +1,30 @@
 extends KinematicBody2D
 
+var red_texture = preload('res://weapons/sprites/red_projectile.png')
+var green_texture = preload('res://weapons/sprites/green_projectile.png')
+var blue_texture = preload('res://weapons/sprites/blue_projectile.png')
+
 var direction = Vector2(0,0)
 var SPEED = 500
 
-func _ready():
-	print('hello bitches')
-	print(position)
-	print(direction)
+var COLOR_ENUM = {
+	0: 'red',
+	1: 'green',
+	2: 'blue'
+}
+var COLOR = null
+
+func setColor(tile_type):
+	COLOR = COLOR_ENUM[tile_type]
+
+	match COLOR:
+		'red':
+			$sprite.set_texture(red_texture)
+		'green':
+			$sprite.set_texture(green_texture)
+		'blue':
+			$sprite.set_texture(blue_texture)
+
 
 func _physics_process(delta):
 	var motion = direction * SPEED * delta
@@ -18,4 +36,4 @@ func _physics_process(delta):
 		if collider is TileMap:
 			var tile_pos = collider.world_to_map(position) - collision.normal
 			var tile = collision.collider.get_cellv(tile_pos)
-			print('tile is ' + str(tile))
+			setColor(tile)
