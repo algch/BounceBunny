@@ -2,6 +2,8 @@ extends KinematicBody2D
 
 var SPEED = 100
 
+var TYPE = 'player'
+
 # how far from the player will the projectile be placed
 var WEAPON_RADIUS = 74
 var motion_dir = Vector2(0, 0)

@@ -1,10 +1,8 @@
 extends KinematicBody2D
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
+var TYPE='enemy'
 
-var SPEED = 50
+var SPEED = 100
 
 var red_texture = preload('res://enemies/spider/sprites/red_spider.png')
 var green_texture = preload('res://enemies/spider/sprites/green_spider.png')
@@ -15,11 +13,11 @@ var movement_timer = Timer.new()
 
 var motion_dir = Vector2(0, 0)
 
-var color = 'red'
+var COLOR = 'red'
 
 func _ready():
 	randomize()
-	match color:
+	match COLOR:
 		'red':
 			$sprite.set_texture(red_texture)
 		'green':
@@ -59,15 +57,23 @@ func getRandomDir():
 	return Vector2(randX, randY)
 
 
-func movementLoop():
+func movementLoop(delta):
 	if is_on_wall():
 		motion_dir = getRandomDir()
 
 	if movement_timer.get_time_left() <= 4:
-		var motion = motion_dir.normalized() * SPEED
-		move_and_slide(motion)
+		var motion = motion_dir.normalized() * SPEED * delta
+		var collision = move_and_collide(motion)
+
+		if collision:
+			var collider = collision.collider
+			var collider_type = collider.get('TYPE')
+			if collider_type == 'player':
+				collider.queue_free()
+				print('game over')
+
 
 
 
 func _physics_process(delta):
-	movementLoop()
+	movementLoop(delta)
