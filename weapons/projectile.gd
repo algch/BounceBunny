@@ -8,6 +8,7 @@ var debug_texture = preload('res://weapons/sprites/debug_projectile.png')
 var direction = Vector2(0,0)
 var distance_to_tip
 var SPEED = 700
+var health = 3
 
 var COLOR_ENUM = {
 	0: 'red',
@@ -36,10 +37,15 @@ func setColor(tile_type):
 			$sprite.set_texture(blue_texture)
 
 func _physics_process(delta):
+	if health <= 0:
+		queue_free()
+		return
+
 	var motion = direction * SPEED * delta
 	var collision = move_and_collide(motion)
 
 	if collision:
+		health -= 1
 		var collider = collision.collider
 		var tip_position = getTipPosition()
 
