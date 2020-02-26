@@ -13,11 +13,14 @@ var movement_timer = Timer.new()
 
 var motion_dir = Vector2(0, 0)
 
-var COLOR = 'red'
+var colors = ['red', 'green', 'blue']
+var COLOR = null
 
 func _ready():
 	randomize()
-	match COLOR:
+	var color = colors[randi() % 3]
+	COLOR = color
+	match color:
 		'red':
 			$sprite.set_texture(red_texture)
 		'green':

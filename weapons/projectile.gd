@@ -62,6 +62,11 @@ func _physics_process(delta):
 				collider.queue_free()
 			else:
 				collider.SPEED += 10
+		if collider_type == 'plant/teleport' and not COLOR:
+			var player = get_parent().get_node('player')
+			player.position = collider.position
+			collider.queue_free()
+			queue_free()
 
 		direction = direction.bounce(collision.normal)
 		rotation = direction.angle() + PI/2.0
