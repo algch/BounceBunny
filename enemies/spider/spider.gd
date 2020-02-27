@@ -33,6 +33,14 @@ func _ready():
 	resetMovementTimer()
 	add_child(movement_timer)
 
+func handleWeaponCollision(collider):
+	if collider.COLOR == COLOR:
+		queue_free()
+	else:
+		SPEED += 50
+
+	collider.queue_free()
+
 func resetMovementTimer():
 	movement_timer.set_wait_time(5)
 	movement_timer.start()
