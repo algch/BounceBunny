@@ -8,6 +8,8 @@ var red_texture = preload('res://enemies/spider/sprites/red_spider.png')
 var green_texture = preload('res://enemies/spider/sprites/green_spider.png')
 var blue_texture = preload('res://enemies/spider/sprites/blue_spider.png')
 
+var teleport_class = preload('res://plants/teleport/teleport.tscn')
+
 
 var movement_timer = Timer.new()
 
@@ -35,6 +37,9 @@ func _ready():
 
 func handleWeaponCollision(collider):
 	if collider.COLOR == COLOR:
+		var teleport = teleport_class.instance()
+		teleport.position = position
+		get_parent().add_child(teleport)
 		queue_free()
 	else:
 		SPEED += 50
