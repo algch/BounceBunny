@@ -4,7 +4,7 @@
 [ext_resource path="res://plants/teleport/sprites/teleport.png" type="Texture" id=2]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 40, 40 )
+extents = Vector2( 80, 80 )
 
 [node name="teleport" type="StaticBody2D" groups=[
 "affected_by_weapons",
