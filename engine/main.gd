@@ -1,15 +1,51 @@
 extends Node
 
+var spider_class = preload('res://enemies/spider/spider.tscn')
+var SPIDER_EXTENTS = Vector2(50, 50)
+
 var TILE_SIZE = 20
 var TILE_TYPES = 3
 
 var CHANGE_TILE_PROBABILITY = 50
 var MIN_TILE_STRIP_SIZE = 5
 
+onready var SCREEN_SIZE = get_viewport().size
 var X
 var Y
 
 var last_tile = null
+
+func getRandomPosition():
+	return Vector2(
+		randi() % int(SCREEN_SIZE.x - 20) + 20,
+		randi() % int(SCREEN_SIZE.y - 20) + 20
+	)
+
+func spawnEnemy():
+	var spider = spider_class.instance()
+
+	var rectangle_shape = RectangleShape2D.new()
+	rectangle_shape.set_extents(SPIDER_EXTENTS)
+
+	var coll_shape = CollisionShape2D.new()
+	coll_shape.shape = rectangle_shape
+	
+
+	var pos_tester = Area2D.new()
+	pos_tester.add_child(coll_shape)
+	pos_tester.position = getRandomPosition()
+	add_child(pos_tester)
+	
+	var player = get_node('player')
+	var is_far = player.position.distance_to(pos_tester.position) > 320
+
+	var overlap = pos_tester.get_overlapping_bodies()
+	while overlap and is_far:
+		pos_tester.position = getRandomPosition()
+		overlap = pos_tester.get_overlapping_bodies()
+	
+	add_child(spider)
+	spider.position = pos_tester.position
 
 
 func getRandomTileId():
@@ -45,9 +81,8 @@ func _ready():
 	tilemap.clear()
 	randomize()
 
-	var screen_size = get_viewport().size
-	X = screen_size.x / TILE_SIZE
-	Y = screen_size.y / TILE_SIZE
+	X = SCREEN_SIZE.x / TILE_SIZE
+	Y = SCREEN_SIZE.y / TILE_SIZE
 
 	print(X, Y)
 
@@ -67,3 +102,5 @@ func _ready():
 		tiles_left -= 1
 
 		coord += step
+	
+	spawnEnemy()
