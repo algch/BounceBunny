@@ -4,7 +4,7 @@
 [ext_resource path="res://player/sprites/tito-shooting-01.png" type="Texture" id=2]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 80, 80 )
+extents = Vector2( 45, 80 )
 
 [node name="player" type="KinematicBody2D"]
 script = ExtResource( 1 )
