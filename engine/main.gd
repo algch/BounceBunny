@@ -14,6 +14,8 @@ var X
 var Y
 
 var last_tile = null
+var spawn_timer = Timer.new()
+var shouldSpawn = false
 
 func getRandomPosition():
 	return Vector2(
@@ -31,22 +33,39 @@ func spawnEnemy():
 	coll_shape.shape = rectangle_shape
 	
 
+	# TODO 
+	# looks like this can be solved using shapes only
+	# check https://godotengine.org/qa/18952/area2d-code-building-array-get_overlapping_bodies-method
 	var pos_tester = Area2D.new()
-	pos_tester.add_child(coll_shape)
 	pos_tester.position = getRandomPosition()
+	pos_tester.add_child(coll_shape)
 	add_child(pos_tester)
+	yield(get_tree(), "physics_frame")
 	
 	var player = get_node('player')
-	var is_far = player.position.distance_to(pos_tester.position) > 320
+	var dist_to_player = player.position.distance_to(pos_tester.position)
 
-	var overlap = pos_tester.get_overlapping_bodies()
-	while overlap and is_far:
+	var overlap = pos_tester.get_overlapping_bodies() + pos_tester.get_overlapping_areas()
+	yield(get_tree(), "physics_frame")
+
+	while overlap or dist_to_player < 320:
 		pos_tester.position = getRandomPosition()
+		yield(get_tree(), "physics_frame")
 		overlap = pos_tester.get_overlapping_bodies()
+		dist_to_player = player.position.distance_to(pos_tester.position)
 	
 	add_child(spider)
 	spider.position = pos_tester.position
 
+func spawnLoop():
+	if shouldSpawn:
+		spawnEnemy()
+		spawn_timer.set_wait_time(2.5)
+		spawn_timer.start()
+		shouldSpawn = false
+
+func setSpawn():
+	shouldSpawn = true
 
 func getRandomTileId():
 	var tile = int(rand_range(0, TILE_TYPES))
@@ -84,8 +103,6 @@ func _ready():
 	X = SCREEN_SIZE.x / TILE_SIZE
 	Y = SCREEN_SIZE.y / TILE_SIZE
 
-	print(X, Y)
-
 	var steps = [Vector2(1, 0), Vector2(0, 1), Vector2(-1, 0), Vector2(0, -1)]
 
 	var tiles_left = MIN_TILE_STRIP_SIZE
@@ -102,5 +119,10 @@ func _ready():
 		tiles_left -= 1
 
 		coord += step
-	
-	spawnEnemy()
+
+	spawn_timer.connect('timeout', self, 'setSpawn')
+	add_child(spawn_timer)
+	spawn_timer.start()
+
+func _physics_process(delta):
+	spawnLoop()
