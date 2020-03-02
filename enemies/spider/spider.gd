@@ -17,6 +17,19 @@ var motion_dir = Vector2(0, 0)
 
 var colors = ['red', 'green', 'blue']
 var COLOR = null
+enum STATE {
+	walk,
+	attack
+}
+var current_state = STATE.walk
+
+var ATTACK_WAIT_TIME = 2
+var attack_timer = Timer.new()
+
+var damage = 1
+
+
+onready var player = get_node('/root/main/player')
 
 func _ready():
 	randomize()
@@ -34,6 +47,9 @@ func _ready():
 	movement_timer.connect('timeout', self, 'resetMovementTimer')
 	resetMovementTimer()
 	add_child(movement_timer)
+
+	attack_timer.connect('timeout', self, 'attack')
+	add_child(attack_timer)
 
 func handleWeaponCollision(collider):
 	if collider.COLOR == COLOR:
@@ -74,11 +90,16 @@ func getRandomDir():
 
 
 func movementLoop(delta):
-	if is_on_wall():
-		motion_dir = getRandomDir()
+	if current_state != STATE.walk:
+		return
+
 
 	if movement_timer.get_time_left() <= 4:
+		if is_on_wall():
+			motion_dir = getRandomDir()
+
 		var motion = motion_dir.normalized() * SPEED * delta
+
 		var collision = move_and_collide(motion)
 
 		if collision:
@@ -88,8 +109,32 @@ func movementLoop(delta):
 				collider.queue_free()
 				print('game over')
 
+func attack():
+	if not player:
+		return
+	player.receiveDamage(damage)
+	attack_timer.set_wait_time(ATTACK_WAIT_TIME)
+	attack_timer.start()
 
+func attackLoop():
+	if not player:
+		return
+
+	var dist_to_player = position.distance_to(player.position)
+
+	if current_state == STATE.attack:
+		if dist_to_player >= 160:
+			current_state = STATE.walk
+		else:
+			return
+
+	if dist_to_player < 160:
+		print('setting state to attack')
+		current_state = STATE.attack
+		attack_timer.set_wait_time(ATTACK_WAIT_TIME)
+		attack_timer.start()
 
 
 func _physics_process(delta):
 	movementLoop(delta)
+	attackLoop()

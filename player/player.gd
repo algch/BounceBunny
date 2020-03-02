@@ -10,10 +10,15 @@ var motion_dir = Vector2(0, 0)
 var is_attacking = false
 onready var projectile_class = preload('res://weapons/projectile.tscn')
 
+var health = 10
+
 
 func _ready():
 	pass
 
+func receiveDamage(damage):
+	health -= damage
+	print('hijos de la verga')
 
 func movementLoop():
 	var motion = motion_dir.normalized() * SPEED
