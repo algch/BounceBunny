@@ -14,6 +14,7 @@ var teleport_class = preload('res://plants/teleport/teleport.tscn')
 var movement_timer = Timer.new()
 
 var motion_dir = Vector2(0, 0)
+var rotation_speed = 0.5 # in degrees
 
 var colors = ['red', 'green', 'blue']
 var COLOR = null
@@ -66,6 +67,14 @@ func resetMovementTimer():
 	movement_timer.set_wait_time(5)
 	movement_timer.start()
 	motion_dir = getRandomDir()
+	# testing
+	motion_dir = Vector2(
+		cos(rotation + PI/2.0),
+		sin(rotation + PI/2.0)
+	)
+
+	rotation_speed = (randf() * 2 + 0.5) * (-1 if randi()%2 == 0 else 1)
+	
 
 # HEY game logic here, abstract this to a separated class or something
 func getRandomDir():
@@ -108,6 +117,8 @@ func movementLoop(delta):
 			if collider_type == 'player':
 				collider.queue_free()
 				print('game over')
+	else:
+		rotation += deg2rad(rotation_speed)
 
 func attack():
 	if not player:
