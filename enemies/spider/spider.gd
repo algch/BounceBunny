@@ -21,6 +21,7 @@ var COLOR = null
 enum STATE {
 	walk,
 	rotate,
+	walk_backwards,
 	attack
 }
 var current_state = STATE.walk
@@ -54,6 +55,11 @@ func _ready():
 
 	attack_timer.connect('timeout', self, 'attack')
 	add_child(attack_timer)
+
+	motion_dir = Vector2(
+		cos(rotation + PI/2.0),
+		sin(rotation + PI/2.0)
+	)
 
 
 func handleWeaponCollision(collider):
@@ -93,20 +99,19 @@ func getRandomDir():
 func movementLoop(delta):
 	match current_state:
 		STATE.walk:
-			if is_on_wall():
-				current_state = STATE.rotate
 			var motion = motion_dir.normalized() * SPEED * delta
 
 			var collision = move_and_collide(motion)
 
 			if collision:
-				var collider = collision.collider
-				var collider_type = collider.get('TYPE')
-				if collider_type == 'player':
-					collider.queue_free()
-					print('game over')
+				print('collided')
+				current_state = STATE.walk_backwards
 		STATE.rotate:
 			rotation += deg2rad(rotation_speed)
+		STATE.walk_backwards:
+			print('walking backwards')
+			var motion = motion_dir.normalized() * SPEED * -1
+			move_and_slide(motion)
 		_:
 			return
 
@@ -125,8 +130,11 @@ func setRandomMovementAction():
 
 	match randi() % 2:
 		0:
+			print('set to rotate')
 			current_state = STATE.rotate
+			rotation_speed = randf() + 0.5
 		1:
+			print('set to walk')
 			current_state = STATE.walk
 
 func attack():
@@ -140,7 +148,9 @@ func attackLoop():
 	if not player:
 		return
 
-	var dist_to_player = position.distance_to(player.position)
+	var direction_to_player = player.position - position
+	var dist_to_player = direction_to_player.length()
+	var is_facing_player = direction_to_player.normalized().dot(motion_dir.normalized()) > 0
 
 	if current_state == STATE.attack:
 		if dist_to_player >= 160:
@@ -149,7 +159,7 @@ func attackLoop():
 		else:
 			return
 
-	if dist_to_player < 160:
+	if dist_to_player < 160 and is_facing_player:
 		print('setting state to attack')
 		current_state = STATE.attack
 		attack_timer.set_wait_time(ATTACK_WAIT_TIME)
