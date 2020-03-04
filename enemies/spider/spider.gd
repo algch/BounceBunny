@@ -20,6 +20,7 @@ var colors = ['red', 'green', 'blue']
 var COLOR = null
 enum STATE {
 	walk,
+	rotate,
 	attack
 }
 var current_state = STATE.walk
@@ -45,12 +46,15 @@ func _ready():
 			$sprite.set_texture(blue_texture)
 		_:
 			$sprite.set_texture(red_texture)
-	movement_timer.connect('timeout', self, 'resetMovementTimer')
-	resetMovementTimer()
+	movement_timer.connect('timeout', self, 'setRandomMovementAction')
+	var wait_time = randi() % 2 + 1
+	movement_timer.set_wait_time(wait_time)
+	movement_timer.start()
 	add_child(movement_timer)
 
 	attack_timer.connect('timeout', self, 'attack')
 	add_child(attack_timer)
+
 
 func handleWeaponCollision(collider):
 	if collider.COLOR == COLOR:
@@ -63,18 +67,6 @@ func handleWeaponCollision(collider):
 
 	collider.queue_free()
 
-func resetMovementTimer():
-	movement_timer.set_wait_time(5)
-	movement_timer.start()
-	motion_dir = getRandomDir()
-	# testing
-	motion_dir = Vector2(
-		cos(rotation + PI/2.0),
-		sin(rotation + PI/2.0)
-	)
-
-	rotation_speed = (randf() * 2 + 0.5) * (-1 if randi()%2 == 0 else 1)
-	
 
 # HEY game logic here, abstract this to a separated class or something
 func getRandomDir():
@@ -99,26 +91,43 @@ func getRandomDir():
 
 
 func movementLoop(delta):
-	if current_state != STATE.walk:
+	match current_state:
+		STATE.walk:
+			if is_on_wall():
+				current_state = STATE.rotate
+			var motion = motion_dir.normalized() * SPEED * delta
+
+			var collision = move_and_collide(motion)
+
+			if collision:
+				var collider = collision.collider
+				var collider_type = collider.get('TYPE')
+				if collider_type == 'player':
+					collider.queue_free()
+					print('game over')
+		STATE.rotate:
+			rotation += deg2rad(rotation_speed)
+		_:
+			return
+
+
+func setRandomMovementAction():
+	var wait_time = randi() % 2 + 1
+	movement_timer.set_wait_time(wait_time)
+	movement_timer.start()
+	if current_state == STATE.attack:
 		return
 
+	motion_dir = Vector2(
+		cos(rotation + PI/2.0),
+		sin(rotation + PI/2.0)
+	)
 
-	if movement_timer.get_time_left() <= 4:
-		if is_on_wall():
-			motion_dir = getRandomDir()
-
-		var motion = motion_dir.normalized() * SPEED * delta
-
-		var collision = move_and_collide(motion)
-
-		if collision:
-			var collider = collision.collider
-			var collider_type = collider.get('TYPE')
-			if collider_type == 'player':
-				collider.queue_free()
-				print('game over')
-	else:
-		rotation += deg2rad(rotation_speed)
+	match randi() % 2:
+		0:
+			current_state = STATE.rotate
+		1:
+			current_state = STATE.walk
 
 func attack():
 	if not player:
@@ -136,6 +145,7 @@ func attackLoop():
 	if current_state == STATE.attack:
 		if dist_to_player >= 160:
 			current_state = STATE.walk
+			attack_timer.stop()
 		else:
 			return
 
