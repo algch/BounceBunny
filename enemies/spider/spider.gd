@@ -105,7 +105,7 @@ func movementLoop(delta):
 
 			if collision:
 				print('collided')
-				current_state = STATE.walk_backwards
+				current_state = STATE.rotate
 		STATE.rotate:
 			rotation += deg2rad(rotation_speed)
 		STATE.walk_backwards:
@@ -116,8 +116,11 @@ func movementLoop(delta):
 			return
 
 
+# TODO replace these magic numbers
+# and refator this function
 func setRandomMovementAction():
-	var wait_time = randi() % 2 + 1
+	var selected_state = STATE.rotate if current_state == STATE.walk else STATE.walk
+	var wait_time = 2
 	movement_timer.set_wait_time(wait_time)
 	movement_timer.start()
 	if current_state == STATE.attack:
@@ -127,15 +130,9 @@ func setRandomMovementAction():
 		cos(rotation + PI/2.0),
 		sin(rotation + PI/2.0)
 	)
+	rotation_speed *= -1 if randi() % 2 == 0 else 1
 
-	match randi() % 2:
-		0:
-			print('set to rotate')
-			current_state = STATE.rotate
-			rotation_speed = randf() + 0.5
-		1:
-			print('set to walk')
-			current_state = STATE.walk
+	current_state = selected_state
 
 func attack():
 	if not player:
