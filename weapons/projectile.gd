@@ -9,6 +9,7 @@ var direction = Vector2(0,0)
 var distance_to_tip
 var SPEED = 700
 var health = 3
+var damage = 1
 
 var COLOR_ENUM = {
 	0: 'red',

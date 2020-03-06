@@ -1,10 +1,13 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://plants/support/support.gd" type="Script" id=1]
 [ext_resource path="res://plants/support/sprites/support.png" type="Texture" id=2]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 40, 40 )
+
+[sub_resource type="CircleShape2D" id=2]
+radius = 160.0
 
 [node name="support" type="StaticBody2D"]
 script = ExtResource( 1 )
@@ -17,11 +20,10 @@ texture = ExtResource( 2 )
 
 [node name="Area2D" type="Area2D" parent="."]
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Area2D"]
-polygon = PoolVector2Array( 0, 120, 75, 105, 105, 75, 120, 0, 105, -75, 75, -105, 0, -120, -75, -105, -105, -75, -120, 0, -105, 75, -75, 105 )
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource( 2 )
 
 [node name="attack_timer" type="Timer" parent="."]
-wait_time = 2.0
 [connection signal="body_entered" from="Area2D" to="." method="_on_Area2D_body_entered"]
 [connection signal="body_exited" from="Area2D" to="." method="_on_Area2D_body_exited"]
 [connection signal="timeout" from="attack_timer" to="." method="_on_attack_timer_timeout"]

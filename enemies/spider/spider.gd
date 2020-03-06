@@ -30,6 +30,7 @@ var ATTACK_WAIT_TIME = 2
 var attack_timer = Timer.new()
 
 var damage = 1
+var health = 3
 
 
 onready var player = get_node('/root/main/player')
@@ -63,18 +64,12 @@ func _ready():
 
 
 func handleWeaponCollision(collider):
-	if collider.COLOR == COLOR:
-		var teleport = teleport_class.instance()
-		teleport.position = position
-		get_parent().add_child(teleport)
-		queue_free()
-	else:
-		SPEED += 50
-
+	# TODO involve color mechanics here
+	health -= collider.damage
 	collider.queue_free()
 
 
-# HEY game logic here, abstract this to a separated class or something
+# TODO game logic here, move this to a separated class
 func getRandomDir():
 	var randX
 	match randi() % 2:
@@ -162,7 +157,13 @@ func attackLoop():
 		attack_timer.set_wait_time(ATTACK_WAIT_TIME)
 		attack_timer.start()
 
+func healthLoop():
+	if health <= 0:
+		# TODO leave loot
+		queue_free()
+
 
 func _physics_process(delta):
+	healthLoop()
 	movementLoop(delta)
 	attackLoop()
