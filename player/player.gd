@@ -9,6 +9,13 @@ var WEAPON_RADIUS = 113
 var motion_dir = Vector2(0, 0)
 var is_attacking = false
 onready var projectile_class = preload('res://weapons/projectile.tscn')
+onready var charge_timer = get_node('charge_timer')
+
+enum STATE {
+	idle,
+	charging
+}
+var current_state = STATE.idle
 
 var health = 10
 
@@ -48,7 +55,20 @@ func pollInput():
 
 	motion_dir =  Vector2(X, Y)
 
-	is_attacking = Input.is_action_just_released('touch_release')
+	if Input.is_action_just_pressed('touch') and current_state != STATE.charging:
+		# TODO fix bug here, it should only shoot once
+		current_state = STATE.charging
+		charge_timer.start()
+
+	if Input.is_action_just_released('touch'):
+		# instance arrow and make it move and cause a damage proportional
+		# to the time it was charged
+		current_state = STATE.idle
+		charge_timer.stop()
+
+func _on_charge_timer_timeout():
+	is_attacking = true
+	current_state = STATE.idle
 
 
 func _physics_process(delta):
