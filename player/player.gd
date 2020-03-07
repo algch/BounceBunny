@@ -56,12 +56,12 @@ func pollInput():
 
 	motion_dir =  Vector2(X, Y)
 
-	if Input.is_action_just_pressed('touch') and current_state != STATE.charging:
-		current_state = STATE.charging
+	if Input.is_action_pressed('touch') and current_state != STATE.charging:
 		charge_timer.set_wait_time(CHARGE_WAIT_TIME)
 		charge_timer.start()
+		current_state = STATE.charging
 
-	if Input.is_action_just_released('touch'):
+	if Input.is_action_just_released('touch') and current_state == STATE.charging:
 		var travel_time = CHARGE_WAIT_TIME - charge_timer.get_time_left()
 		current_state = STATE.idle
 		charge_timer.stop()
@@ -70,7 +70,7 @@ func pollInput():
 
 func _on_charge_timer_timeout():
 	charge_timer.stop()
-	print('READY ', charge_timer.get_time_left())
+	print('READY')
 
 
 func _physics_process(delta):
