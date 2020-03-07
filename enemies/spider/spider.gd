@@ -30,7 +30,7 @@ var ATTACK_WAIT_TIME = 2
 var attack_timer = Timer.new()
 
 var damage = 1
-var health = 3
+var health = 3.0
 
 
 onready var player = get_node('/root/main/player')
@@ -99,7 +99,6 @@ func movementLoop(delta):
 			var collision = move_and_collide(motion)
 
 			if collision:
-				print('collided')
 				current_state = STATE.rotate
 		STATE.rotate:
 			rotation += deg2rad(rotation_speed)
@@ -152,7 +151,6 @@ func attackLoop():
 			return
 
 	if dist_to_player < 160 and is_facing_player:
-		print('setting state to attack')
 		current_state = STATE.attack
 		attack_timer.set_wait_time(ATTACK_WAIT_TIME)
 		attack_timer.start()

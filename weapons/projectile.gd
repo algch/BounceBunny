@@ -8,8 +8,10 @@ var debug_texture = preload('res://weapons/sprites/debug_projectile.png')
 var direction = Vector2(0,0)
 var distance_to_tip
 var SPEED = 700
-var health = 3
-var damage = 1
+var damage
+
+var travel_timer = Timer.new()
+var travel_time
 
 var COLOR_ENUM = {
 	0: 'red',
@@ -18,13 +20,26 @@ var COLOR_ENUM = {
 }
 var COLOR = null
 
+
 func _ready():
+	damage = travel_time
 	rotation = direction.angle() + PI/2.0
 	distance_to_tip = Vector2(0, 0).distance_to($tip.position)
+	travel_timer.set_wait_time(travel_time)
+	travel_timer.connect('timeout', self, 'travelEnded')
+	travel_timer.start()
+	add_child(travel_timer)
+
+
+
+func travelEnded():
+	queue_free()
+
 
 func getTipPosition():
 	var tip_pos = direction * distance_to_tip
 	return position + tip_pos
+
 
 func setColor(tile_type):
 	COLOR = COLOR_ENUM[tile_type]
@@ -38,15 +53,10 @@ func setColor(tile_type):
 			$sprite.set_texture(blue_texture)
 
 func _physics_process(delta):
-	if health <= 0:
-		queue_free()
-		return
-
 	var motion = direction * SPEED * delta
 	var collision = move_and_collide(motion)
 
 	if collision:
-		health -= 1
 		var collider = collision.collider
 		var tip_position = getTipPosition()
 
