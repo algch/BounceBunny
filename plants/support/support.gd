@@ -9,7 +9,7 @@ enum STATE {
 	idle
 }
 var current_state = STATE.idle
-var travel_time = 3.0
+var travel_time = 1.0
 
 func attack():
 	var target = targets[targets.keys()[randi() % targets.size()]]
