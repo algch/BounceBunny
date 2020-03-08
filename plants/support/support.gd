@@ -9,9 +9,9 @@ enum STATE {
 	idle
 }
 var current_state = STATE.idle
-var travel_time = 1.0
+var DEFAULT_POWER = 0.5
 
-func attack():
+func attack(power):
 	var target = targets[targets.keys()[randi() % targets.size()]]
 	var projectile = projectile_class.instance()
 	var direction = (target.position - position).normalized()
@@ -19,7 +19,8 @@ func attack():
 
 	projectile.position = position + offset
 	projectile.direction = direction
-	projectile.travel_time = travel_time
+
+	projectile.power = power
 
 	get_node('/root/main/').add_child(projectile)
 
@@ -39,5 +40,5 @@ func _on_Area2D_body_exited(body):
 
 
 func _on_attack_timer_timeout():
-	attack()
+	attack(0.5)
 	attack_timer.start()

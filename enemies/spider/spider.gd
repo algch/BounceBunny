@@ -135,6 +135,7 @@ func attack():
 	attack_timer.set_wait_time(ATTACK_WAIT_TIME)
 	attack_timer.start()
 
+# TODO change this, it must work for the player and the support plants, crete group
 func attackLoop():
 	if not player:
 		return

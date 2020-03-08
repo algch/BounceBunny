@@ -9,7 +9,7 @@ var WEAPON_RADIUS = 113
 var motion_dir = Vector2(0, 0)
 onready var projectile_class = preload('res://weapons/projectile.tscn')
 var charge_timer = Timer.new()
-var CHARGE_WAIT_TIME = 3.0
+var CHARGE_WAIT_TIME = 2.0
 
 enum STATE {
 	idle,
@@ -33,14 +33,14 @@ func movementLoop():
 	move_and_slide(motion)
 
 
-func attack(travel_time):
+func attack(power):
 	var projectile = projectile_class.instance()
 	var direction = (get_global_mouse_position() - position).normalized()
 	var offset = direction * WEAPON_RADIUS
 
 	projectile.position = position + offset
 	projectile.direction = direction
-	projectile.travel_time = travel_time
+	projectile.power = power
 
 	get_node('/root/main/').add_child(projectile)
 
@@ -62,10 +62,11 @@ func pollInput():
 		current_state = STATE.charging
 
 	if Input.is_action_just_released('touch') and current_state == STATE.charging:
-		var travel_time = CHARGE_WAIT_TIME - charge_timer.get_time_left()
+		var power = (CHARGE_WAIT_TIME - charge_timer.get_time_left())/CHARGE_WAIT_TIME
+
 		current_state = STATE.idle
 		charge_timer.stop()
-		attack(travel_time)
+		attack(power)
 
 
 func _on_charge_timer_timeout():

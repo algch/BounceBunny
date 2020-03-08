@@ -17,7 +17,6 @@ emission_shape = 2
 emission_box_extents = Vector3( 4, 4, 1 )
 flag_disable_z = true
 gravity = Vector3( 0, 98, 0 )
-angular_velocity = 0.0
 orbit_velocity = 0.0
 orbit_velocity_random = 0.0
 scale = 4.0
@@ -37,6 +36,7 @@ texture = ExtResource( 2 )
 position = Vector2( 0, -15 )
 
 [node name="Particles2D" type="Particles2D" parent="."]
-position = Vector2( 0.133488, -18.2876 )
+position = Vector2( -0.667431, 15.084 )
+speed_scale = 2.0
 fract_delta = false
 process_material = SubResource( 4 )
