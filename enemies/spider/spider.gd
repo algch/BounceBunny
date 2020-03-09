@@ -39,6 +39,8 @@ var attack_timer = Timer.new()
 var damage = 1.0
 var health = 300.0
 
+var default_font = DynamicFont.new()
+
 
 onready var player = get_node('/root/main/player')
 
@@ -64,6 +66,10 @@ func _ready():
 	attack_timer.connect('timeout', self, 'attack')
 	add_child(attack_timer)
 
+	default_font.font_data = load('res://fonts/default-font.ttf')
+	default_font.size = 22
+
+
 
 func handleWeaponCollision(weapon):
 	# TODO involve color mechanics here
@@ -87,8 +93,6 @@ func movementLoop(delta):
 			if abs(motion_dir.angle() - facing_dir.angle()) > HALF_PI/8.0:
 				motion_dir = motion_dir.rotated(deg2rad(rotation_speed * rotation_dir))
 			
-			print('facing angle = ', facing_dir.angle())
-
 			var collision = move_and_collide(motion)
 			rotation = facing_dir.angle() - HALF_PI
 
@@ -202,9 +206,8 @@ func getStateName(state):
 func _draw():
 	draw_line(Vector2(0, 0), Vector2(0, 0) + motion_dir*200, Color(1, 0, 0))
 	draw_line(Vector2(0, 0), Vector2(0, 0) + facing_dir*200, Color(0.75, 0, 0.9))
-	var label = Label.new()
-	var font = label.get_font('')
-	draw_string(font, Vector2(0, -80), getStateName(current_state), Color(1, 1, 1))
+	var message = 'state: ' + getStateName(current_state) + ' rotation: ' + str(rad2deg(rotation))
+	draw_string(default_font, Vector2(-200, -80),  message, Color(1, 1, 1))
 
 
 func _process(delta):
