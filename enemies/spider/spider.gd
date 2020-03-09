@@ -80,6 +80,7 @@ func handleWeaponCollision(weapon):
 
 
 func movementLoop(delta):
+	# STATE TRANSITION IS WRONG, THE SPIDER SHOULD FOLLOW ITS CURRENT TARGET
 	match current_state:
 		STATE.walk:
 			var motion = motion_dir.normalized() * SPEED * delta
@@ -213,5 +214,4 @@ func _process(delta):
 func _physics_process(delta):
 	healthLoop()
 	movementLoop(delta)
-	# there is a bug in the attack loop
 	attackLoop()
