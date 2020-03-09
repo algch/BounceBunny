@@ -14,11 +14,13 @@ var teleport_class = preload('res://plants/teleport/teleport.tscn')
 
 var movement_timer = Timer.new()
 
-var targets = {}
+var reachable_targets = {}
+var visible_targets = {}
 var current_target = null
 
 var motion_dir = Vector2(0, 0)
-var rotation_speed = 0.5 # in degrees
+var facing_dir = Vector2(0, 0)
+var rotation_speed = 1 # in degrees
 var rotation_dir = 1
 
 var colors = ['red', 'green', 'blue']
@@ -28,7 +30,6 @@ enum STATE {
 	rotate,
 	walk_backwards,
 	attack,
-	FIND_TARGET,
 }
 var current_state = STATE.walk
 
@@ -85,19 +86,14 @@ func handleWeaponCollision(weapon):
 
 func movementLoop(delta):
 	match current_state:
-		STATE.FIND_TARGET:
-			var target_dir = (current_target.position - position).normalized()
-			if motion_dir.dot(target_dir) > 0.75:
-				current_state = STATE.attack
-				return
-
-			rotation += deg2rad(rotation_speed * rotation_dir)
-			motion_dir = Vector2(
-				cos(rotation + HALF_PI),
-				sin(rotation + HALF_PI)
-			)
 		STATE.walk:
 			var motion = motion_dir.normalized() * SPEED * delta
+			if rad2deg(motion_dir.angle_to(facing_dir)) > 10:
+				rotation += deg2rad(rotation_speed * rotation_dir)
+				facing_dir = Vector2(
+					cos(rotation + HALF_PI),
+					sin(rotation + HALF_PI)
+				)
 
 			var collision = move_and_collide(motion)
 
@@ -105,7 +101,7 @@ func movementLoop(delta):
 				current_state = STATE.rotate
 		STATE.rotate:
 			rotation += deg2rad(rotation_speed * rotation_dir)
-			motion_dir = Vector2(
+			facing_dir = Vector2(
 				cos(rotation + HALF_PI),
 				sin(rotation + HALF_PI)
 			)
@@ -124,7 +120,7 @@ func setRandomMovementAction():
 	var wait_time = 2
 	movement_timer.set_wait_time(wait_time)
 	movement_timer.start()
-	if current_state == STATE.attack or current_state == STATE.FIND_TARGET:
+	if current_state == STATE.attack:
 		return
 
 	rotation_dir = -1 if randi() % 2 == 0 else 1
@@ -136,42 +132,59 @@ func attack():
 	attack_timer.set_wait_time(ATTACK_WAIT_TIME)
 	attack_timer.start()
 
-# TODO change this, it must work for the player and the support plants, crete group
 func attackLoop():
 	if current_target and not current_target.is_queued_for_deletion():
-		var direction_to_target = current_target.position - position
-		var dist_to_target = direction_to_target.length()
-		var is_facing_target = direction_to_target.normalized().dot(motion_dir.normalized()) > 0
-
-		if current_state == STATE.attack and attack_timer.is_stopped():
-			attack_timer.set_wait_time(ATTACK_WAIT_TIME)
-			attack_timer.start()
-
-	else:
-		if targets.empty():
-			current_target = null
-			attack_timer.stop()
-			current_state = STATE.walk
+		if current_target.get_instance_id() in reachable_targets:
+			if current_state != STATE.attack:
+				attack_timer.set_wait_time(ATTACK_WAIT_TIME)
+				attack_timer.start()
+				current_state = STATE.attack
 		else:
-			print(targets)
-			current_target = targets[targets.keys()[0]]
-			if current_target.is_queued_for_deletion():
-				targets.erase(current_target.get_instance_id())
-				current_target = null
-				return
-			current_state = STATE.FIND_TARGET
-			var target_dir = (current_target.position - position).normalized()
-			rotation_dir = -1 if motion_dir.rotated(HALF_PI).dot(target_dir.rotated(HALF_PI)) < 0 else 1
+			var motion_dir = (current_target.position - position).normalized()
+			STATE.walk
+
+		return
+
+	current_target = null
+	if not attack_timer.is_stopped():
+		attack_timer.stop()
+
+	if reachable_targets.empty():
+		while not visible_targets.empty():
+			var possible_target = visible_targets[visible_targets.keys()[0]]
+			if possible_target.is_queued_for_deletion():
+				visible_targets.erase(possible_target.get_instance_id())
+			else:
+				current_target = possible_target
+				break
+	else:
+		while not reachable_targets.empty():
+			var possible_target = reachable_targets[reachable_targets.keys()[0]]
+			if possible_target.is_queued_for_deletion():
+				reachable_targets.erase(possible_target.get_instance_id())
+			else:
+				current_target = possible_target
+				break
 
 
-func _on_Area2D_body_entered(body):
+func on_attackArea_body_entered(body):
 	if body.is_in_group('attacked_by_enemies'):
-		targets[body.get_instance_id()] = body
+		reachable_targets[body.get_instance_id()] = body
 
 
-func _on_Area2D_body_exited(body):
-	targets.erase(body.get_instance_id())
+func on_attackArea_body_exited(body):
+	if body.is_in_group('attacked_by_enemies'):
+		reachable_targets.erase(body.get_instance_id())
 
+
+func on_visionArea_body_entered(body):
+	if body.is_in_group('attacked_by_enemies'):
+		visible_targets[body.get_instance_id()] = body
+
+
+func on_visionArea_body_exited(body):
+	if body.is_in_group('attacked_by_enemies'):
+		visible_targets.erase(body.get_instance_id())
 
 
 func healthLoop():
@@ -183,4 +196,5 @@ func healthLoop():
 func _physics_process(delta):
 	healthLoop()
 	movementLoop(delta)
+	# there is a bug in the attack loop
 	attackLoop()

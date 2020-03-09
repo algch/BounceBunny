@@ -125,4 +125,5 @@ func _ready():
 	spawn_timer.start()
 
 func _physics_process(delta):
+	return
 	spawnLoop()

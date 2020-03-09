@@ -19,9 +19,17 @@ shape = SubResource( 1 )
 
 [node name="sprite" type="Sprite" parent="."]
 
-[node name="Area2D" type="Area2D" parent="."]
+[node name="attackArea" type="Area2D" parent="."]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="attackArea"]
 shape = SubResource( 2 )
-[connection signal="body_entered" from="Area2D" to="." method="_on_Area2D_body_entered"]
-[connection signal="body_exited" from="Area2D" to="." method="_on_Area2D_body_exited"]
+
+[node name="visionArea" type="Area2D" parent="."]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="visionArea"]
+position = Vector2( 5.33308, 0 )
+polygon = PoolVector2Array( -120, 160, 120, 160, 0, 0 )
+[connection signal="body_entered" from="attackArea" to="." method="on_attackArea_body_entered"]
+[connection signal="body_exited" from="attackArea" to="." method="on_attackArea_body_exited"]
+[connection signal="body_entered" from="visionArea" to="." method="on_visionArea_body_entered"]
+[connection signal="body_exited" from="visionArea" to="." method="on_visionArea_body_exited"]

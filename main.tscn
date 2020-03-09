@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://engine/main.gd" type="Script" id=1]
 [ext_resource path="res://player/player.tscn" type="PackedScene" id=2]
 [ext_resource path="res://tiles/rgb_tileset.tres" type="TileSet" id=3]
 [ext_resource path="res://plants/support/support.tscn" type="PackedScene" id=4]
+[ext_resource path="res://enemies/spider/spider.tscn" type="PackedScene" id=5]
 
 [node name="main" type="Node"]
 script = ExtResource( 1 )
@@ -22,3 +23,6 @@ position = Vector2( 221.531, 613.554 )
 
 [node name="support2" parent="." instance=ExtResource( 4 )]
 position = Vector2( 497.359, 617.898 )
+
+[node name="spider" parent="." instance=ExtResource( 5 )]
+position = Vector2( 507.327, 310.427 )

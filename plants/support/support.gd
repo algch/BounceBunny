@@ -16,9 +16,14 @@ var health = 3.0
 
 func receiveDamage(damage):
 	health -= damage
+	print('sporte atacado')
 
 func attack(power):
 	var target = targets[targets.keys()[randi() % targets.size()]]
+	if target.is_queued_for_deletion():
+		targets.erase(target.get_instance_id())
+		return
+
 	var projectile = projectile_class.instance()
 	var direction = (target.position - position).normalized()
 	var offset = direction * WEAPON_RADIUS
