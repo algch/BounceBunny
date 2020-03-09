@@ -11,6 +11,12 @@ enum STATE {
 var current_state = STATE.idle
 var DEFAULT_POWER = 0.5
 
+var health = 3.0
+
+
+func receiveDamage(damage):
+	health -= damage
+
 func attack(power):
 	var target = targets[targets.keys()[randi() % targets.size()]]
 	var projectile = projectile_class.instance()
@@ -25,14 +31,14 @@ func attack(power):
 	get_node('/root/main/').add_child(projectile)
 
 func _on_Area2D_body_entered(body):
-	if body.get('TYPE') == 'enemy':
+	if body.is_in_group('enemies'):
 		targets[body.get_instance_id()] = body
 		if current_state != STATE.attacking:
 			attack_timer.start()
 			current_state = STATE.attacking
 
 func _on_Area2D_body_exited(body):
-	if body.get('TYPE') == 'enemy':
+	if body.is_in_group('enemies'):
 		targets.erase(body.get_instance_id())
 		if targets.empty():
 			attack_timer.stop()
@@ -42,3 +48,10 @@ func _on_Area2D_body_exited(body):
 func _on_attack_timer_timeout():
 	attack(0.5)
 	attack_timer.start()
+
+func healthLoop():
+	if health <= 0:
+		queue_free()
+
+func _physics_process(delta):
+	healthLoop()

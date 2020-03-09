@@ -26,7 +26,7 @@ func _ready():
 
 func receiveDamage(damage):
 	health -= damage
-	print('hijos de la verga')
+	print('¡Mi pierna!')
 
 func movementLoop():
 	var motion = motion_dir.normalized() * SPEED
