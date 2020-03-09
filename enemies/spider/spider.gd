@@ -18,8 +18,8 @@ var reachable_targets = {}
 var visible_targets = {}
 var current_target = null
 
-var motion_dir = Vector2(0, 0)
-var facing_dir = Vector2(0, 0)
+var motion_dir = Vector2(1, 0)
+var facing_dir = Vector2(0, 1)
 var rotation_speed = 1 # in degrees
 var rotation_dir = 1
 
@@ -64,11 +64,6 @@ func _ready():
 	attack_timer.connect('timeout', self, 'attack')
 	add_child(attack_timer)
 
-	motion_dir = Vector2(
-		cos(rotation + HALF_PI),
-		sin(rotation + HALF_PI)
-	)
-
 
 func handleWeaponCollision(weapon):
 	# TODO involve color mechanics here
@@ -88,25 +83,21 @@ func movementLoop(delta):
 	match current_state:
 		STATE.walk:
 			var motion = motion_dir.normalized() * SPEED * delta
-			if rad2deg(motion_dir.angle_to(facing_dir)) > 10:
-				rotation += deg2rad(rotation_speed * rotation_dir)
-				facing_dir = Vector2(
-					cos(rotation + HALF_PI),
-					sin(rotation + HALF_PI)
-				)
+			if abs(motion_dir.angle() - facing_dir.angle()) > HALF_PI/8.0:
+				motion_dir = motion_dir.rotated(deg2rad(rotation_speed * rotation_dir))
+			
+			print('facing angle = ', facing_dir.angle())
 
 			var collision = move_and_collide(motion)
+			rotation = facing_dir.angle() - HALF_PI
 
-			if collision:
-				current_state = STATE.rotate
+			# if collision:
+			# 	current_state = STATE.rotate
+			# 	print('collided, rotating')
 		STATE.rotate:
-			rotation += deg2rad(rotation_speed * rotation_dir)
-			facing_dir = Vector2(
-				cos(rotation + HALF_PI),
-				sin(rotation + HALF_PI)
-			)
+			facing_dir = facing_dir.rotated(deg2rad(rotation_speed * rotation_dir))
+			rotation = facing_dir.angle() - HALF_PI
 		STATE.walk_backwards:
-			print('walking backwards')
 			var motion = motion_dir.normalized() * SPEED * -1
 			move_and_slide(motion)
 		_:
@@ -150,6 +141,8 @@ func attackLoop():
 		attack_timer.stop()
 
 	if reachable_targets.empty():
+		if visible_targets.empty():
+			current_state = STATE.walk
 		while not visible_targets.empty():
 			var possible_target = visible_targets[visible_targets.keys()[0]]
 			if possible_target.is_queued_for_deletion():
@@ -191,6 +184,30 @@ func healthLoop():
 	if health <= 0:
 		# TODO leave loot
 		queue_free()
+
+func getStateName(state):
+	match state:
+		0:
+			return 'walk'
+		1:
+			return 'rotate'
+		2:
+			return 'walk_backwards'
+		3:
+			return 'attack'
+		_:
+				return ''
+
+func _draw():
+	draw_line(Vector2(0, 0), Vector2(0, 0) + motion_dir*200, Color(1, 0, 0))
+	draw_line(Vector2(0, 0), Vector2(0, 0) + facing_dir*200, Color(0.75, 0, 0.9))
+	var label = Label.new()
+	var font = label.get_font('')
+	draw_string(font, Vector2(0, -80), getStateName(current_state), Color(1, 1, 1))
+
+
+func _process(delta):
+	update()
 
 
 func _physics_process(delta):
