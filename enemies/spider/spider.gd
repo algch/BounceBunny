@@ -12,7 +12,7 @@ var blue_texture = preload('res://enemies/spider/sprites/blue_spider.png')
 var teleport_class = preload('res://plants/teleport/teleport.tscn')
 
 
-var movement_timer = Timer.new()
+var direction_timer = Timer.new()
 
 var reachable_targets = {}
 var visible_targets = {}
@@ -20,18 +20,17 @@ var current_target = null
 
 var motion_dir = Vector2(1, 0)
 var facing_dir = Vector2(0, 1)
-var rotation_speed = 1 # in degrees
+var rotation_speed = 90 # in degrees
 var rotation_dir = 1
 
 var colors = ['red', 'green', 'blue']
 var COLOR = null
 enum STATE {
-	walk,
-	rotate,
-	walk_backwards,
-	attack,
+	WANDER,
+	CHASE,
+	ATTACK,
 }
-var current_state = STATE.walk
+var current_state = STATE.WANDER
 
 var ATTACK_WAIT_TIME = 2
 var attack_timer = Timer.new()
@@ -57,11 +56,11 @@ func _ready():
 			$sprite.set_texture(blue_texture)
 		_:
 			$sprite.set_texture(red_texture)
-	movement_timer.connect('timeout', self, 'setRandomMovementAction')
+	direction_timer.connect('timeout', self, 'setRandomMovementAction')
 	var wait_time = randi() % 2 + 1
-	movement_timer.set_wait_time(wait_time)
-	movement_timer.start()
-	add_child(movement_timer)
+	direction_timer.set_wait_time(wait_time)
+	direction_timer.start()
+	add_child(direction_timer)
 
 	attack_timer.connect('timeout', self, 'attack')
 	add_child(attack_timer)
@@ -85,104 +84,78 @@ func handleWeaponCollision(weapon):
 	weapon.queue_free()
 
 
-func movementLoop(delta):
-	# STATE TRANSITION IS WRONG, THE SPIDER SHOULD FOLLOW ITS CURRENT TARGET
-	match current_state:
-		STATE.walk:
-			var motion = motion_dir.normalized() * SPEED * delta
-			if abs(motion_dir.angle() - facing_dir.angle()) > HALF_PI/8.0:
-				motion_dir = motion_dir.rotated(deg2rad(rotation_speed * rotation_dir))
-			
-			var collision = move_and_collide(motion)
-			rotation = facing_dir.angle() - HALF_PI
-
-			# if collision:
-			# 	current_state = STATE.rotate
-			# 	print('collided, rotating')
-		STATE.rotate:
-			facing_dir = facing_dir.rotated(deg2rad(rotation_speed * rotation_dir))
-			rotation = facing_dir.angle() - HALF_PI
-		STATE.walk_backwards:
-			var motion = motion_dir.normalized() * SPEED * -1
-			move_and_slide(motion)
-		_:
+func chaseLoop(delta):
+	if current_target and not current_target.is_queued_for_deletion():
+		motion_dir = (current_target.position - position).normalized()
+		var target_id = current_target.get_instance_id()
+		if reachable_targets.has(target_id):
+			current_state = STATE.ATTACK
 			return
+		if not visible_targets.has(target_id):
+			current_target = null
 
-
-# TODO replace these magic numbers
-# and refator this function
-func setRandomMovementAction():
-	var selected_state = STATE.rotate if current_state == STATE.walk else STATE.walk
-	var wait_time = 2
-	movement_timer.set_wait_time(wait_time)
-	movement_timer.start()
-	if current_state == STATE.attack:
+	if visible_targets.empty():
+		current_state = STATE.WANDER
 		return
 
-	rotation_dir = -1 if randi() % 2 == 0 else 1
+	while not visible_targets.empty():
+		var target = visible_targets[visible_targets.keys()[0]]
+		if is_instance_valid(target) and not target.is_queued_for_deletion():
+			current_target = target
+			break
+		else:
+			visible_targets.erase(target.get_instance_id())
 
-	current_state = selected_state
+
 
 func attack():
 	current_target.receiveDamage(damage)
 	attack_timer.set_wait_time(ATTACK_WAIT_TIME)
 	attack_timer.start()
 
-func attackLoop():
+func attackLoop(delta):
 	if current_target and not current_target.is_queued_for_deletion():
-		if current_target.get_instance_id() in reachable_targets:
-			if current_state != STATE.attack:
-				attack_timer.set_wait_time(ATTACK_WAIT_TIME)
-				attack_timer.start()
-				current_state = STATE.attack
-		else:
-			var motion_dir = (current_target.position - position).normalized()
-			STATE.walk
-
-		return
-
-	current_target = null
-	if not attack_timer.is_stopped():
+		attack_timer.set_wait_time(ATTACK_WAIT_TIME)
+		attack_timer.start()
+	else:
 		attack_timer.stop()
+		current_target = null
 
 	if reachable_targets.empty():
-		if visible_targets.empty():
-			current_state = STATE.walk
-		while not visible_targets.empty():
-			var possible_target = visible_targets[visible_targets.keys()[0]]
-			if possible_target.is_queued_for_deletion():
-				visible_targets.erase(possible_target.get_instance_id())
-			else:
-				current_target = possible_target
-				break
-	else:
-		while not reachable_targets.empty():
-			var possible_target = reachable_targets[reachable_targets.keys()[0]]
-			if possible_target.is_queued_for_deletion():
-				reachable_targets.erase(possible_target.get_instance_id())
-			else:
-				current_target = possible_target
-				break
+		current_state = STATE.CHASE
+		return
+
+	while not reachable_targets.empty():
+		var target = reachable_targets[reachable_targets.keys()[0]]
+		if is_instance_valid(target) and not target.is_queued_for_deletion():
+			current_target = target
+			break
+		else:
+			reachable_targets.erase(target.get_instance_id())
 
 
 func on_attackArea_body_entered(body):
 	if body.is_in_group('attacked_by_enemies'):
-		reachable_targets[body.get_instance_id()] = body
+		var body_id = body.get_instance_id()
+		reachable_targets[body_id] = body
 
 
 func on_attackArea_body_exited(body):
-	if body.is_in_group('attacked_by_enemies'):
-		reachable_targets.erase(body.get_instance_id())
+	var body_id = body.get_instance_id()
+	if body.is_in_group('attacked_by_enemies') and reachable_targets.has(body_id):
+		reachable_targets.erase(body_id)
 
 
 func on_visionArea_body_entered(body):
 	if body.is_in_group('attacked_by_enemies'):
-		visible_targets[body.get_instance_id()] = body
+		var body_id = body.get_instance_id()
+		visible_targets[body_id] = body
 
 
 func on_visionArea_body_exited(body):
-	if body.is_in_group('attacked_by_enemies'):
-		visible_targets.erase(body.get_instance_id())
+	var body_id = body.get_instance_id()
+	if visible_targets.has(body_id):
+		visible_targets.erase(body_id)
 
 
 func healthLoop():
@@ -193,19 +166,17 @@ func healthLoop():
 func getStateName(state):
 	match state:
 		0:
-			return 'walk'
+			return 'WANDER'
 		1:
-			return 'rotate'
+			return 'CHASE'
 		2:
-			return 'walk_backwards'
-		3:
-			return 'attack'
+			return 'ATTACK'
 		_:
 				return ''
 
 func _draw():
-	draw_line(Vector2(0, 0), Vector2(0, 0) + motion_dir*200, Color(1, 0, 0))
-	draw_line(Vector2(0, 0), Vector2(0, 0) + facing_dir*200, Color(0.75, 0, 0.9))
+	draw_line(Vector2(0, 0), Vector2(0, 0) + motion_dir*200, Color(0, 1, 0.5))
+	draw_line(Vector2(0, 0), Vector2(0, 0) + facing_dir*200, Color(1, 1, 0))
 	var message = 'state: ' + getStateName(current_state) + ' rotation: ' + str(rad2deg(rotation))
 	draw_string(default_font, Vector2(-200, -80),  message, Color(1, 1, 1))
 
@@ -213,8 +184,36 @@ func _draw():
 func _process(delta):
 	update()
 
+func changeDirection():
+	direction_timer.set_wait_time(2.5)
+	direction_timer.start()
+
+	motion_dir = Vector2(randi(), randi()).normalized()
+
+func wanderLoop(delta):
+		var motion = motion_dir.normalized() * SPEED * delta
+		if rad2deg(motion_dir.angle() - facing_dir.angle()) > 1:
+			facing_dir = facing_dir.rotated(deg2rad(rotation_speed * rotation_dir * delta))
+		
+		var collision = move_and_collide(motion)
+		$sprite.rotation = facing_dir.angle() - HALF_PI
+
+		if collision:
+			facing_dir *= -1
+
+
+func behaviorLoop(delta):
+	match current_state:
+		STATE.WANDER:
+			wanderLoop(delta)
+		STATE.CHASE:
+			chaseLoop(delta)
+		STATE.ATTACK:
+			attackLoop(delta)
+		_:
+			return
+
 
 func _physics_process(delta):
 	healthLoop()
-	movementLoop(delta)
-	attackLoop()
+	behaviorLoop(delta)
