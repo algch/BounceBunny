@@ -18,7 +18,7 @@ var reachable_targets = {}
 var visible_targets = {}
 var current_target = null
 
-var motion_dir = Vector2(1, 0)
+var motion_dir = Vector2(-1, 0)
 var facing_dir = Vector2(0, 1)
 var rotation_speed = 90 # in degrees
 var rotation_dir = 1
@@ -36,9 +36,10 @@ var ATTACK_WAIT_TIME = 2
 var attack_timer = Timer.new()
 
 var damage = 1.0
-var health = 300.0
+var health = 3.0
 
 var default_font = DynamicFont.new()
+var DIRECTION_CHANGE_INTERVAL = 3.0
 
 
 onready var player = get_node('/root/main/player')
@@ -56,7 +57,7 @@ func _ready():
 			$sprite.set_texture(blue_texture)
 		_:
 			$sprite.set_texture(red_texture)
-	direction_timer.connect('timeout', self, 'setRandomMovementAction')
+	direction_timer.connect('timeout', self, 'changeDirection')
 	var wait_time = randi() % 2 + 1
 	direction_timer.set_wait_time(wait_time)
 	direction_timer.start()
@@ -85,8 +86,19 @@ func handleWeaponCollision(weapon):
 
 
 func chaseLoop(delta):
+	# Handle this in a better way
+	if not direction_timer.is_stopped():
+		direction_timer.stop()
+
 	if current_target and not current_target.is_queued_for_deletion():
+
 		motion_dir = (current_target.position - position).normalized()
+		var motion = motion_dir.normalized() * SPEED * delta
+
+		updateFacingDir(delta)
+
+		var collision = move_and_collide(motion)
+
 		var target_id = current_target.get_instance_id()
 		if reachable_targets.has(target_id):
 			current_state = STATE.ATTACK
@@ -114,9 +126,15 @@ func attack():
 	attack_timer.start()
 
 func attackLoop(delta):
+	# Handle this in a better way
+	if not direction_timer.is_stopped():
+		direction_timer.stop()
+
 	if current_target and not current_target.is_queued_for_deletion():
-		attack_timer.set_wait_time(ATTACK_WAIT_TIME)
-		attack_timer.start()
+		if attack_timer.is_stopped():
+			attack_timer.set_wait_time(ATTACK_WAIT_TIME)
+			attack_timer.start()
+		updateFacingDir(delta)
 	else:
 		attack_timer.stop()
 		current_target = null
@@ -139,9 +157,14 @@ func on_attackArea_body_entered(body):
 		var body_id = body.get_instance_id()
 		reachable_targets[body_id] = body
 
+		if not current_target:
+			current_state = STATE.ATTACK
+
 
 func on_attackArea_body_exited(body):
 	var body_id = body.get_instance_id()
+	if current_target and current_target.get_instance_id() == body_id:
+		current_target = null
 	if body.is_in_group('attacked_by_enemies') and reachable_targets.has(body_id):
 		reachable_targets.erase(body_id)
 
@@ -151,9 +174,14 @@ func on_visionArea_body_entered(body):
 		var body_id = body.get_instance_id()
 		visible_targets[body_id] = body
 
+		if not current_target:
+			current_state = STATE.CHASE
+
 
 func on_visionArea_body_exited(body):
 	var body_id = body.get_instance_id()
+	if current_target and current_target.get_instance_id() == body_id:
+		current_target = null
 	if visible_targets.has(body_id):
 		visible_targets.erase(body_id)
 
@@ -177,7 +205,7 @@ func getStateName(state):
 func _draw():
 	draw_line(Vector2(0, 0), Vector2(0, 0) + motion_dir*200, Color(0, 1, 0.5))
 	draw_line(Vector2(0, 0), Vector2(0, 0) + facing_dir*200, Color(1, 1, 0))
-	var message = 'state: ' + getStateName(current_state) + ' rotation: ' + str(rad2deg(rotation))
+	var message = 'state: ' + getStateName(current_state) + ' rotation: ' + str(rad2deg($sprite.rotation))
 	draw_string(default_font, Vector2(-200, -80),  message, Color(1, 1, 1))
 
 
@@ -185,21 +213,38 @@ func _process(delta):
 	update()
 
 func changeDirection():
-	direction_timer.set_wait_time(2.5)
+	direction_timer.set_wait_time(DIRECTION_CHANGE_INTERVAL)
 	direction_timer.start()
 
-	motion_dir = Vector2(randi(), randi()).normalized()
+	var angle = randf() * HALF_PI/2.0 * rotation_dir
+
+	motion_dir = motion_dir.rotated(angle)
+
+func updateFacingDir(delta):
+	# this function has a bug
+	var angle_diff = rad2deg(motion_dir.angle() - facing_dir.angle())
+	rotation_dir = -1 if angle_diff <= 0 else 1
+	if abs(angle_diff) > 2:
+		facing_dir = facing_dir.rotated(deg2rad(rotation_speed * rotation_dir * delta))
+
+	var angle = facing_dir.angle() - HALF_PI
+	
+	$sprite.rotation = angle
+	$visionArea.rotation = angle
+
 
 func wanderLoop(delta):
-		var motion = motion_dir.normalized() * SPEED * delta
-		if rad2deg(motion_dir.angle() - facing_dir.angle()) > 1:
-			facing_dir = facing_dir.rotated(deg2rad(rotation_speed * rotation_dir * delta))
-		
-		var collision = move_and_collide(motion)
-		$sprite.rotation = facing_dir.angle() - HALF_PI
+		if direction_timer.is_stopped():
+			direction_timer.set_wait_time(DIRECTION_CHANGE_INTERVAL)
+			direction_timer.start()
 
-		if collision:
-			facing_dir *= -1
+		var motion = motion_dir.normalized() * SPEED * delta
+		updateFacingDir(delta)
+
+		# how can we handle collisions properly?
+		var collision = move_and_collide(motion)
+		# if collision:
+		# 	motion_dir *= -1
 
 
 func behaviorLoop(delta):

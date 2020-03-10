@@ -1,6 +1,6 @@
 extends KinematicBody2D
 
-var SPEED = 100
+var SPEED = 500
 
 var TYPE = 'player'
 
