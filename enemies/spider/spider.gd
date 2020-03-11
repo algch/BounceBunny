@@ -134,6 +134,7 @@ func attackLoop(delta):
 		if attack_timer.is_stopped():
 			attack_timer.set_wait_time(ATTACK_WAIT_TIME)
 			attack_timer.start()
+		motion_dir = (current_target.position - position).normalized()
 		updateFacingDir(delta)
 	else:
 		attack_timer.stop()
@@ -158,6 +159,7 @@ func on_attackArea_body_entered(body):
 		reachable_targets[body_id] = body
 
 		if not current_target:
+			motion_dir = (body.position - position).normalized()
 			current_state = STATE.ATTACK
 
 
@@ -175,6 +177,7 @@ func on_visionArea_body_entered(body):
 		visible_targets[body_id] = body
 
 		if not current_target:
+			motion_dir = (body.position - position).normalized()
 			current_state = STATE.CHASE
 
 
@@ -205,12 +208,15 @@ func getStateName(state):
 func _draw():
 	draw_line(Vector2(0, 0), Vector2(0, 0) + motion_dir*200, Color(0, 1, 0.5))
 	draw_line(Vector2(0, 0), Vector2(0, 0) + facing_dir*200, Color(1, 1, 0))
-	var message = 'state: ' + getStateName(current_state) + ' rotation: ' + str(rad2deg($sprite.rotation))
+	var left_side = facing_dir.rotated(-HALF_PI)
+	draw_line(Vector2(0, 0), Vector2(0, 0) + left_side*200, Color(1, 1, 1))
+	var message = 'state: ' + getStateName(current_state) + ' rotation_dir: ' + str(rotation_dir)
 	draw_string(default_font, Vector2(-200, -80),  message, Color(1, 1, 1))
 
 
 func _process(delta):
 	update()
+
 
 func changeDirection():
 	direction_timer.set_wait_time(DIRECTION_CHANGE_INTERVAL)
@@ -220,10 +226,16 @@ func changeDirection():
 
 	motion_dir = motion_dir.rotated(angle)
 
+
 func updateFacingDir(delta):
-	# this function has a bug
+	var left_side = facing_dir.rotated(-HALF_PI)
+	var is_on_left = left_side.normalized().dot(motion_dir.normalized()) >= 0
+	if is_on_left:
+		rotation_dir = -1
+	else:
+		rotation_dir = 1
+
 	var angle_diff = rad2deg(motion_dir.angle() - facing_dir.angle())
-	rotation_dir = -1 if angle_diff <= 0 else 1
 	if abs(angle_diff) > 2:
 		facing_dir = facing_dir.rotated(deg2rad(rotation_speed * rotation_dir * delta))
 
@@ -234,17 +246,17 @@ func updateFacingDir(delta):
 
 
 func wanderLoop(delta):
-		if direction_timer.is_stopped():
-			direction_timer.set_wait_time(DIRECTION_CHANGE_INTERVAL)
-			direction_timer.start()
+	if direction_timer.is_stopped():
+		direction_timer.set_wait_time(DIRECTION_CHANGE_INTERVAL)
+		direction_timer.start()
 
-		var motion = motion_dir.normalized() * SPEED * delta
-		updateFacingDir(delta)
+	var motion = motion_dir.normalized() * SPEED * delta
+	updateFacingDir(delta)
 
-		# how can we handle collisions properly?
-		var collision = move_and_collide(motion)
-		# if collision:
-		# 	motion_dir *= -1
+	# how can we handle collisions properly?
+	var collision = move_and_collide(motion)
+	if collision:
+		motion_dir *= -1
 
 
 func behaviorLoop(delta):

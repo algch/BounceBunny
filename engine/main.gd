@@ -58,7 +58,7 @@ func spawnEnemy():
 	spider.position = pos_tester.position
 
 func spawnLoop():
-	if shouldSpawn:
+	if shouldSpawn and len(get_tree().get_nodes_in_group('enemies')) < 5:
 		spawnEnemy()
 		spawn_timer.set_wait_time(2.5)
 		spawn_timer.start()
