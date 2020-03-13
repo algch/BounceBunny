@@ -10,6 +10,7 @@ var green_texture = preload('res://enemies/spider/sprites/green_spider.png')
 var blue_texture = preload('res://enemies/spider/sprites/blue_spider.png')
 
 var teleport_class = preload('res://plants/teleport/teleport.tscn')
+var item_class = preload('res://items/item.tscn')
 
 
 var direction_timer = Timer.new()
@@ -189,10 +190,19 @@ func on_visionArea_body_exited(body):
 		visible_targets.erase(body_id)
 
 
+func leaveLoot():
+	# TODO create func: calculateChance(probability): -> bool
+	if randf() <= 0.25:
+		var item = item_class.instance()
+		item.position = position
+		get_parent().add_child(item)
+
+
 func healthLoop():
 	if health <= 0:
-		# TODO leave loot
 		queue_free()
+		leaveLoot()
+
 
 func getStateName(state):
 	match state:
