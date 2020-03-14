@@ -28,7 +28,6 @@ var health = 10.0
 func _ready():
 	charge_timer.connect('timeout', self, '_on_charge_timer_timeout')
 	add_child(charge_timer)
-	print('globals ', globals)
 
 func addItem(item):
 	items[item.TYPE] += 1
