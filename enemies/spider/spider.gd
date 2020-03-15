@@ -33,7 +33,7 @@ enum STATE {
 }
 var current_state = STATE.WANDER
 
-var ATTACK_WAIT_TIME = 2
+var ATTACK_WAIT_TIME = 1.0
 var attack_timer = Timer.new()
 
 var damage = 1.0
@@ -73,10 +73,11 @@ func _ready():
 
 
 func handleWeaponCollision(weapon):
+	# TODO ADD KNOCKBACK
 	# TODO involve color mechanics here
 	health -= weapon.damage
 
-	# LOOK AT WEAPON
+	# LOOK AT weapon
 	# if current_state != STATE.FIND_TARGET or current_state != STATE.attack:
 	# 	var weapon_dir = (weapon.position - position).normalized()
 	# 	if motion_dir.dot(weapon_dir) < 0:

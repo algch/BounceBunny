@@ -1,6 +1,6 @@
 extends StaticBody2D
 
-var projectile_class = preload('res://weapons/projectile.tscn')
+var projectile_class = preload('res://weapons/projectile/projectile.tscn')
 var targets = {}
 var WEAPON_RADIUS = 57
 onready var attack_timer = get_node('attack_timer')

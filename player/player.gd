@@ -7,7 +7,11 @@ var TYPE = 'player'
 # how far from the player will the projectile be placed
 var WEAPON_RADIUS = 113
 var motion_dir = Vector2(0, 0)
-onready var projectile_class = preload('res://weapons/projectile.tscn')
+onready var projectile_class = preload('res://weapons/projectile/projectile.tscn')
+onready var support_class = preload('res://plants/support/support.tscn')
+onready var attack_texture = preload('res://player/sprites/tito-shooting-01.png')
+onready var summon_texture = preload('res://player/sprites/tito-pixelart-01.png')
+onready var summon_class = preload('res://weapons/summon/summon.tscn')
 var CHARGE_WAIT_TIME = 1.0
 var MAX_SHOOT_LENGTH = 200
 onready var items = {
@@ -21,6 +25,7 @@ enum STATE {
 	charging
 }
 var current_state = STATE.idle
+var current_weapon = globals.PROJECTILE_TYPES.ATTACK
 var shoot_point_start = null
 
 var health = 10.0
@@ -28,6 +33,34 @@ var health = 10.0
 
 func _ready():
 	pass
+
+func changeWeapon():
+	if current_state == STATE.charging:
+		return
+	match current_weapon:
+		globals.PROJECTILE_TYPES.ATTACK:
+			current_weapon = globals.PROJECTILE_TYPES.SUMMON
+			$sprite.set_texture(summon_texture)
+		globals.PROJECTILE_TYPES.SUMMON:
+			current_weapon = globals.PROJECTILE_TYPES.ATTACK
+			$sprite.set_texture(attack_texture)
+
+func summonSupport(power, direction):
+	if items[globals.ITEM_TYPES.SUPPORT] <= 0:
+		print('NO HAY SEMILLAS')
+		return
+
+	var support = support_class.instance()
+	var summon = summon_class.instance()
+	var offset = direction * WEAPON_RADIUS
+
+	summon.position = position + offset
+	summon.direction = direction
+	summon.power = power
+	summon.type = globals.PROJECTILE_TYPES.SUMMON
+
+	get_node('/root/main/').add_child(summon)
+	items[globals.ITEM_TYPES.SUPPORT] -= 1
 
 func addItem(item):
 	items[item.TYPE] += 1
@@ -49,6 +82,7 @@ func attack(power, direction):
 	projectile.position = position + offset
 	projectile.direction = direction
 	projectile.power = power
+	projectile.type = globals.PROJECTILE_TYPES.ATTACK
 
 	get_node('/root/main/').add_child(projectile)
 
@@ -64,7 +98,7 @@ func pollInput():
 
 	motion_dir =  Vector2(X, Y)
 
-	if Input.is_action_pressed('touch') and current_state != STATE.charging:
+	if Input.is_action_pressed('touch') and current_state != STATE.charging and not $weaponSwitcher.is_pressed():
 		current_state = STATE.charging
 		shoot_point_start = get_global_mouse_position()
 		
@@ -78,7 +112,10 @@ func pollInput():
 		current_state = STATE.idle
 		if power >= 0.5:
 			var direction = (shoot_point_start - get_global_mouse_position()).normalized()
-			attack(power, direction)
+			if current_weapon == globals.PROJECTILE_TYPES.ATTACK:
+				attack(power, direction)
+			if current_weapon == globals.PROJECTILE_TYPES.SUMMON:
+				summonSupport(power, direction)	
 
 
 func _draw():
@@ -87,7 +124,7 @@ func _draw():
 	draw_circle(
 		shoot_point_start - position,
 		(get_global_mouse_position() - shoot_point_start).length(),
-		Color(1, 1, 1, 0.5)
+		Color(1, 1, 1, 0.25)
 	)
 	var color = Color(1, 1, 1) if (get_global_mouse_position() - shoot_point_start).length() < MAX_SHOOT_LENGTH else Color(1, 0, 0)
 	draw_line(Vector2(0, 0), shoot_point_start - get_global_mouse_position(), color)
@@ -99,5 +136,4 @@ func _process(delta):
 
 func _physics_process(delta):
 	pollInput()
-
 	movementLoop()

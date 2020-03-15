@@ -1,9 +1,10 @@
 extends KinematicBody2D
 
-var red_texture = preload('res://weapons/sprites/red_projectile.png')
-var green_texture = preload('res://weapons/sprites/green_projectile.png')
-var blue_texture = preload('res://weapons/sprites/blue_projectile.png')
-var debug_texture = preload('res://weapons/sprites/debug_projectile.png')
+onready var red_texture = preload('res://weapons/projectile/sprites/red_projectile.png')
+onready var green_texture = preload('res://weapons/projectile/sprites/green_projectile.png')
+onready var blue_texture = preload('res://weapons/projectile/sprites/blue_projectile.png')
+onready var debug_texture = preload('res://weapons/projectile/sprites/debug_projectile.png')
+# onready var support_class = preload('res://plants/support/support.tscn')
 
 var direction = Vector2(0,0)
 var distance_to_tip
@@ -17,6 +18,8 @@ var damage
 var MAX_TRAVEL_TIME = 2.0
 var travel_time
 
+var type = null
+
 var travel_timer = Timer.new()
 
 var COLOR_ENUM = {
@@ -25,6 +28,8 @@ var COLOR_ENUM = {
 	2: 'blue'
 }
 var COLOR = null
+
+# TODO this whole file needs refactor
 
 
 func _ready():
@@ -42,7 +47,7 @@ func _ready():
 
 
 func travelEnded():
-	queue_free()
+    print('NOT IMPLEMENTED')
 
 
 func getTipPosition():
@@ -60,26 +65,3 @@ func setColor(tile_type):
 			$sprite.set_texture(green_texture)
 		'blue':
 			$sprite.set_texture(blue_texture)
-
-
-func _physics_process(delta):
-	var motion = direction * speed * delta
-	var collision = move_and_collide(motion)
-
-	if collision:
-		var collider = collision.collider
-		var tip_position = getTipPosition()
-
-		if collider is TileMap:
-			var tile_pos = collider.world_to_map(tip_position) - collision.normal
-			var tile = collision.collider.get_cellv(tile_pos)
-
-			if tile != -1:
-				setColor(tile)
-		var collider_type = collider.get('TYPE')
-
-		if collider.is_in_group('affected_by_weapons'):
-			collider.handleWeaponCollision(self)
-
-		direction = direction.bounce(collision.normal)
-		rotation = direction.angle() + PI/2.0

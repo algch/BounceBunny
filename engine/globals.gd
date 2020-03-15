@@ -5,3 +5,8 @@ enum ITEM_TYPES {
     BOOST,
     HEAL,
 }
+
+enum PROJECTILE_TYPES {
+    ATTACK,
+    SUMMON,
+}
