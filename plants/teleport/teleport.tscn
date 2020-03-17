@@ -8,6 +8,7 @@ extents = Vector2( 80, 80 )
 
 [node name="teleport" type="StaticBody2D" groups=[
 "affected_by_weapons",
+"attacked_by_enemies",
 ]]
 script = ExtResource( 1 )
 

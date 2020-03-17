@@ -30,9 +30,11 @@ var shoot_point_start = null
 var MAX_HEALTH = 10.0
 var health = MAX_HEALTH
 
+var default_font = DynamicFont.new()
 
 func _ready():
-	pass
+	default_font.font_data = load('res://fonts/default-font.ttf')
+	default_font.size = 22
 
 func healthLoop():
 	if health <= 0 and not is_queued_for_deletion():
@@ -169,8 +171,23 @@ func pollInput():
 			if current_weapon == globals.PROJECTILE_TYPES.TELEPORT:
 				summonTeleport(power, direction)
 
+func getWeaponString():
+	match current_weapon:
+		0:
+			return 'ATTACK'
+		1:
+			return 'SUMMON'
+		2:
+			return 'SCORE'
+		3:
+			return 'TELEPORT'
+
 
 func _draw():
+	var score = get_node('/root/main/').score
+	var weapon_str = getWeaponString()
+	var message = 'weapon: ' + weapon_str + ' score: ' + str(score)
+	draw_string(default_font, Vector2(-20, -80),  message, Color(1, 1, 1))
 	if current_state != STATE.charging:
 		return
 	draw_circle(
