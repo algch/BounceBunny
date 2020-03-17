@@ -16,6 +16,10 @@ var Y
 var last_tile = null
 var spawn_timer = Timer.new()
 var shouldSpawn = false
+onready var player = get_node('player')
+var GAME_OVER = false
+var score = 0
+
 
 func getRandomPosition():
 	return Vector2(
@@ -42,7 +46,6 @@ func spawnEnemy():
 	add_child(pos_tester)
 	yield(get_tree(), "physics_frame")
 	
-	var player = get_node('player')
 	var dist_to_player = player.position.distance_to(pos_tester.position)
 
 	var overlap = pos_tester.get_overlapping_bodies() + pos_tester.get_overlapping_areas()
@@ -125,4 +128,5 @@ func _ready():
 	spawn_timer.start()
 
 func _physics_process(delta):
-	spawnLoop()
+	if not GAME_OVER:
+		spawnLoop()

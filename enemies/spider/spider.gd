@@ -193,7 +193,7 @@ func on_visionArea_body_exited(body):
 
 func leaveLoot():
 	# TODO create func: calculateChance(probability): -> bool
-	if randf() <= 0.25:
+	if globals.calculateChance(0.25):
 		var item = item_class.instance()
 		item.position = position
 		get_parent().add_child(item)

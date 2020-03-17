@@ -8,7 +8,6 @@ var TYPE = 'player'
 var WEAPON_RADIUS = 113
 var motion_dir = Vector2(0, 0)
 onready var projectile_class = preload('res://weapons/projectile/projectile.tscn')
-onready var support_class = preload('res://plants/support/support.tscn')
 onready var attack_texture = preload('res://player/sprites/tito-shooting-01.png')
 onready var summon_texture = preload('res://player/sprites/tito-pixelart-01.png')
 onready var summon_class = preload('res://weapons/summon/summon.tscn')
@@ -16,8 +15,8 @@ var CHARGE_WAIT_TIME = 1.0
 var MAX_SHOOT_LENGTH = 200
 onready var items = {
 	globals.ITEM_TYPES.SUPPORT: 0,
-	globals.ITEM_TYPES.BOOST: 0,
-	globals.ITEM_TYPES.HEAL: 0,
+	globals.ITEM_TYPES.TELEPORT: 0,
+	globals.ITEM_TYPES.SCORE: 0,
 }
 
 enum STATE {
@@ -28,11 +27,22 @@ var current_state = STATE.idle
 var current_weapon = globals.PROJECTILE_TYPES.ATTACK
 var shoot_point_start = null
 
-var health = 10.0
+var MAX_HEALTH = 10.0
+var health = MAX_HEALTH
 
 
 func _ready():
 	pass
+
+func healthLoop():
+	if health <= 0 and not is_queued_for_deletion():
+		get_node('/root/main/').GAME_OVER = true
+		# GAME OVER
+		queue_free()
+
+func heal(points):
+	if (health + points) <= MAX_HEALTH:
+		health += points
 
 func changeWeapon():
 	if current_state == STATE.charging:
@@ -42,6 +52,12 @@ func changeWeapon():
 			current_weapon = globals.PROJECTILE_TYPES.SUMMON
 			$sprite.set_texture(summon_texture)
 		globals.PROJECTILE_TYPES.SUMMON:
+			current_weapon = globals.PROJECTILE_TYPES.TELEPORT
+			$sprite.set_texture(summon_texture)
+		globals.PROJECTILE_TYPES.TELEPORT:
+			current_weapon = globals.PROJECTILE_TYPES.SCORE
+			$sprite.set_texture(summon_texture)
+		globals.PROJECTILE_TYPES.SCORE:
 			current_weapon = globals.PROJECTILE_TYPES.ATTACK
 			$sprite.set_texture(attack_texture)
 
@@ -50,17 +66,49 @@ func summonSupport(power, direction):
 		print('NO HAY SEMILLAS')
 		return
 
-	var support = support_class.instance()
 	var summon = summon_class.instance()
 	var offset = direction * WEAPON_RADIUS
 
 	summon.position = position + offset
 	summon.direction = direction
 	summon.power = power
-	summon.type = globals.PROJECTILE_TYPES.SUMMON
+	summon.type = globals.ITEM_TYPES.SUPPORT
 
 	get_node('/root/main/').add_child(summon)
 	items[globals.ITEM_TYPES.SUPPORT] -= 1
+
+func summonScore(power, direction):
+	if items[globals.ITEM_TYPES.SCORE] <= 0:
+		print('NO HAY SEMILLAS')
+		return
+
+	var summon = summon_class.instance()
+	var offset = direction * WEAPON_RADIUS
+
+	summon.position = position + offset
+	summon.direction = direction
+	summon.power = power
+	summon.type = globals.ITEM_TYPES.SCORE
+
+	get_node('/root/main/').add_child(summon)
+	items[globals.ITEM_TYPES.SCORE] -= 1
+
+func summonTeleport(power, direction):
+	if items[globals.ITEM_TYPES.TELEPORT] <= 0:
+		print('NO HAY SEMILLAS')
+		return
+
+	var summon = summon_class.instance()
+	var offset = direction * WEAPON_RADIUS
+
+	summon.position = position + offset
+	summon.direction = direction
+	summon.power = power
+	summon.type = globals.ITEM_TYPES.TELEPORT
+
+	get_node('/root/main/').add_child(summon)
+	items[globals.ITEM_TYPES.SCORE] -= 1
+
 
 func addItem(item):
 	items[item.TYPE] += 1
@@ -116,6 +164,10 @@ func pollInput():
 				attack(power, direction)
 			if current_weapon == globals.PROJECTILE_TYPES.SUMMON:
 				summonSupport(power, direction)	
+			if current_weapon == globals.PROJECTILE_TYPES.SCORE:
+				summonScore(power, direction)
+			if current_weapon == globals.PROJECTILE_TYPES.TELEPORT:
+				summonTeleport(power, direction)
 
 
 func _draw():
@@ -136,4 +188,5 @@ func _process(delta):
 
 func _physics_process(delta):
 	pollInput()
+	healthLoop()
 	movementLoop()

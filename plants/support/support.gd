@@ -49,6 +49,9 @@ func _on_Area2D_body_exited(body):
 			attack_timer.stop()
 			current_state = STATE.idle
 
+func handleWeaponCollision(weapon):
+	health -= weapon.damage
+	weapon.queue_free()
 
 func _on_attack_timer_timeout():
 	attack(0.5)

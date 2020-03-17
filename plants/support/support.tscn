@@ -10,6 +10,7 @@ extents = Vector2( 40, 40 )
 radius = 160.0
 
 [node name="support" type="StaticBody2D" groups=[
+"affected_by_weapons",
 "attacked_by_enemies",
 ]]
 script = ExtResource( 1 )
