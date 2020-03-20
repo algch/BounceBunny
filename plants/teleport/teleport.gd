@@ -33,5 +33,5 @@ func _physics_process(delta):
 	healthLoop()
 
 func _draw():
-	var message = 'SCORE'
+	var message = 'TELEPORT'
 	draw_string(default_font, Vector2(-20, -80),  message, Color(1, 1, 1))
