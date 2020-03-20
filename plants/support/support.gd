@@ -12,7 +12,12 @@ var current_state = STATE.idle
 var DEFAULT_POWER = 0.5
 
 var health = 3.0
+var default_font = DynamicFont.new()
 
+
+func _ready():
+	default_font.font_data = load('res://fonts/default-font.ttf')
+	default_font.size = 22
 
 func receiveDamage(damage):
 	health -= damage
@@ -63,3 +68,7 @@ func healthLoop():
 
 func _physics_process(delta):
 	healthLoop()
+
+func _draw():
+	var message = 'SUPPORT'
+	draw_string(default_font, Vector2(-20, -80),  message, Color(1, 1, 1))
