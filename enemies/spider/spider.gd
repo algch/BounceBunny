@@ -9,7 +9,6 @@ var red_texture = preload('res://enemies/spider/sprites/red_spider.png')
 var green_texture = preload('res://enemies/spider/sprites/green_spider.png')
 var blue_texture = preload('res://enemies/spider/sprites/blue_spider.png')
 
-var teleport_class = preload('res://plants/teleport/teleport.tscn')
 var item_class = preload('res://items/item.tscn')
 
 

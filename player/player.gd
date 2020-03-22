@@ -1,4 +1,4 @@
-extends KinematicBody2D
+extends Sprite
 
 var SPEED = 500
 
@@ -32,6 +32,8 @@ var health = MAX_HEALTH
 
 var default_font = DynamicFont.new()
 
+var current_plant_id = null
+
 func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
@@ -52,18 +54,13 @@ func changeWeapon():
 	match current_weapon:
 		globals.PROJECTILE_TYPES.ATTACK:
 			current_weapon = globals.PROJECTILE_TYPES.SUMMON
-			$sprite.set_texture(summon_texture)
+			set_texture(summon_texture)
 		globals.PROJECTILE_TYPES.SUMMON:
-			current_weapon = globals.PROJECTILE_TYPES.TELEPORT
-			$sprite.set_texture(summon_texture)
-		globals.PROJECTILE_TYPES.TELEPORT:
-			current_weapon = globals.PROJECTILE_TYPES.SCORE
-			$sprite.set_texture(summon_texture)
-		globals.PROJECTILE_TYPES.SCORE:
 			current_weapon = globals.PROJECTILE_TYPES.ATTACK
-			$sprite.set_texture(attack_texture)
+			set_texture(summon_texture)
 
-func summonSupport(power, direction):
+
+func summonPlant(power, direction):
 	if items[globals.ITEM_TYPES.SUPPORT] <= 0:
 		print('NO HAY SEMILLAS')
 		return
@@ -79,38 +76,6 @@ func summonSupport(power, direction):
 	get_node('/root/main/').add_child(summon)
 	items[globals.ITEM_TYPES.SUPPORT] -= 1
 
-func summonScore(power, direction):
-	if items[globals.ITEM_TYPES.SCORE] <= 0:
-		print('NO HAY SEMILLAS')
-		return
-
-	var summon = summon_class.instance()
-	var offset = direction * WEAPON_RADIUS
-
-	summon.position = position + offset
-	summon.direction = direction
-	summon.power = power
-	summon.type = globals.ITEM_TYPES.SCORE
-
-	get_node('/root/main/').add_child(summon)
-	items[globals.ITEM_TYPES.SCORE] -= 1
-
-func summonTeleport(power, direction):
-	if items[globals.ITEM_TYPES.TELEPORT] <= 0:
-		print('NO HAY SEMILLAS')
-		return
-
-	var summon = summon_class.instance()
-	var offset = direction * WEAPON_RADIUS
-
-	summon.position = position + offset
-	summon.direction = direction
-	summon.power = power
-	summon.type = globals.ITEM_TYPES.TELEPORT
-
-	get_node('/root/main/').add_child(summon)
-	items[globals.ITEM_TYPES.SCORE] -= 1
-
 
 func addItem(item):
 	items[item.TYPE] += 1
@@ -119,10 +84,6 @@ func addItem(item):
 func receiveDamage(damage):
 	health -= damage
 	print('¡Mi pierna!')
-
-func movementLoop():
-	var motion = motion_dir.normalized() * SPEED
-	move_and_slide(motion)
 
 
 func attack(power, direction):
@@ -165,11 +126,7 @@ func pollInput():
 			if current_weapon == globals.PROJECTILE_TYPES.ATTACK:
 				attack(power, direction)
 			if current_weapon == globals.PROJECTILE_TYPES.SUMMON:
-				summonSupport(power, direction)	
-			if current_weapon == globals.PROJECTILE_TYPES.SCORE:
-				summonScore(power, direction)
-			if current_weapon == globals.PROJECTILE_TYPES.TELEPORT:
-				summonTeleport(power, direction)
+				summonPlant(power, direction)	
 
 func getWeaponString():
 	match current_weapon:
@@ -206,4 +163,3 @@ func _process(delta):
 func _physics_process(delta):
 	pollInput()
 	healthLoop()
-	movementLoop()
