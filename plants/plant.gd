@@ -27,6 +27,7 @@ func receiveDamage(damage):
 func healthLoop():
 	if health <= 0:
 		queue_free()
+		main.removePlant()
 
 func handleWeaponCollision(weapon):
 	health -= weapon.damage
@@ -53,6 +54,7 @@ func _on_Area2D_body_entered(body):
 	if body.is_in_group('enemies'):
 		targets[body.get_instance_id()] = body
 		if current_state != STATE.attacking:
+			print('Atacnado!!')
 			attack_timer.start()
 			current_state = STATE.attacking
 
@@ -78,6 +80,7 @@ func _on_teleport_released():
 func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
+	main.addPlant()
 
 func _physics_process(delta):
 	healthLoop()

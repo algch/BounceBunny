@@ -9,8 +9,8 @@ extents = Vector2( 40, 40 )
 radius = 90.0
 
 [node name="spider" type="KinematicBody2D" groups=[
-"enemies",
 "affected_by_weapons",
+"enemies",
 ]]
 script = ExtResource( 1 )
 
@@ -29,7 +29,7 @@ shape = SubResource( 2 )
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="visionArea"]
 position = Vector2( 5.33308, 0 )
 polygon = PoolVector2Array( -120, 280, 120, 280, 0, 0 )
-[connection signal="body_entered" from="attackArea" to="." method="on_attackArea_body_entered"]
-[connection signal="body_exited" from="attackArea" to="." method="on_attackArea_body_exited"]
-[connection signal="body_entered" from="visionArea" to="." method="on_visionArea_body_entered"]
-[connection signal="body_exited" from="visionArea" to="." method="on_visionArea_body_exited"]
+[connection signal="body_entered" from="attackArea" to="." method="_on_attackArea_body_entered"]
+[connection signal="body_exited" from="attackArea" to="." method="_on_attackArea_body_exited"]
+[connection signal="body_entered" from="visionArea" to="." method="_on_visionArea_body_entered"]
+[connection signal="body_exited" from="visionArea" to="." method="_on_visionArea_body_exited"]

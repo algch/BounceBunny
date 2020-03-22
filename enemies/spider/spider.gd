@@ -154,7 +154,7 @@ func attackLoop(delta):
 			reachable_targets.erase(target.get_instance_id())
 
 
-func on_attackArea_body_entered(body):
+func _on_attackArea_body_entered(body):
 	if body.is_in_group('attacked_by_enemies'):
 		var body_id = body.get_instance_id()
 		reachable_targets[body_id] = body
@@ -164,7 +164,7 @@ func on_attackArea_body_entered(body):
 			current_state = STATE.ATTACK
 
 
-func on_attackArea_body_exited(body):
+func _on_attackArea_body_exited(body):
 	var body_id = body.get_instance_id()
 	if current_target and current_target.get_instance_id() == body_id:
 		current_target = null
@@ -172,7 +172,7 @@ func on_attackArea_body_exited(body):
 		reachable_targets.erase(body_id)
 
 
-func on_visionArea_body_entered(body):
+func _on_visionArea_body_entered(body):
 	if body.is_in_group('attacked_by_enemies'):
 		var body_id = body.get_instance_id()
 		visible_targets[body_id] = body
@@ -182,7 +182,7 @@ func on_visionArea_body_entered(body):
 			current_state = STATE.CHASE
 
 
-func on_visionArea_body_exited(body):
+func _on_visionArea_body_exited(body):
 	var body_id = body.get_instance_id()
 	if current_target and current_target.get_instance_id() == body_id:
 		current_target = null

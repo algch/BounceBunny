@@ -40,16 +40,6 @@ func _ready():
 func lifespanEnded():
 	queue_free()
 
-
-func bodyEntered(body):
-	if player and body.is_in_group('weapons'):
-		if TYPE == globals.ITEM_TYPES.HEAL:
-			player.heal(heal_points)
-		else:
-			player.addItem(self)
-		queue_free()
-
-
 func _draw():
 	draw_string(default_font, Vector2(-20, -80),  message, Color(1, 1, 1))
 

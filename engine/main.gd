@@ -19,6 +19,7 @@ var shouldSpawn = false
 onready var player = get_node('player')
 var GAME_OVER = false
 var score = 0
+var total_plants = 0
 
 
 func getRandomPosition():
@@ -96,6 +97,12 @@ func isOnCorner(coord):
 		is_on_corner = true
 
 	return is_on_corner
+
+func addPlant():
+	total_plants += 1
+
+func removePlant():
+	total_plants -= 1
 
 
 func _ready():

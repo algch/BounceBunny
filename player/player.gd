@@ -1,4 +1,4 @@
-extends Sprite
+extends Position2D
 
 var SPEED = 500
 
@@ -38,26 +38,20 @@ func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
 
-func healthLoop():
-	if health <= 0 and not is_queued_for_deletion():
-		get_node('/root/main/').GAME_OVER = true
-		# GAME OVER
-		queue_free()
-
-func heal(points):
-	if (health + points) <= MAX_HEALTH:
-		health += points
-
 func changeWeapon():
 	if current_state == STATE.charging:
 		return
 	match current_weapon:
 		globals.PROJECTILE_TYPES.ATTACK:
 			current_weapon = globals.PROJECTILE_TYPES.SUMMON
-			set_texture(summon_texture)
+			$animation.set_animation('attack')
+			$animation.set_frame(0)
+			$animation.stop()
 		globals.PROJECTILE_TYPES.SUMMON:
 			current_weapon = globals.PROJECTILE_TYPES.ATTACK
-			set_texture(summon_texture)
+			$animation.set_animation('summon')
+			$animation.set_frame(0)
+			$animation.stop()
 
 
 func summonPlant(power, direction):
@@ -96,6 +90,7 @@ func attack(power, direction):
 	projectile.type = globals.PROJECTILE_TYPES.ATTACK
 
 	get_node('/root/main/').add_child(projectile)
+	$animation.play('attack')
 
 
 func pollInput():
@@ -112,6 +107,7 @@ func pollInput():
 	if Input.is_action_pressed('touch') and current_state != STATE.charging and not $weaponSwitcher.is_pressed():
 		current_state = STATE.charging
 		shoot_point_start = get_global_mouse_position()
+		$animation.play('charge')
 		
 
 	if Input.is_action_just_released('touch') and current_state == STATE.charging:
@@ -131,14 +127,9 @@ func pollInput():
 func getWeaponString():
 	match current_weapon:
 		0:
-			return 'ATTACK'
+			return 'attack'
 		1:
-			return 'SUMMON'
-		2:
-			return 'SCORE'
-		3:
-			return 'TELEPORT'
-
+			return 'summon'
 
 func _draw():
 	var score = get_node('/root/main/').score
@@ -155,11 +146,36 @@ func _draw():
 	var color = Color(1, 1, 1) if (get_global_mouse_position() - shoot_point_start).length() < MAX_SHOOT_LENGTH else Color(1, 0, 0)
 	draw_line(Vector2(0, 0), shoot_point_start - get_global_mouse_position(), color)
 
+func _on_animation_finished():
+	match $animation.get_animation():
+		'charge':
+			$animation.set_animation('attack')
+			$animation.set_frame(0)
+			$animation.stop()
+		'attack':
+			$animation.set_animation('charge')
+			$animation.set_frame(0)
+			$animation.stop()
+		'summon':
+			$animation.set_animation('charge')
+			$animation.set_frame(0)
+			$animation.stop()
+
+func aimingLoop():
+	if current_state != STATE.charging:
+		return
+
+	var reference = (shoot_point_start - get_global_mouse_position()).normalized()
+	if reference.length() <= 0.5:
+		return
+	var angle = reference.angle()
+	$animation.rotation = angle + PI/2.0
+
 
 
 func _process(delta):
 	update()
 
 func _physics_process(delta):
+	aimingLoop()
 	pollInput()
-	healthLoop()
