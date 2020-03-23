@@ -88,6 +88,13 @@ func _on_teleport_released():
 		return
 	player.setCurrentPlant(self)
 
+func _draw():
+	for id in child_plants:
+		draw_line(Vector2(0, 0), child_plants[id].position - position, Color(1, 1, 1))
+
+func _process(delta):
+	update()
+
 func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22

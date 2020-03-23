@@ -22,6 +22,7 @@ var score = 0
 var total_plants = 0
 
 func gameOver():
+	print('game over')
 	GAME_OVER = true
 	player.queue_free()
 

@@ -140,10 +140,11 @@ func releaseAnimation():
 			$animation.play('summon_1')
 
 func setCurrentPlant(plant):
-	if not plant.is_queued_for_deletion() or not plant.is_valid():
+	if plant.is_queued_for_deletion() or not is_instance_valid(plant):
 		main.gameOver()
 	position = plant.position
 	current_plant = plant
+	print('current plant ', current_plant)
 
 func getWeaponString():
 	match current_weapon:
