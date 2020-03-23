@@ -38,6 +38,8 @@ autostart = true
 "affected_by_weapons",
 ]]
 shape = SubResource( 3 )
+[connection signal="body_entered" from="Area2D" to="." method="_on_Area2D_body_entered"]
+[connection signal="body_exited" from="Area2D" to="." method="_on_Area2D_body_exited"]
 [connection signal="timeout" from="score_timer" to="." method="_on_score_timer_timeout"]
 [connection signal="timeout" from="attack_timer" to="." method="_on_attack_timer_timeout"]
 [connection signal="released" from="teleport" to="." method="_on_teleport_released"]

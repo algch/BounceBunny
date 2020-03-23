@@ -14,7 +14,14 @@ var current_state = STATE.idle
 var DEFAULT_POWER = 0.5
 var health = 3.0
 var default_font = DynamicFont.new()
+var parent_plant = null
+var child_plants = {}
 
+func addPlantChild(plant):
+	child_plants[plant.get_instance_id()] = plant
+
+func removePlantChild(plant):
+	child_plants.erase(plant.get_instance_id())
 
 func _on_score_timer_timeout():
 	main.score += 1
@@ -22,12 +29,20 @@ func _on_score_timer_timeout():
 
 func receiveDamage(damage):
 	health -= damage
-	print('score atacado')
+
+func destroy():
+	if player.current_plant == self:
+		if parent_plant:
+			player.setCurrentPlant(parent_plant)
+		else:
+			main.gameOver()
+	if parent_plant:
+		parent_plant.removePlantChild(self)
+	queue_free()
 
 func healthLoop():
 	if health <= 0:
-		queue_free()
-		main.removePlant()
+		destroy()
 
 func handleWeaponCollision(weapon):
 	health -= weapon.damage
@@ -54,7 +69,6 @@ func _on_Area2D_body_entered(body):
 	if body.is_in_group('enemies'):
 		targets[body.get_instance_id()] = body
 		if current_state != STATE.attacking:
-			print('Atacnado!!')
 			attack_timer.start()
 			current_state = STATE.attacking
 
@@ -70,17 +84,13 @@ func _on_attack_timer_timeout():
 	attack_timer.start()
 
 func _on_teleport_released():
-	print('teleport pressed')
-	print('current_plant_id ', player.current_plant_id)
-	if player.current_plant_id == get_instance_id():
+	if player.current_plant == self:
 		return
-	player.position = position
-	player.current_plant_id = get_instance_id()
+	player.setCurrentPlant(self)
 
 func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
-	main.addPlant()
 
 func _physics_process(delta):
 	healthLoop()

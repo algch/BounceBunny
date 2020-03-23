@@ -11,13 +11,9 @@ onready var projectile_class = preload('res://weapons/projectile/projectile.tscn
 onready var attack_texture = preload('res://player/sprites/tito-shooting-01.png')
 onready var summon_texture = preload('res://player/sprites/tito-pixelart-01.png')
 onready var summon_class = preload('res://weapons/summon/summon.tscn')
+onready var main = get_node('/root/main/')
 var CHARGE_WAIT_TIME = 1.0
 var MAX_SHOOT_LENGTH = 200
-onready var items = {
-	globals.ITEM_TYPES.SUPPORT: 0,
-	globals.ITEM_TYPES.TELEPORT: 0,
-	globals.ITEM_TYPES.SCORE: 0,
-}
 
 enum STATE {
 	idle,
@@ -32,48 +28,52 @@ var health = MAX_HEALTH
 
 var default_font = DynamicFont.new()
 
-var current_plant_id = null
+var current_plant = null
+var mana = 100.0
 
 func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
+	current_plant = get_node('/root/main/plant/')
+	print('mana ', mana)
 
-func changeWeapon():
+func _on_weaponSwitcher_pressed():
 	if current_state == STATE.charging:
 		return
+	var animation_name
+	var part = 0 if current_state == STATE.idle else 1 
 	match current_weapon:
 		globals.PROJECTILE_TYPES.ATTACK:
 			current_weapon = globals.PROJECTILE_TYPES.SUMMON
-			$animation.set_animation('attack')
-			$animation.set_frame(0)
-			$animation.stop()
+			animation_name = 'summon_' + str(part)
 		globals.PROJECTILE_TYPES.SUMMON:
 			current_weapon = globals.PROJECTILE_TYPES.ATTACK
-			$animation.set_animation('summon')
-			$animation.set_frame(0)
-			$animation.stop()
+			animation_name = 'bow_' + str(part)
+
+	$animation.set_animation(animation_name)
+	$animation.set_frame(0)
+	$animation.stop()
 
 
 func summonPlant(power, direction):
-	if items[globals.ITEM_TYPES.SUPPORT] <= 0:
-		print('NO HAY SEMILLAS')
+	var summon = summon_class.instance()
+
+	if mana < summon.mana_cost:
 		return
 
-	var summon = summon_class.instance()
 	var offset = direction * WEAPON_RADIUS
 
 	summon.position = position + offset
 	summon.direction = direction
 	summon.power = power
-	summon.type = globals.ITEM_TYPES.SUPPORT
+	summon.parent_plant = current_plant
 
 	get_node('/root/main/').add_child(summon)
-	items[globals.ITEM_TYPES.SUPPORT] -= 1
+	mana -= summon.mana_cost
 
 
-func addItem(item):
-	items[item.TYPE] += 1
-	print(items)
+func addMana(increment):
+	mana += increment
 
 func receiveDamage(damage):
 	health -= damage
@@ -107,7 +107,7 @@ func pollInput():
 	if Input.is_action_pressed('touch') and current_state != STATE.charging and not $weaponSwitcher.is_pressed():
 		current_state = STATE.charging
 		shoot_point_start = get_global_mouse_position()
-		$animation.play('charge')
+		pressAnimation()
 		
 
 	if Input.is_action_just_released('touch') and current_state == STATE.charging:
@@ -123,6 +123,27 @@ func pollInput():
 				attack(power, direction)
 			if current_weapon == globals.PROJECTILE_TYPES.SUMMON:
 				summonPlant(power, direction)	
+		releaseAnimation()
+
+func pressAnimation():
+	match current_weapon:
+		globals.PROJECTILE_TYPES.ATTACK:
+			$animation.play('bow_0')
+		globals.PROJECTILE_TYPES.SUMMON:
+			$animation.play('summon_0')
+
+func releaseAnimation():
+	match current_weapon:
+		globals.PROJECTILE_TYPES.ATTACK:
+			$animation.play('bow_1')
+		globals.PROJECTILE_TYPES.SUMMON:
+			$animation.play('summon_1')
+
+func setCurrentPlant(plant):
+	if not plant.is_queued_for_deletion() or not plant.is_valid():
+		main.gameOver()
+	position = plant.position
+	current_plant = plant
 
 func getWeaponString():
 	match current_weapon:
@@ -134,7 +155,7 @@ func getWeaponString():
 func _draw():
 	var score = get_node('/root/main/').score
 	var weapon_str = getWeaponString()
-	var message = 'weapon: ' + weapon_str + ' score: ' + str(score)
+	var message = 'weapon: ' + weapon_str + ' score: ' + str(score) + ' mana: ' + str(mana)
 	draw_string(default_font, Vector2(-20, -80),  message, Color(1, 1, 1))
 	if current_state != STATE.charging:
 		return
@@ -147,19 +168,18 @@ func _draw():
 	draw_line(Vector2(0, 0), shoot_point_start - get_global_mouse_position(), color)
 
 func _on_animation_finished():
-	match $animation.get_animation():
-		'charge':
-			$animation.set_animation('attack')
-			$animation.set_frame(0)
-			$animation.stop()
-		'attack':
-			$animation.set_animation('charge')
-			$animation.set_frame(0)
-			$animation.stop()
-		'summon':
-			$animation.set_animation('charge')
-			$animation.set_frame(0)
-			$animation.stop()
+	var animation_name
+	var part = 0 if current_state == STATE.idle else 1 
+	match current_weapon:
+		globals.PROJECTILE_TYPES.ATTACK:
+			animation_name = 'bow_' + str(part)
+			$animation.set_animation(animation_name)
+		globals.PROJECTILE_TYPES.SUMMON:
+			animation_name= 'summon_' + str(part)
+			$animation.set_animation(animation_name)
+
+	$animation.set_frame(0)
+	$animation.stop()
 
 func aimingLoop():
 	if current_state != STATE.charging:
@@ -168,8 +188,9 @@ func aimingLoop():
 	var reference = (shoot_point_start - get_global_mouse_position()).normalized()
 	if reference.length() <= 0.5:
 		return
-	var angle = reference.angle()
-	$animation.rotation = angle + PI/2.0
+	var angle = reference.angle() + PI/2.0
+	$animation.rotation = angle
+	$weaponSwitcher.rotation = angle
 
 
 

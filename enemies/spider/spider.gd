@@ -9,7 +9,7 @@ var red_texture = preload('res://enemies/spider/sprites/red_spider.png')
 var green_texture = preload('res://enemies/spider/sprites/green_spider.png')
 var blue_texture = preload('res://enemies/spider/sprites/blue_spider.png')
 
-var item_class = preload('res://items/item.tscn')
+var mana_class = preload('res://mana/mana.tscn')
 
 
 var direction_timer = Timer.new()
@@ -193,9 +193,9 @@ func _on_visionArea_body_exited(body):
 func leaveLoot():
 	# TODO create func: calculateChance(probability): -> bool
 	if globals.calculateChance(0.25):
-		var item = item_class.instance()
-		item.position = position
-		get_parent().add_child(item)
+		var mana = mana_class.instance()
+		mana.position = position
+		get_parent().add_child(mana)
 
 
 func healthLoop():

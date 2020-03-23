@@ -1,6 +1,8 @@
 extends 'res://weapons/weapon.gd'
 
 var plant_class = preload('res://plants/plant.tscn')
+var mana_cost = 20.0
+var parent_plant
 
 func _ready():
 	MAX_TRAVEL_TIME = 0.25
@@ -8,9 +10,11 @@ func _ready():
 	._ready()
 
 func travelEnded():
-	var summon = plant_class.instance()
-	summon.position = position
-	get_node('/root/main/').add_child(summon)
+	var plant = plant_class.instance()
+	plant.parent_plant = parent_plant
+	plant.position = position
+	parent_plant.addPlantChild(plant)
+	get_node('/root/main/').add_child(plant)
 	queue_free()
 
 func _physics_process(delta):

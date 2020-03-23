@@ -1,17 +1,13 @@
 extends Node
 
 enum ITEM_TYPES {
-    SUPPORT,
-    TELEPORT,
+    SEED,
     HEAL,
-    SCORE,
 }
 
 enum PROJECTILE_TYPES {
     ATTACK,
     SUMMON,
-    SCORE,
-    TELEPORT,
 }
 
 

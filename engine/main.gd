@@ -21,6 +21,9 @@ var GAME_OVER = false
 var score = 0
 var total_plants = 0
 
+func gameOver():
+	GAME_OVER = true
+	player.queue_free()
 
 func getRandomPosition():
 	return Vector2(
@@ -97,13 +100,6 @@ func isOnCorner(coord):
 		is_on_corner = true
 
 	return is_on_corner
-
-func addPlant():
-	total_plants += 1
-
-func removePlant():
-	total_plants -= 1
-
 
 func _ready():
 	var tilemap = $tilemap
