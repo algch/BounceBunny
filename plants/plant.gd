@@ -12,7 +12,9 @@ enum STATE {
 }
 var current_state = STATE.idle
 var DEFAULT_POWER = 0.5
-var health = 3.0
+var max_health = 3.0
+var health = max_health
+var health_recovery = 0.2
 var default_font = DynamicFont.new()
 var current_level = 1
 var neighbors = []
@@ -98,25 +100,48 @@ func _draw():
 	var message = 'neighbors: ' + str(len(neighbors))
 	draw_string(default_font, Vector2(-200, -80),  message, Color(1, 1, 1))
 
+func _on_health_timer_timeout():
+	health += health_recovery
+	if health > max_health:
+		health = max_health
+	$health_timer.start()
+
 func setAnimation():
 	var current_animation = $animation.get_animation()
+	match current_level:
+		1:
+			if 'level_1' != current_animation:
+				$animation.play('level_1')
+		2:
+			if 'level_2' != current_animation:
+				$animation.play('level_2')
+		3:
+			if 'level_3' != current_animation:
+				$animation.play('level_3')
+
+func updateCurrentLevel():
 	var neighbors_count = len(neighbors)
 	if neighbors_count <= 1:
-		if 'level_1' != current_animation:
-			$animation.play('level_1')
-			return
+		current_level = 1
+		max_health = 3.0
 	if neighbors_count > 1 and neighbors_count < 5:
-		if 'level_2' != current_animation:
-			$animation.play('level_2')
-			return
+		current_level = 2
+		max_health = 4.0
 	if neighbors_count >= 5:
-		if 'level_3' != current_animation:
-			$animation.play('level_3')
-			return
+		current_level = 3
+		max_health = 5.0
+		
+	if health > max_health:
+		health = max_health
 
+func updateGui():
+	var percentage = 100 * (health/max_health)
+	$gui/bar/life.set_value(percentage)
 
 func _process(delta):
 	neighbors = main.getNeighbors(self)
+	updateCurrentLevel()
+	updateGui()
 	setAnimation()
 	update()
 

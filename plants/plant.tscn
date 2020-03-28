@@ -1,4 +1,4 @@
-[gd_scene load_steps=100 format=2]
+[gd_scene load_steps=102 format=2]
 
 [ext_resource path="res://plants/plant.gd" type="Script" id=1]
 [ext_resource path="res://plants/animations/level_1/Planta_Portal0001.png" type="Texture" id=2]
@@ -95,6 +95,8 @@
 [ext_resource path="res://plants/animations/level_3/Attack0028.png" type="Texture" id=93]
 [ext_resource path="res://plants/animations/level_3/Attack0029.png" type="Texture" id=94]
 [ext_resource path="res://plants/animations/level_3/Attack0030.png" type="Texture" id=95]
+[ext_resource path="res://plants/gui/lifebar_bg.png" type="Texture" id=96]
+[ext_resource path="res://plants/gui/lifebar_fill.png" type="Texture" id=97]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 60, 60 )
@@ -124,8 +126,8 @@ animations = [ {
 } ]
 
 [node name="plant" type="StaticBody2D" groups=[
-"attacked_by_enemies",
 "affected_by_weapons",
+"attacked_by_enemies",
 ]]
 script = ExtResource( 1 )
 
@@ -142,19 +144,39 @@ autostart = true
 
 [node name="attack_timer" type="Timer" parent="."]
 
+[node name="health_timer" type="Timer" parent="."]
+autostart = true
+
 [node name="teleport" type="TouchScreenButton" parent="." groups=[
-"attacked_by_enemies",
 "affected_by_weapons",
+"attacked_by_enemies",
 ]]
 shape = SubResource( 3 )
 
 [node name="animation" type="AnimatedSprite" parent="."]
 frames = SubResource( 4 )
 animation = "level_1"
-frame = 18
-playing = true
+frame = 28
+
+[node name="gui" type="MarginContainer" parent="."]
+margin_left = -62.3445
+margin_top = -110.813
+margin_right = 333.655
+margin_bottom = -56.8135
+
+[node name="bar" type="HBoxContainer" parent="gui"]
+margin_right = 396.0
+margin_bottom = 54.0
+
+[node name="life" type="TextureProgress" parent="gui/bar"]
+margin_right = 190.0
+margin_bottom = 54.0
+value = 100.0
+texture_under = ExtResource( 96 )
+texture_progress = ExtResource( 97 )
 [connection signal="body_entered" from="Area2D" to="." method="_on_Area2D_body_entered"]
 [connection signal="body_exited" from="Area2D" to="." method="_on_Area2D_body_exited"]
 [connection signal="timeout" from="score_timer" to="." method="_on_score_timer_timeout"]
 [connection signal="timeout" from="attack_timer" to="." method="_on_attack_timer_timeout"]
+[connection signal="timeout" from="health_timer" to="." method="_on_health_timer_timeout"]
 [connection signal="released" from="teleport" to="." method="_on_teleport_released"]
