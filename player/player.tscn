@@ -1,51 +1,71 @@
-[gd_scene load_steps=30 format=2]
+[gd_scene load_steps=50 format=2]
 
 [ext_resource path="res://player/player.gd" type="Script" id=1]
-[ext_resource path="res://player/sprites/tito-pixelart-01.png" type="Texture" id=2]
-[ext_resource path="res://player/animations/5_UP/final-0015.png" type="Texture" id=3]
-[ext_resource path="res://player/animations/5_UP/final-0017.png" type="Texture" id=4]
-[ext_resource path="res://player/animations/5_UP/final-0018.png" type="Texture" id=5]
-[ext_resource path="res://player/animations/5_UP/final-0019.png" type="Texture" id=6]
-[ext_resource path="res://player/animations/5_UP/final-0020.png" type="Texture" id=7]
-[ext_resource path="res://player/animations/5_UP/final-0021.png" type="Texture" id=8]
-[ext_resource path="res://player/animations/5_UP/final-0022.png" type="Texture" id=9]
-[ext_resource path="res://player/animations/5_UP/final-0023.png" type="Texture" id=10]
-[ext_resource path="res://player/animations/5_UP/final-0024.png" type="Texture" id=11]
-[ext_resource path="res://player/animations/5_UP/final-0025.png" type="Texture" id=12]
-[ext_resource path="res://player/sprites/tito-pixelart-02.png" type="Texture" id=13]
-[ext_resource path="res://player/animations/5_UP/final-0001.png" type="Texture" id=14]
-[ext_resource path="res://player/animations/5_UP/final-0002.png" type="Texture" id=15]
-[ext_resource path="res://player/animations/5_UP/final-0003.png" type="Texture" id=16]
-[ext_resource path="res://player/animations/5_UP/final-0004.png" type="Texture" id=17]
-[ext_resource path="res://player/animations/5_UP/final-0005.png" type="Texture" id=18]
-[ext_resource path="res://player/animations/5_UP/final-0006.png" type="Texture" id=19]
-[ext_resource path="res://player/animations/5_UP/final-0007.png" type="Texture" id=20]
-[ext_resource path="res://player/animations/5_UP/final-0008.png" type="Texture" id=21]
-[ext_resource path="res://player/animations/5_UP/final-0009.png" type="Texture" id=22]
-[ext_resource path="res://player/animations/5_UP/final-0010.png" type="Texture" id=23]
-[ext_resource path="res://player/animations/5_UP/final-0011.png" type="Texture" id=24]
-[ext_resource path="res://player/animations/5_UP/final-0012.png" type="Texture" id=25]
-[ext_resource path="res://player/animations/5_UP/final-0013.png" type="Texture" id=26]
-[ext_resource path="res://player/animations/5_UP/final-0014.png" type="Texture" id=27]
+[ext_resource path="res://player/animations/seed/Player_Seed0001.png" type="Texture" id=2]
+[ext_resource path="res://player/animations/seed/Player_Seed0002.png" type="Texture" id=3]
+[ext_resource path="res://player/animations/seed/Player_Seed0003.png" type="Texture" id=4]
+[ext_resource path="res://player/animations/seed/Player_Seed0004.png" type="Texture" id=5]
+[ext_resource path="res://player/animations/attack/Player0015.png" type="Texture" id=6]
+[ext_resource path="res://player/animations/attack/Player0017.png" type="Texture" id=7]
+[ext_resource path="res://player/animations/attack/Player0018.png" type="Texture" id=8]
+[ext_resource path="res://player/animations/attack/Player0019.png" type="Texture" id=9]
+[ext_resource path="res://player/animations/attack/Player0020.png" type="Texture" id=10]
+[ext_resource path="res://player/animations/attack/Player0021.png" type="Texture" id=11]
+[ext_resource path="res://player/animations/attack/Player0022.png" type="Texture" id=12]
+[ext_resource path="res://player/animations/attack/Player0023.png" type="Texture" id=13]
+[ext_resource path="res://player/animations/attack/Player0024.png" type="Texture" id=14]
+[ext_resource path="res://player/animations/attack/Player0025.png" type="Texture" id=15]
+[ext_resource path="res://player/animations/seed/Player_Seed0005.png" type="Texture" id=16]
+[ext_resource path="res://player/animations/seed/Player_Seed0006.png" type="Texture" id=17]
+[ext_resource path="res://player/animations/seed/Player_Seed0007.png" type="Texture" id=18]
+[ext_resource path="res://player/animations/seed/Player_Seed0008.png" type="Texture" id=19]
+[ext_resource path="res://player/animations/seed/Player_Seed0009.png" type="Texture" id=20]
+[ext_resource path="res://player/animations/seed/Player_Seed0010.png" type="Texture" id=21]
+[ext_resource path="res://player/animations/seed/Player_Seed0011.png" type="Texture" id=22]
+[ext_resource path="res://player/animations/seed/Player_Seed0012.png" type="Texture" id=23]
+[ext_resource path="res://player/animations/seed/Player_Seed0013.png" type="Texture" id=24]
+[ext_resource path="res://player/animations/seed/Player_Seed0014.png" type="Texture" id=25]
+[ext_resource path="res://player/animations/seed/Player_Seed0015.png" type="Texture" id=26]
+[ext_resource path="res://player/animations/seed/Player_Seed0016.png" type="Texture" id=27]
+[ext_resource path="res://player/animations/seed/Player_Seed0017.png" type="Texture" id=28]
+[ext_resource path="res://player/animations/seed/Player_Seed0018.png" type="Texture" id=29]
+[ext_resource path="res://player/animations/seed/Player_Seed0019.png" type="Texture" id=30]
+[ext_resource path="res://player/animations/seed/Player_Seed0020.png" type="Texture" id=31]
+[ext_resource path="res://player/animations/seed/Player_Seed0021.png" type="Texture" id=32]
+[ext_resource path="res://player/animations/seed/Player_Seed0022.png" type="Texture" id=33]
+[ext_resource path="res://player/animations/attack/Player0001.png" type="Texture" id=34]
+[ext_resource path="res://player/animations/attack/Player0002.png" type="Texture" id=35]
+[ext_resource path="res://player/animations/attack/Player0003.png" type="Texture" id=36]
+[ext_resource path="res://player/animations/attack/Player0004.png" type="Texture" id=37]
+[ext_resource path="res://player/animations/attack/Player0005.png" type="Texture" id=38]
+[ext_resource path="res://player/animations/attack/Player0006.png" type="Texture" id=39]
+[ext_resource path="res://player/animations/attack/Player0007.png" type="Texture" id=40]
+[ext_resource path="res://player/animations/attack/Player0008.png" type="Texture" id=41]
+[ext_resource path="res://player/animations/attack/Player0009.png" type="Texture" id=42]
+[ext_resource path="res://player/animations/attack/Player0010.png" type="Texture" id=43]
+[ext_resource path="res://player/animations/attack/Player0011.png" type="Texture" id=44]
+[ext_resource path="res://player/animations/attack/Player0012.png" type="Texture" id=45]
+[ext_resource path="res://player/animations/attack/Player0013.png" type="Texture" id=46]
+[ext_resource path="res://player/animations/attack/Player0014.png" type="Texture" id=47]
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
-"frames": [ ExtResource( 2 ) ],
+"frames": [ ExtResource( 2 ), ExtResource( 3 ), ExtResource( 4 ), ExtResource( 5 ) ],
 "loop": true,
 "name": "summon_0",
-"speed": 30.0
+"speed": 8.0
 }, {
-"frames": [ ExtResource( 3 ), ExtResource( 4 ), ExtResource( 5 ), ExtResource( 6 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 10 ), ExtResource( 11 ), ExtResource( 12 ) ],
+"frames": [ ExtResource( 6 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 10 ), ExtResource( 11 ), ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 15 ) ],
 "loop": true,
 "name": "bow_1",
 "speed": 24.0
 }, {
-"frames": [ ExtResource( 13 ) ],
+"frames": [ ExtResource( 16 ), ExtResource( 17 ), ExtResource( 18 ), ExtResource( 19 ), ExtResource( 20 ), ExtResource( 21 ), ExtResource( 22 ), ExtResource( 23 ), ExtResource( 24 ), ExtResource( 25 ), ExtResource( 26 ), ExtResource( 27 ), ExtResource( 28 ), ExtResource( 29 ), ExtResource( 30 ), ExtResource( 31 ), ExtResource( 32 ), ExtResource( 33 ) ],
 "loop": true,
 "name": "summon_1",
-"speed": 5.0
+"speed": 24.0
 }, {
-"frames": [ ExtResource( 14 ), ExtResource( 15 ), ExtResource( 16 ), ExtResource( 17 ), ExtResource( 18 ), ExtResource( 19 ), ExtResource( 20 ), ExtResource( 21 ), ExtResource( 22 ), ExtResource( 23 ), ExtResource( 24 ), ExtResource( 25 ), ExtResource( 26 ), ExtResource( 27 ), ExtResource( 3 ) ],
+"frames": [ ExtResource( 34 ), ExtResource( 35 ), ExtResource( 36 ), ExtResource( 37 ), ExtResource( 38 ), ExtResource( 39 ), ExtResource( 40 ), ExtResource( 41 ), ExtResource( 42 ), ExtResource( 43 ), ExtResource( 44 ), ExtResource( 45 ), ExtResource( 46 ), ExtResource( 47 ), ExtResource( 6 ) ],
 "loop": true,
 "name": "bow_0",
 "speed": 24.0
@@ -63,7 +83,6 @@ frames = SubResource( 1 )
 animation = "bow_0"
 
 [node name="weaponSwitcher" type="TouchScreenButton" parent="."]
-position = Vector2( 4, 26 )
 z_index = 1
 shape = SubResource( 2 )
 [connection signal="animation_finished" from="animation" to="." method="_on_animation_finished"]

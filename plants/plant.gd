@@ -14,6 +14,8 @@ var current_state = STATE.idle
 var DEFAULT_POWER = 0.5
 var health = 3.0
 var default_font = DynamicFont.new()
+var current_level = 1
+var neighbors = []
 
 
 func _on_score_timer_timeout():
@@ -90,12 +92,32 @@ func _on_teleport_released():
 	player.setCurrentPlant(self)
 
 func _draw():
-	var neighbors = main.getNeighbors(self)
 	for neighbor in neighbors:
 		if neighbor and is_instance_valid(neighbor) and not neighbor.is_queued_for_deletion():
 			draw_line(Vector2(0, 0), neighbor.position - position, Color(1, 1, 1), 2)
+	var message = 'neighbors: ' + str(len(neighbors))
+	draw_string(default_font, Vector2(-200, -80),  message, Color(1, 1, 1))
+
+func setAnimation():
+	var current_animation = $animation.get_animation()
+	var neighbors_count = len(neighbors)
+	if neighbors_count <= 1:
+		if 'level_1' != current_animation:
+			$animation.play('level_1')
+			return
+	if neighbors_count > 1 and neighbors_count < 5:
+		if 'level_2' != current_animation:
+			$animation.play('level_2')
+			return
+	if neighbors_count >= 5:
+		if 'level_3' != current_animation:
+			$animation.play('level_3')
+			return
+
 
 func _process(delta):
+	neighbors = main.getNeighbors(self)
+	setAnimation()
 	update()
 
 func _ready():

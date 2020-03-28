@@ -106,7 +106,7 @@ func spawnEnemy():
 	spider.position = pos_tester.position
 
 func spawnLoop():
-	if GAME_OVER:
+	if GAME_OVER or not is_instance_valid(player) or player.is_queued_for_deletion():
 		return
 	if shouldSpawn and len(get_tree().get_nodes_in_group('enemies')) < 5:
 		spawnEnemy()
@@ -174,6 +174,4 @@ func _ready():
 	spawn_timer.start()
 
 func _physics_process(delta):
-	if GAME_OVER:
-		return
 	spawnLoop()
