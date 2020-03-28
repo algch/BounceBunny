@@ -29,13 +29,12 @@ var health = MAX_HEALTH
 var default_font = DynamicFont.new()
 
 var current_plant = null
-var mana = 100.0
+var mana = 1000.0
 
 func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
 	current_plant = get_node('/root/main/plant/')
-	print('mana ', mana)
 
 func _on_weaponSwitcher_pressed():
 	if current_state == STATE.charging:
@@ -66,7 +65,7 @@ func summonPlant(power, direction):
 	summon.position = position + offset
 	summon.direction = direction
 	summon.power = power
-	summon.parent_plant = current_plant
+	summon.first_neighbor = current_plant
 
 	get_node('/root/main/').add_child(summon)
 	mana -= summon.mana_cost

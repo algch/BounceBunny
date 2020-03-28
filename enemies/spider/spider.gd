@@ -32,7 +32,7 @@ enum STATE {
 }
 var current_state = STATE.WANDER
 
-var ATTACK_WAIT_TIME = 1.0
+var ATTACK_WAIT_TIME = 0.5
 var attack_timer = Timer.new()
 
 var damage = 1.0

@@ -2,7 +2,7 @@ extends 'res://weapons/weapon.gd'
 
 var plant_class = preload('res://plants/plant.tscn')
 var mana_cost = 20.0
-var parent_plant
+var first_neighbor
 
 func _ready():
 	MAX_TRAVEL_TIME = 0.25
@@ -11,9 +11,9 @@ func _ready():
 
 func travelEnded():
 	var plant = plant_class.instance()
-	plant.parent_plant = parent_plant
+	plant.addNeighbor(first_neighbor)
 	plant.position = position
-	parent_plant.addPlantChild(plant)
+	first_neighbor.addNeighbor(plant)
 	get_node('/root/main/').add_child(plant)
 	queue_free()
 
