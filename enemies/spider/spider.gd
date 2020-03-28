@@ -31,9 +31,8 @@ enum STATE {
 	ATTACK,
 }
 var current_state = STATE.WANDER
+var is_attacking = false
 
-var ATTACK_WAIT_TIME = 0.5
-var attack_timer = Timer.new()
 
 var damage = 1.0
 var health = 3.0
@@ -46,28 +45,15 @@ onready var player = get_node('/root/main/player')
 
 func _ready():
 	randomize()
-	var color = colors[randi() % 3]
-	COLOR = color
-	match color:
-		'red':
-			$sprite.set_texture(red_texture)
-		'green':
-			$sprite.set_texture(green_texture)
-		'blue':
-			$sprite.set_texture(blue_texture)
-		_:
-			$sprite.set_texture(red_texture)
 	direction_timer.connect('timeout', self, 'changeDirection')
 	var wait_time = randi() % 2 + 1
 	direction_timer.set_wait_time(wait_time)
 	direction_timer.start()
 	add_child(direction_timer)
 
-	attack_timer.connect('timeout', self, 'attack')
-	add_child(attack_timer)
-
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
+	$animation.play('walk')
 
 
 
@@ -109,6 +95,7 @@ func chaseLoop(delta):
 
 	if visible_targets.empty():
 		current_state = STATE.WANDER
+		$animation.play('walk')
 		return
 
 	while not visible_targets.empty():
@@ -119,26 +106,29 @@ func chaseLoop(delta):
 		else:
 			visible_targets.erase(target.get_instance_id())
 
-
+func _on_animation_animation_finished():
+	var current_animation = $animation.get_animation()
+	match current_animation:
+		'attack':
+			current_target.receiveDamage(damage)
+			$animation.play('walk')
+			is_attacking = false
 
 func attack():
-	current_target.receiveDamage(damage)
-	attack_timer.set_wait_time(ATTACK_WAIT_TIME)
-	attack_timer.start()
+	$animation.play('attack')
 
 func attackLoop(delta):
-	# Handle this in a better way
 	if not direction_timer.is_stopped():
 		direction_timer.stop()
 
 	if current_target and not current_target.is_queued_for_deletion():
-		if attack_timer.is_stopped():
-			attack_timer.set_wait_time(ATTACK_WAIT_TIME)
-			attack_timer.start()
+		if not is_attacking:
+			is_attacking = true
+			attack()
 		motion_dir = (current_target.position - position).normalized()
 		updateFacingDir(delta)
 	else:
-		attack_timer.stop()
+		is_attacking = false
 		current_target = null
 
 	if reachable_targets.empty():
@@ -251,7 +241,7 @@ func updateFacingDir(delta):
 
 	var angle = facing_dir.angle() - HALF_PI
 	
-	$sprite.rotation = angle
+	$animation.rotation = angle
 	$visionArea.rotation = angle
 
 

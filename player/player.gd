@@ -143,7 +143,6 @@ func setCurrentPlant(plant):
 		main.gameOver()
 	position = plant.position
 	current_plant = plant
-	print('current plant ', current_plant)
 
 func getWeaponString():
 	match current_weapon:

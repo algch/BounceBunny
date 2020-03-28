@@ -48,7 +48,6 @@ func removeIfDetached(node):
 		var current_id = current.get_instance_id()
 
 		if current == player.current_plant:
-			print('found ', current)
 			return
 
 		for id in plants_graph[current_id]:
@@ -57,7 +56,6 @@ func removeIfDetached(node):
 				visited[id] = true
 
 	node.destroy()
-	print('destroying node ', node)
 
 func getNeighbors(node):
 	var node_id = node.get_instance_id()
@@ -108,6 +106,8 @@ func spawnEnemy():
 	spider.position = pos_tester.position
 
 func spawnLoop():
+	if GAME_OVER:
+		return
 	if shouldSpawn and len(get_tree().get_nodes_in_group('enemies')) < 5:
 		spawnEnemy()
 		spawn_timer.set_wait_time(2.5)
@@ -174,6 +174,6 @@ func _ready():
 	spawn_timer.start()
 
 func _physics_process(delta):
-	if not GAME_OVER:
-		pass
-		# spawnLoop()
+	if GAME_OVER:
+		return
+	spawnLoop()

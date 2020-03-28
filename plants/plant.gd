@@ -30,13 +30,9 @@ func destroy():
 	var neighbors = main.getNeighbors(self)
 
 	if self == player.current_plant:
-		var found = false
-		for neighbor in neighbors:
-			if is_instance_valid(neighbor) and not neighbor.is_queued_for_deletion():
-				player.setCurrentPlant(neighbor)
-				found = true
-				break
-		if not found:
+		if neighbors:
+			player.setCurrentPlant(neighbors[0])
+		else:
 			main.gameOver()
 
 	main.removeNode(self)
@@ -98,8 +94,6 @@ func _draw():
 	for neighbor in neighbors:
 		if neighbor and is_instance_valid(neighbor) and not neighbor.is_queued_for_deletion():
 			draw_line(Vector2(0, 0), neighbor.position - position, Color(1, 1, 1), 2)
-		else:
-			print('neighbor', neighbor, ' valid ', is_instance_valid(neighbor))
 
 func _process(delta):
 	update()
