@@ -14,13 +14,7 @@ var current_state = STATE.idle
 var DEFAULT_POWER = 0.5
 var health = 3.0
 var default_font = DynamicFont.new()
-var neighbors = {}
 
-func addNeighbor(plant):
-	neighbors[plant.get_instance_id()] = plant
-
-func removeNeighbor(plant):
-	neighbors.erase(plant.get_instance_id())
 
 func _on_score_timer_timeout():
 	main.score += 1
@@ -30,14 +24,25 @@ func receiveDamage(damage):
 	health -= damage
 
 func destroy():
-	if player.current_plant == self:
-		if neighbors:
-			var random_neighbor = neighbors.get(neighbors.keys()[0])
-			player.setCurrentPlant(random_neighbor)
-		else:
+	if is_queued_for_deletion():
+		return
+
+	var neighbors = main.getNeighbors(self)
+
+	if self == player.current_plant:
+		var found = false
+		for neighbor in neighbors:
+			if is_instance_valid(neighbor) and not neighbor.is_queued_for_deletion():
+				player.setCurrentPlant(neighbor)
+				found = true
+				break
+		if not found:
 			main.gameOver()
-	for id in neighbors:
-		neighbors[id].removeNeighbor(self)
+
+	main.removeNode(self)
+	for neighbor in neighbors:
+		main.removeIfDetached(neighbor)
+
 	queue_free()
 
 func healthLoop():
@@ -89,11 +94,12 @@ func _on_teleport_released():
 	player.setCurrentPlant(self)
 
 func _draw():
-	for id in neighbors:
-		if is_instance_valid(neighbors[id]) and not neighbors[id].is_queued_for_deletion():
-			draw_line(Vector2(0, 0), neighbors[id].position - position, Color(1, 1, 1))
+	var neighbors = main.getNeighbors(self)
+	for neighbor in neighbors:
+		if neighbor and is_instance_valid(neighbor) and not neighbor.is_queued_for_deletion():
+			draw_line(Vector2(0, 0), neighbor.position - position, Color(1, 1, 1), 2)
 		else:
-			print('neighbor', neighbors[id], ' valid ', is_instance_valid(neighbors[id]), ' queued ', neighbors[id].is_queued_for_deletion())
+			print('neighbor', neighbor, ' valid ', is_instance_valid(neighbor))
 
 func _process(delta):
 	update()

@@ -21,6 +21,48 @@ var GAME_OVER = false
 var score = 0
 var total_plants = 0
 
+onready var plants_graph = {}
+
+func addNode(source, dest):
+	var source_id = source.get_instance_id()
+	var dest_id = dest.get_instance_id()
+	if source_id in plants_graph:
+		plants_graph[source_id][dest_id] = dest
+	else:
+		plants_graph[source_id] = { dest_id: dest }
+
+func removeNode(node):
+	var node_id = node.get_instance_id()
+	for id in plants_graph:
+		if node_id in plants_graph[id]:
+			plants_graph[id].erase(node_id)
+	plants_graph.erase(node_id)
+
+func removeIfDetached(node):
+	var node_id = node.get_instance_id()
+	var queue = [node]
+	var visited = { node_id: true }
+ 
+	while queue:
+		var current = queue.pop_front()
+		var current_id = current.get_instance_id()
+
+		if current == player.current_plant:
+			print('found ', current)
+			return
+
+		for id in plants_graph[current_id]:
+			if not id in visited:
+				queue.append(plants_graph[current_id][id])
+				visited[id] = true
+
+	node.destroy()
+	print('destroying node ', node)
+
+func getNeighbors(node):
+	var node_id = node.get_instance_id()
+	return plants_graph[node_id].values() if node_id in plants_graph else []
+
 func gameOver():
 	print('game over')
 	GAME_OVER = true
@@ -133,4 +175,5 @@ func _ready():
 
 func _physics_process(delta):
 	if not GAME_OVER:
-		spawnLoop()
+		pass
+		# spawnLoop()
