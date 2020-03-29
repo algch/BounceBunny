@@ -146,6 +146,7 @@ func isOnCorner(coord):
 	return is_on_corner
 
 func _ready():
+	randomize()
 	spawn_timer.connect('timeout', self, 'setSpawn')
 	add_child(spawn_timer)
 	spawn_timer.start()
