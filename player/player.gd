@@ -21,13 +21,10 @@ var current_state = STATE.idle
 var current_weapon = globals.PROJECTILE_TYPES.ATTACK
 var shoot_point_start = null
 
-var MAX_HEALTH = 10.0
-var health = MAX_HEALTH
-
 var default_font = DynamicFont.new()
 
 var current_plant = null
-var mana = 1000.0
+var mana = 100.0
 
 func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
@@ -71,11 +68,6 @@ func summonPlant(power, direction):
 
 func addMana(increment):
 	mana += increment
-
-func receiveDamage(damage):
-	health -= damage
-	print('¡Mi pierna!')
-
 
 func attack(power, direction):
 	var projectile = projectile_class.instance()
@@ -150,10 +142,6 @@ func getWeaponString():
 			return 'summon'
 
 func _draw():
-	var score = get_node('/root/main/').score
-	var weapon_str = getWeaponString()
-	var message = 'weapon: ' + weapon_str + ' score: ' + str(score) + ' mana: ' + str(mana)
-	draw_string(default_font, Vector2(-20, -80),  message, Color(1, 1, 1))
 	if current_state != STATE.charging:
 		return
 	draw_circle(
@@ -162,7 +150,7 @@ func _draw():
 		Color(1, 1, 1, 0.25)
 	)
 	var color = Color(1, 1, 1) if (get_global_mouse_position() - shoot_point_start).length() < MAX_SHOOT_LENGTH else Color(1, 0, 0)
-	draw_line(Vector2(0, 0), shoot_point_start - get_global_mouse_position(), color)
+	draw_line(Vector2(0, 0), shoot_point_start - get_global_mouse_position(), color, 4.0)
 
 func _on_animation_finished():
 	var animation_name
@@ -189,9 +177,12 @@ func aimingLoop():
 	$animation.rotation = angle
 	$weaponSwitcher.rotation = angle
 
-
+func updateGui():
+	var message = 'MANA: ' + str(mana) + '\nSCORE: ' + str(main.score)
+	$gui/label.set_text(message)
 
 func _process(delta):
+	updateGui()
 	update()
 
 func _physics_process(delta):

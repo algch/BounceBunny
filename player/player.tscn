@@ -1,4 +1,4 @@
-[gd_scene load_steps=51 format=2]
+[gd_scene load_steps=53 format=2]
 
 [ext_resource path="res://player/player.gd" type="Script" id=1]
 [ext_resource path="res://player/animations/attack/Player0015.png" type="Texture" id=2]
@@ -47,6 +47,7 @@
 [ext_resource path="res://player/animations/attack/Player0012.png" type="Texture" id=45]
 [ext_resource path="res://player/animations/attack/Player0013.png" type="Texture" id=46]
 [ext_resource path="res://player/animations/attack/Player0014.png" type="Texture" id=47]
+[ext_resource path="res://fonts/default-font.ttf" type="DynamicFontData" id=48]
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
@@ -77,6 +78,10 @@ extents = Vector2( 50, 50 )
 [sub_resource type="RectangleShape2D" id=3]
 extents = Vector2( 85, 60 )
 
+[sub_resource type="DynamicFont" id=4]
+size = 36
+font_data = ExtResource( 48 )
+
 [node name="player" type="Position2D"]
 z_index = 1
 script = ExtResource( 1 )
@@ -91,7 +96,6 @@ shape = SubResource( 2 )
 
 [node name="Camera2D" type="Camera2D" parent="."]
 current = true
-zoom = Vector2( 7, 7 )
 smoothing_enabled = true
 smoothing_speed = 3.0
 
@@ -102,5 +106,18 @@ smoothing_speed = 3.0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 position = Vector2( 0, -20 )
 shape = SubResource( 3 )
+
+[node name="gui" type="MarginContainer" parent="."]
+margin_left = -79.8714
+margin_top = -246.875
+margin_right = 162.129
+margin_bottom = -157.875
+
+[node name="label" type="Label" parent="gui"]
+margin_right = 242.0
+margin_bottom = 89.0
+custom_fonts/font = SubResource( 4 )
+text = "MANA: 100.0
+SCORE: 0"
 [connection signal="animation_finished" from="animation" to="." method="_on_animation_finished"]
 [connection signal="pressed" from="weaponSwitcher" to="." method="_on_weaponSwitcher_pressed"]

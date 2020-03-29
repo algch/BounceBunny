@@ -1,6 +1,13 @@
 extends KinematicBody2D
 
-var SPEED = 100
+onready var player = get_node('/root/main/player')
+onready var main = get_node('/root/main')
+
+onready var speed = main.MAX_SPIDER_SPEED
+onready var damage = main.MAX_SPIDER_DAMAGE
+onready var max_health = main.MAX_SPIDER_HEALTH
+onready var health = main.MAX_SPIDER_HEALTH
+
 var HALF_PI = PI/2.0
 
 var mana_class = preload('res://items/mana/mana.tscn')
@@ -25,14 +32,11 @@ var current_state = STATE.WANDER
 var is_attacking = false
 
 
-var damage = 2.0
-var health = 3.0
 
 var default_font = DynamicFont.new()
 var DIRECTION_CHANGE_INTERVAL = 3.0
 
 
-onready var player = get_node('/root/main/player')
 
 func _ready():
 	randomize()
@@ -51,6 +55,11 @@ func handleWeaponCollision(weapon):
 
 	weapon.queue_free()
 
+func updateGui():
+	var message = str(health) + '/' + str(max_health)
+	$gui/container/label.set_text(message)
+	var percentage = 100 * (health/max_health)
+	$gui/container/bar.set_value(percentage)
 
 func chaseLoop(delta):
 	# Handle this in a better way
@@ -60,7 +69,7 @@ func chaseLoop(delta):
 	if current_target and not current_target.is_queued_for_deletion():
 
 		motion_dir = (current_target.position - position).normalized()
-		var motion = motion_dir.normalized() * SPEED * delta
+		var motion = motion_dir.normalized() * speed * delta
 
 		updateFacingDir(delta)
 
@@ -90,9 +99,10 @@ func _on_animation_animation_finished():
 	var current_animation = $animation.get_animation()
 	match current_animation:
 		'attack':
-			current_target.receiveDamage(damage)
-			$animation.play('walk')
-			is_attacking = false
+			if is_instance_valid(current_target) and not current_target.is_queued_for_deletion():
+				current_target.receiveDamage(damage)
+				$animation.play('walk')
+				is_attacking = false
 
 func attack():
 	$animation.play('attack')
@@ -184,17 +194,9 @@ func getStateName(state):
 		_:
 				return ''
 
-func _draw():
-	# draw_line(Vector2(0, 0), Vector2(0, 0) + motion_dir*200, Color(0, 1, 0.5))
-	# draw_line(Vector2(0, 0), Vector2(0, 0) + facing_dir*200, Color(1, 1, 0))
-	# var left_side = facing_dir.rotated(-HALF_PI)
-	# draw_line(Vector2(0, 0), Vector2(0, 0) + left_side*200, Color(1, 1, 1))
-	var message = 'health: ' + str(health)
-	draw_string(default_font, Vector2(-200, -80),  message, Color(1, 1, 1))
-
 
 func _process(delta):
-	update()
+	updateGui()
 
 
 func changeDirection():
@@ -229,7 +231,7 @@ func wanderLoop(delta):
 		direction_timer.set_wait_time(DIRECTION_CHANGE_INTERVAL)
 		direction_timer.start()
 
-	var motion = motion_dir.normalized() * SPEED * delta
+	var motion = motion_dir.normalized() * speed * delta
 	updateFacingDir(delta)
 
 	# how can we handle collisions properly?

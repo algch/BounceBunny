@@ -4,6 +4,10 @@ var SPEED = 300
 var HALF_PI = PI/2.0
 
 onready var main = get_node('/root/main/')
+onready var max_spiders = main.MAX_SPIDERS
+onready var max_health = main.MAX_SPAWNER_HEALTH
+onready var health = main.MAX_SPAWNER_HEALTH
+onready var health_recovery = main.MAX_SPAWNER_HEALTH_RECOVERY
 
 var mana_class = preload('res://items/mana/mana.tscn')
 var spider_class = preload('res://enemies/spider/spider.tscn')
@@ -11,6 +15,7 @@ var spider_class = preload('res://enemies/spider/spider.tscn')
 var direction_timer = Timer.new()
 
 var current_chaser = null
+var chasers = {}
 
 var motion_dir = Vector2(-1, 0)
 var facing_dir = Vector2(0, 1)
@@ -23,11 +28,9 @@ enum STATE {
 }
 var current_state = STATE.WANDER
 
-var health = 20.0
 
 var default_font = DynamicFont.new()
 var DIRECTION_CHANGE_INTERVAL = 3.0
-var MAX_SPIDERS = 25
 
 
 onready var player = get_node('/root/main/player')
@@ -42,33 +45,41 @@ func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
 
+func updateGui():
+	var message = str(health) + '/' + str(max_health)
+	$gui/container/label.set_text(message)
+	var percentage = 100 * (health/max_health)
+	$gui/container/bar.set_value(percentage)
+
 func handleWeaponCollision(weapon):
 	health -= weapon.damage
-
 	weapon.queue_free()
 
-
-func escapeLoop(delta):
-	if not main.GAME_OVER and current_chaser and not current_chaser.is_queued_for_deletion():
-		motion_dir = (position - current_chaser.position).normalized()
-
-	wanderLoop(delta)
-
+func _on_health_timer_timeout():
+	health += health_recovery
+	if health > max_health:
+		health = max_health
+	$health_timer.start()
 
 func _on_detectionArea_area_entered(area):
 	if area.is_in_group('detected_by_spawner'):
-		current_chaser = area
+		current_chaser = area.get_parent()
+		chasers[current_chaser.get_instance_id()] = current_chaser
 		current_state = STATE.ESCAPE
 
 
 func _on_detectionArea_area_exited(area):
 	if area.is_in_group('detected_by_spawner'):
-		current_chaser = null
-		current_state = STATE.WANDER
+		chasers.erase(area.get_parent().get_instance_id())
+		if chasers:
+			current_chaser = chasers[chasers.keys()[0]]
+		else:
+			current_chaser = null
+			current_state = STATE.WANDER
 
 
 func _on_spawn_timer_timeout():
-	if len(get_tree().get_nodes_in_group('enemies')) >= MAX_SPIDERS:
+	if len(get_tree().get_nodes_in_group('enemies')) >= max_spiders:
 		return
 	var spider = spider_class.instance()
 	spider.position = position
@@ -97,18 +108,8 @@ func getStateName(state):
 		_:
 				return ''
 
-func _draw():
-	# draw_line(Vector2(0, 0), Vector2(0, 0) + motion_dir*200, Color(0, 1, 0.5))
-	# draw_line(Vector2(0, 0), Vector2(0, 0) + facing_dir*200, Color(1, 1, 0))
-	# var left_side = facing_dir.rotated(-HALF_PI)
-	# draw_line(Vector2(0, 0), Vector2(0, 0) + left_side*200, Color(1, 1, 1))
-	var message = 'state: ' + getStateName(current_state) + 'health: ' + str(health)
-	draw_string(default_font, Vector2(0, -80),  message, Color(1, 1, 1))
-
-
 func _process(delta):
-	update()
-
+	updateGui()
 
 func changeDirection():
 	direction_timer.set_wait_time(DIRECTION_CHANGE_INTERVAL)
@@ -134,6 +135,17 @@ func updateFacingDirLoop(delta):
 	var angle = facing_dir.angle() - HALF_PI
 	$sprite.rotation = angle
 
+func escapeLoop(delta):
+	if not direction_timer.is_stopped():
+		direction_timer.stop()
+
+	if not main.GAME_OVER and current_chaser and not current_chaser.is_queued_for_deletion():
+		motion_dir = (position - current_chaser.position).normalized()
+
+	var motion = motion_dir.normalized() * SPEED
+	updateFacingDirLoop(delta)
+	move_and_slide(motion)
+
 
 func wanderLoop(delta):
 	if direction_timer.is_stopped():
@@ -146,8 +158,7 @@ func wanderLoop(delta):
 	# how can we handle collisions properly?
 	var collision = move_and_collide(motion)
 	if collision:
-		print('collision ', self, ' collided with ', collision.collider)
-		motion_dir *= -1
+		motion_dir = motion_dir.rotated(HALF_PI*rotation_dir)
 
 
 func behaviorLoop(delta):

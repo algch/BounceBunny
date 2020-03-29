@@ -1,27 +1,31 @@
 extends Node
 
-var spider_class = preload('res://enemies/spider/spider.tscn')
-var SPIDER_EXTENTS = Vector2(50, 50)
-
-var TILE_SIZE = 20
-var TILE_TYPES = 3
-
-var CHANGE_TILE_PROBABILITY = 50
-var MIN_TILE_STRIP_SIZE = 5
-
-onready var SCREEN_SIZE = get_viewport().size
-var X
-var Y
-
-var last_tile = null
-var spawn_timer = Timer.new()
-var shouldSpawn = false
 onready var player = get_node('player')
 var GAME_OVER = false
 var score = 0
-var total_plants = 0
+
+var difficulty = 0
+
+var MAX_SPIDERS = 10 
+var MAX_SPAWNER_HEALTH = 20.0
+var MAX_SPAWNER_HEALTH_RECOVERY = 0.5
+
+var MAX_SPIDER_SPEED = 100
+var MAX_SPIDER_DAMAGE = 2.0
+var MAX_SPIDER_HEALTH = 3.0
 
 onready var plants_graph = {}
+
+func increaseScore():
+	score += 1
+	difficulty = int(score/500)
+	MAX_SPIDERS = 10 + difficulty
+	MAX_SPAWNER_HEALTH = 20.0 + (0.5 * difficulty)
+	MAX_SPAWNER_HEALTH_RECOVERY = 0.5 + (0.1 * difficulty)
+
+	MAX_SPIDER_SPEED = 100 + (10 * difficulty)
+	MAX_SPIDER_DAMAGE = 2.0 + (0.1 * difficulty)
+	MAX_SPIDER_HEALTH = 3.0 + (0.25 * difficulty)
 
 func addNode(source, dest):
 	var source_id = source.get_instance_id()
@@ -66,87 +70,5 @@ func gameOver():
 	GAME_OVER = true
 	player.queue_free()
 
-func getRandomPosition():
-	return Vector2(
-		randi() % int(SCREEN_SIZE.x - 20) + 20,
-		randi() % int(SCREEN_SIZE.y - 20) + 20
-	)
-
-func spawnEnemy():
-	# TODO use this function to position spawners in the map
-	var spider = spider_class.instance()
-
-	var rectangle_shape = RectangleShape2D.new()
-	rectangle_shape.set_extents(SPIDER_EXTENTS)
-
-	var coll_shape = CollisionShape2D.new()
-	coll_shape.shape = rectangle_shape
-	
-
-	# TODO 
-	# looks like this can be solved using shapes only
-	# check https://godotengine.org/qa/18952/area2d-code-building-array-get_overlapping_bodies-method
-	var pos_tester = Area2D.new()
-	pos_tester.position = getRandomPosition()
-	pos_tester.add_child(coll_shape)
-	add_child(pos_tester)
-	yield(get_tree(), "physics_frame")
-	
-	var dist_to_player = player.position.distance_to(pos_tester.position)
-
-	var overlap = pos_tester.get_overlapping_bodies() + pos_tester.get_overlapping_areas()
-	yield(get_tree(), "physics_frame")
-
-	while overlap or dist_to_player < 320:
-		pos_tester.position = getRandomPosition()
-		yield(get_tree(), "physics_frame")
-		overlap = pos_tester.get_overlapping_bodies()
-		dist_to_player = player.position.distance_to(pos_tester.position)
-	
-	add_child(spider)
-	spider.position = pos_tester.position
-
-func spawnLoop():
-	if GAME_OVER or not is_instance_valid(player) or player.is_queued_for_deletion():
-		return
-	if shouldSpawn and len(get_tree().get_nodes_in_group('enemies')) < 5:
-		spawnEnemy()
-		spawn_timer.set_wait_time(2.5)
-		spawn_timer.start()
-		shouldSpawn = false
-
-func setSpawn():
-	shouldSpawn = true
-
-func getRandomTileId():
-	var tile = int(rand_range(0, TILE_TYPES))
-	while tile == last_tile:
-		tile = int(rand_range(0, TILE_TYPES))
-	last_tile = tile
-	return tile
-
-
-func shouldChangeTile():
-	return (randi() % 100) < CHANGE_TILE_PROBABILITY
-
-
-func isOnCorner(coord):
-	var x = coord.x
-	var y = coord.y
-
-	var is_on_corner = false
-
-	if x == 0 and y == Y - 1:
-		is_on_corner = true
-	if x == X - 1 and y == 0:
-		is_on_corner = true
-	if x == X - 1 and y == Y - 1:
-		is_on_corner = true
-
-	return is_on_corner
-
 func _ready():
 	randomize()
-	spawn_timer.connect('timeout', self, 'setSpawn')
-	add_child(spawn_timer)
-	spawn_timer.start()

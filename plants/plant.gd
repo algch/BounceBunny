@@ -23,7 +23,7 @@ var damage = 3
 
 
 func _on_score_timer_timeout():
-	main.score += 1
+	main.increaseScore()
 	$score_timer.start()
 
 func receiveDamage(damage):

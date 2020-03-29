@@ -1,4 +1,4 @@
-[gd_scene load_steps=46 format=2]
+[gd_scene load_steps=50 format=2]
 
 [ext_resource path="res://enemies/spider/spider.gd" type="Script" id=1]
 [ext_resource path="res://enemies/spider/animations/Attack/Spider_Attack0001.png" type="Texture" id=2]
@@ -42,6 +42,9 @@
 [ext_resource path="res://enemies/spider/animations/Walking/Spider_Walking0014.png" type="Texture" id=40]
 [ext_resource path="res://enemies/spider/animations/Walking/Spider_Walking0015.png" type="Texture" id=41]
 [ext_resource path="res://enemies/spider/animations/Walking/Spider_Walking0016.png" type="Texture" id=42]
+[ext_resource path="res://fonts/default-font.ttf" type="DynamicFontData" id=43]
+[ext_resource path="res://enemies/gui/life_bar_bg.png" type="Texture" id=44]
+[ext_resource path="res://enemies/gui/life_bar_fill.png" type="Texture" id=45]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 40, 40 )
@@ -61,6 +64,9 @@ animations = [ {
 "name": "walk",
 "speed": 24.0
 } ]
+
+[sub_resource type="DynamicFont" id=4]
+font_data = ExtResource( 43 )
 
 [node name="spider" type="KinematicBody2D" groups=[
 "affected_by_weapons",
@@ -85,6 +91,31 @@ polygon = PoolVector2Array( -120, 280, 120, 280, 0, 0 )
 [node name="animation" type="AnimatedSprite" parent="."]
 frames = SubResource( 3 )
 animation = "walk"
+
+[node name="gui" type="MarginContainer" parent="."]
+margin_left = 16.0
+margin_top = -92.0
+margin_right = 221.0
+margin_bottom = -52.0
+
+[node name="container" type="HBoxContainer" parent="gui"]
+margin_right = 264.0
+margin_bottom = 40.0
+
+[node name="label" type="Label" parent="gui/container"]
+margin_top = 10.0
+margin_right = 70.0
+margin_bottom = 29.0
+custom_fonts/font = SubResource( 4 )
+text = "3.0/3.0"
+
+[node name="bar" type="TextureProgress" parent="gui/container"]
+margin_left = 74.0
+margin_right = 264.0
+margin_bottom = 40.0
+value = 100.0
+texture_under = ExtResource( 44 )
+texture_progress = ExtResource( 45 )
 [connection signal="body_entered" from="attackArea" to="." method="_on_attackArea_body_entered"]
 [connection signal="body_exited" from="attackArea" to="." method="_on_attackArea_body_exited"]
 [connection signal="body_entered" from="visionArea" to="." method="_on_visionArea_body_entered"]
