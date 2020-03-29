@@ -34,7 +34,7 @@ var current_state = STATE.WANDER
 var is_attacking = false
 
 
-var damage = 1.0
+var damage = 2.0
 var health = 3.0
 
 var default_font = DynamicFont.new()
@@ -55,12 +55,13 @@ func _ready():
 	default_font.size = 22
 	$animation.play('walk')
 
-
-
 func handleWeaponCollision(weapon):
+	print('WEAPON COLLISION')
 	# TODO ADD KNOCKBACK
 	# TODO involve color mechanics here
 	health -= weapon.damage
+	print('weapon.damage = ', weapon.damage)
+	print('health = ', health)
 
 	# LOOK AT weapon
 	# if current_state != STATE.FIND_TARGET or current_state != STATE.attack:
@@ -205,11 +206,11 @@ func getStateName(state):
 				return ''
 
 func _draw():
-	draw_line(Vector2(0, 0), Vector2(0, 0) + motion_dir*200, Color(0, 1, 0.5))
-	draw_line(Vector2(0, 0), Vector2(0, 0) + facing_dir*200, Color(1, 1, 0))
-	var left_side = facing_dir.rotated(-HALF_PI)
-	draw_line(Vector2(0, 0), Vector2(0, 0) + left_side*200, Color(1, 1, 1))
-	var message = 'state: ' + getStateName(current_state) + ' rotation_dir: ' + str(rotation_dir)
+	# draw_line(Vector2(0, 0), Vector2(0, 0) + motion_dir*200, Color(0, 1, 0.5))
+	# draw_line(Vector2(0, 0), Vector2(0, 0) + facing_dir*200, Color(1, 1, 0))
+	# var left_side = facing_dir.rotated(-HALF_PI)
+	# draw_line(Vector2(0, 0), Vector2(0, 0) + left_side*200, Color(1, 1, 1))
+	var message = 'health: ' + str(health)
 	draw_string(default_font, Vector2(-200, -80),  message, Color(1, 1, 1))
 
 

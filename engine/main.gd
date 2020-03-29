@@ -73,6 +73,7 @@ func getRandomPosition():
 	)
 
 func spawnEnemy():
+	# TODO use this function to position spawners in the map
 	var spider = spider_class.instance()
 
 	var rectangle_shape = RectangleShape2D.new()
@@ -145,34 +146,9 @@ func isOnCorner(coord):
 	return is_on_corner
 
 func _ready():
-	var tilemap = $tilemap
-	tilemap.clear()
-	randomize()
-
-	X = SCREEN_SIZE.x / TILE_SIZE
-	Y = SCREEN_SIZE.y / TILE_SIZE
-
-	var steps = [Vector2(1, 0), Vector2(0, 1), Vector2(-1, 0), Vector2(0, -1)]
-
-	var tiles_left = MIN_TILE_STRIP_SIZE
-	var tile = getRandomTileId()
-	var coord = Vector2(0, 0)
-	var step = steps.pop_front()
-	for i in range(0, 2 * (X + Y) - 2):
-		if isOnCorner(coord):
-			step = steps.pop_front()
-		if tiles_left <= 0 and shouldChangeTile():
-			tile = getRandomTileId()
-			tiles_left = MIN_TILE_STRIP_SIZE
-		tilemap.set_cellv(coord, tile)
-		tiles_left -= 1
-
-		coord += step
-
 	spawn_timer.connect('timeout', self, 'setSpawn')
 	add_child(spawn_timer)
 	spawn_timer.start()
 
 func _physics_process(delta):
-	return
 	spawnLoop()

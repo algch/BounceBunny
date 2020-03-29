@@ -3,8 +3,8 @@ extends StaticBody2D
 onready var main = get_node('/root/main/')
 onready var projectile_class = preload('res://weapons/projectile/projectile.tscn')
 onready var player = get_node('/root/main/player')
+onready var WEAPON_RADIUS = sqrt(pow($collisionShape.shape.extents.x, 2) + pow($collisionShape.shape.extents.y, 2)) + 24
 var targets = {}
-var WEAPON_RADIUS = 57
 onready var attack_timer = get_node('attack_timer')
 enum STATE {
 	attacking,
@@ -17,7 +17,9 @@ var health = max_health
 var health_recovery = 0.2
 var default_font = DynamicFont.new()
 var current_level = 1
+var line_color = Color(0, 0, 1)
 var neighbors = []
+var damage = 3
 
 
 func _on_score_timer_timeout():
@@ -61,10 +63,12 @@ func attack(power):
 
 	var projectile = projectile_class.instance()
 	var direction = (target.position - position).normalized()
+	print('weapon radious ', WEAPON_RADIUS)
 	var offset = direction * WEAPON_RADIUS
 
 	projectile.position = position + offset
 	projectile.direction = direction
+	projectile.MAX_DAMAGE = damage
 
 	projectile.power = power
 
@@ -96,9 +100,7 @@ func _on_teleport_released():
 func _draw():
 	for neighbor in neighbors:
 		if neighbor and is_instance_valid(neighbor) and not neighbor.is_queued_for_deletion():
-			draw_line(Vector2(0, 0), neighbor.position - position, Color(1, 1, 1), 2)
-	var message = 'neighbors: ' + str(len(neighbors))
-	draw_string(default_font, Vector2(-200, -80),  message, Color(1, 1, 1))
+			draw_line(Vector2(0, 0), neighbor.position - position, line_color, 2)
 
 func _on_health_timer_timeout():
 	health += health_recovery
@@ -124,19 +126,27 @@ func updateCurrentLevel():
 	if neighbors_count <= 1:
 		current_level = 1
 		max_health = 3.0
+		line_color = Color(0, 0, 1)
+		damage = 3.0
 	if neighbors_count > 1 and neighbors_count < 5:
 		current_level = 2
 		max_health = 4.0
+		line_color = Color(0, 1, 0)
+		damage = 4.0
 	if neighbors_count >= 5:
 		current_level = 3
 		max_health = 5.0
+		line_color = Color(1, 0, 0)
+		damage = 5.0
 		
 	if health > max_health:
 		health = max_health
 
 func updateGui():
+	var message = str(health) + '/' + str(max_health)
+	$gui/container/label.set_text(message)
 	var percentage = 100 * (health/max_health)
-	$gui/bar/life.set_value(percentage)
+	$gui/container/bar.set_value(percentage)
 
 func _process(delta):
 	neighbors = main.getNeighbors(self)
