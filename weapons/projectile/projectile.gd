@@ -11,10 +11,7 @@ func _physics_process(delta):
 		var collider = collision.collider
 		var tip_position = getTipPosition()
 
-		print('projectile collided')
-
 		if collider.is_in_group('affected_by_weapons'):
-			print('collider ', collider)
 			collider.handleWeaponCollision(self)
 
 		direction = direction.bounce(collision.normal)

@@ -30,7 +30,6 @@ func _ready():
 	travel_timer.connect('timeout', self, 'travelEnded')
 	travel_timer.start()
 	add_child(travel_timer)
-	print('damage ', damage)
 
 
 func travelEnded():

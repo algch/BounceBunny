@@ -63,7 +63,6 @@ func attack(power):
 
 	var projectile = projectile_class.instance()
 	var direction = (target.position - position).normalized()
-	print('weapon radious ', WEAPON_RADIUS)
 	var offset = direction * WEAPON_RADIUS
 
 	projectile.position = position + offset

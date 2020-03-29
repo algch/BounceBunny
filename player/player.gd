@@ -5,7 +5,7 @@ var SPEED = 500
 var TYPE = 'player'
 
 # how far from the player will the projectile be placed
-var WEAPON_RADIUS = 113
+var WEAPON_RADIUS = 125
 var motion_dir = Vector2(0, 0)
 onready var projectile_class = preload('res://weapons/projectile/projectile.tscn')
 onready var summon_class = preload('res://weapons/summon/summon.tscn')

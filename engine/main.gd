@@ -149,6 +149,3 @@ func _ready():
 	spawn_timer.connect('timeout', self, 'setSpawn')
 	add_child(spawn_timer)
 	spawn_timer.start()
-
-func _physics_process(delta):
-	spawnLoop()

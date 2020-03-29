@@ -1,16 +1,9 @@
 extends KinematicBody2D
 
-var TYPE='enemy'
-
 var SPEED = 100
 var HALF_PI = PI/2.0
 
-var red_texture = preload('res://enemies/spider/sprites/red_spider.png')
-var green_texture = preload('res://enemies/spider/sprites/green_spider.png')
-var blue_texture = preload('res://enemies/spider/sprites/blue_spider.png')
-
 var mana_class = preload('res://items/mana/mana.tscn')
-
 
 var direction_timer = Timer.new()
 
@@ -23,8 +16,6 @@ var facing_dir = Vector2(0, 1)
 var rotation_speed = 90 # in degrees
 var rotation_dir = 1
 
-var colors = ['red', 'green', 'blue']
-var COLOR = null
 enum STATE {
 	WANDER,
 	CHASE,
@@ -56,19 +47,7 @@ func _ready():
 	$animation.play('walk')
 
 func handleWeaponCollision(weapon):
-	print('WEAPON COLLISION')
-	# TODO ADD KNOCKBACK
-	# TODO involve color mechanics here
 	health -= weapon.damage
-	print('weapon.damage = ', weapon.damage)
-	print('health = ', health)
-
-	# LOOK AT weapon
-	# if current_state != STATE.FIND_TARGET or current_state != STATE.attack:
-	# 	var weapon_dir = (weapon.position - position).normalized()
-	# 	if motion_dir.dot(weapon_dir) < 0:
-	# 		rotation_dir = -1 if motion_dir.rotated(HALF_PI).dot(weapon_dir) < 0 else 1
-	# 	current_state = STATE.FIND_TARGET
 
 	weapon.queue_free()
 
