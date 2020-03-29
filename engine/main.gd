@@ -6,7 +6,7 @@ var score = 0
 
 var difficulty = 0
 
-var MAX_SPIDERS = 10 
+var MAX_SPIDERS = 25 
 var MAX_SPAWNER_HEALTH = 20.0
 var MAX_SPAWNER_HEALTH_RECOVERY = 0.5
 
