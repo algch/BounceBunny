@@ -2,5 +2,3 @@
 **/*.*.import
 **/*.*~
 **/.DS_Store
-build/
-export_presets.cfg
