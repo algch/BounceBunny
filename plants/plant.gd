@@ -19,7 +19,7 @@ var default_font = DynamicFont.new()
 var current_level = 1
 var line_color = Color(0, 0, 1)
 var neighbors = []
-var damage = 3
+var projectile_damage = 0.5
 
 
 func _on_score_timer_timeout():
@@ -66,7 +66,7 @@ func attack(power):
 
 	projectile.position = position + offset
 	projectile.direction = direction
-	projectile.MAX_DAMAGE = damage
+	projectile.MAX_DAMAGE = projectile_damage
 
 	projectile.power = power
 
@@ -125,17 +125,17 @@ func updateCurrentLevel():
 		current_level = 1
 		max_health = 3.0
 		line_color = Color(0, 0, 1)
-		damage = 3.0
+		projectile_damage = 0.5
 	if neighbors_count > 1 and neighbors_count < 5:
 		current_level = 2
 		max_health = 4.0
 		line_color = Color(0, 1, 0)
-		damage = 4.0
+		projectile_damage = 1.0
 	if neighbors_count >= 5:
 		current_level = 3
 		max_health = 5.0
 		line_color = Color(1, 0, 0)
-		damage = 5.0
+		projectile_damage = 1.5
 		
 	if health > max_health:
 		health = max_health

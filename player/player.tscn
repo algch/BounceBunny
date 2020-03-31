@@ -1,4 +1,4 @@
-[gd_scene load_steps=59 format=2]
+[gd_scene load_steps=64 format=2]
 
 [ext_resource path="res://player/player.gd" type="Script" id=1]
 [ext_resource path="res://player/animations/seed/Player_Seed0005.png" type="Texture" id=2]
@@ -48,9 +48,12 @@
 [ext_resource path="res://player/animations/attack/Player0024.png" type="Texture" id=46]
 [ext_resource path="res://player/animations/attack/Player0025.png" type="Texture" id=47]
 [ext_resource path="res://fonts/default-font.ttf" type="DynamicFontData" id=48]
-[ext_resource path="res://player/sprites/bow_button.png" type="Texture" id=49]
-[ext_resource path="res://player/sprites/seed_button.png" type="Texture" id=50]
-[ext_resource path="res://player/sprites/options_button.png" type="Texture" id=51]
+[ext_resource path="res://player/sprites/1.png" type="Texture" id=49]
+[ext_resource path="res://player/sprites/2.png" type="Texture" id=50]
+[ext_resource path="res://player/sprites/3.png" type="Texture" id=51]
+[ext_resource path="res://player/sprites/pause_screen.png" type="Texture" id=52]
+[ext_resource path="res://player/sprites/4.png" type="Texture" id=53]
+[ext_resource path="res://player/sprites/5.png" type="Texture" id=54]
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
@@ -75,9 +78,6 @@ animations = [ {
 "speed": 24.0
 } ]
 
-[sub_resource type="RectangleShape2D" id=2]
-extents = Vector2( 50, 50 )
-
 [sub_resource type="RectangleShape2D" id=3]
 extents = Vector2( 85, 60 )
 
@@ -85,14 +85,24 @@ extents = Vector2( 85, 60 )
 size = 36
 font_data = ExtResource( 48 )
 
-[sub_resource type="RectangleShape2D" id=6]
-extents = Vector2( 120, 100 )
+[sub_resource type="CircleShape2D" id=5]
+radius = 110.0
 
-[sub_resource type="RectangleShape2D" id=7]
-extents = Vector2( 120, 100 )
+[sub_resource type="CircleShape2D" id=6]
+radius = 110.0
 
-[sub_resource type="RectangleShape2D" id=5]
-extents = Vector2( 120, 100 )
+[sub_resource type="CircleShape2D" id=7]
+radius = 110.0
+
+[sub_resource type="DynamicFont" id=10]
+size = 100
+font_data = ExtResource( 48 )
+
+[sub_resource type="CircleShape2D" id=8]
+radius = 110.0
+
+[sub_resource type="CircleShape2D" id=9]
+radius = 110.0
 
 [node name="player" type="Position2D"]
 z_index = 1
@@ -101,10 +111,6 @@ script = ExtResource( 1 )
 [node name="animation" type="AnimatedSprite" parent="."]
 frames = SubResource( 1 )
 animation = "bow_0"
-
-[node name="weaponSwitcher" type="TouchScreenButton" parent="."]
-z_index = 1
-shape = SubResource( 2 )
 
 [node name="Camera2D" type="Camera2D" parent="."]
 current = true
@@ -129,25 +135,62 @@ margin_bottom = -157.875
 margin_right = 242.0
 margin_bottom = 89.0
 custom_fonts/font = SubResource( 4 )
+custom_colors/font_color = Color( 0.00392157, 0, 0, 1 )
 text = "MANA: 100.0
 SCORE: 0"
 
 [node name="bow" type="TouchScreenButton" parent="."]
-position = Vector2( -300, 490 )
+position = Vector2( -399.21, 355.586 )
 normal = ExtResource( 49 )
-shape = SubResource( 6 )
+shape = SubResource( 5 )
 action = "use_bow"
 
 [node name="seed" type="TouchScreenButton" parent="."]
-position = Vector2( -60, 490 )
+position = Vector2( -156.01, 360.387 )
 normal = ExtResource( 50 )
-shape = SubResource( 7 )
+shape = SubResource( 6 )
 action = "use_seed"
 
 [node name="options" type="TouchScreenButton" parent="."]
-position = Vector2( 180, 490 )
+position = Vector2( 82.3901, 361.987 )
 normal = ExtResource( 51 )
-shape = SubResource( 5 )
+shape = SubResource( 7 )
 action = "pause"
+
+[node name="pauseScreen" type="Sprite" parent="."]
+pause_mode = 2
+visible = false
+z_index = 2
+texture = ExtResource( 52 )
+
+[node name="Label" type="Label" parent="pauseScreen"]
+margin_left = -270.428
+margin_top = -536.055
+margin_right = 269.572
+margin_bottom = -419.055
+custom_fonts/font = SubResource( 10 )
+text = "P A U S E"
+
+[node name="resumeRestart" type="TouchScreenButton" parent="."]
+pause_mode = 2
+visible = false
+position = Vector2( -371.238, -334.434 )
+z_index = 3
+normal = ExtResource( 53 )
+shape = SubResource( 8 )
+action = "resume_restart"
+
+[node name="quit" type="TouchScreenButton" parent="."]
+pause_mode = 2
+visible = false
+position = Vector2( 36.8036, -318.432 )
+z_index = 3
+normal = ExtResource( 54 )
+shape = SubResource( 9 )
+action = "quit"
 [connection signal="animation_finished" from="animation" to="." method="_on_animation_finished"]
-[connection signal="pressed" from="weaponSwitcher" to="." method="_on_weaponSwitcher_pressed"]
+[connection signal="released" from="bow" to="." method="_on_bow_released"]
+[connection signal="released" from="seed" to="." method="_on_seed_released"]
+[connection signal="released" from="options" to="." method="_on_options_released"]
+[connection signal="released" from="resumeRestart" to="." method="_on_resumeRestart_released"]
+[connection signal="released" from="quit" to="." method="_on_quit_released"]

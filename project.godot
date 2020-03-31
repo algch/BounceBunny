@@ -41,6 +41,26 @@ touch={
 "events": [ Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"button_mask":0,"position":Vector2( 0, 0 ),"global_position":Vector2( 0, 0 ),"factor":1.0,"button_index":1,"pressed":false,"doubleclick":false,"script":null)
  ]
 }
+use_bow={
+"deadzone": 0.5,
+"events": [  ]
+}
+use_seed={
+"deadzone": 0.5,
+"events": [  ]
+}
+pause={
+"deadzone": 0.5,
+"events": [  ]
+}
+resume_restart={
+"deadzone": 0.5,
+"events": [  ]
+}
+quit={
+"deadzone": 0.5,
+"events": [  ]
+}
 
 [input_devices]
 

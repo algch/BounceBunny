@@ -6,12 +6,12 @@ var score = 0
 
 var difficulty = 0
 
-var MAX_SPIDERS = 25 
+var MAX_SPIDERS = 10 
 var MAX_SPAWNER_HEALTH = 20.0
 var MAX_SPAWNER_HEALTH_RECOVERY = 0.5
 
 var MAX_SPIDER_SPEED = 100
-var MAX_SPIDER_DAMAGE = 2.0
+var MAX_SPIDER_DAMAGE = 0.5
 var MAX_SPIDER_HEALTH = 3.0
 
 onready var plants_graph = {}
@@ -19,13 +19,13 @@ onready var plants_graph = {}
 func increaseScore():
 	score += 1
 	difficulty = int(score/500)
-	MAX_SPIDERS = 10 + difficulty
-	MAX_SPAWNER_HEALTH = 20.0 + (0.5 * difficulty)
-	MAX_SPAWNER_HEALTH_RECOVERY = 0.5 + (0.1 * difficulty)
+	MAX_SPIDERS = MAX_SPIDERS + difficulty
+	MAX_SPAWNER_HEALTH = MAX_SPAWNER_HEALTH + (0.5 * difficulty)
+	MAX_SPAWNER_HEALTH_RECOVERY = MAX_SPAWNER_HEALTH_RECOVERY + (0.1 * difficulty)
 
-	MAX_SPIDER_SPEED = 100 + (10 * difficulty)
-	MAX_SPIDER_DAMAGE = 2.0 + (0.1 * difficulty)
-	MAX_SPIDER_HEALTH = 3.0 + (0.25 * difficulty)
+	MAX_SPIDER_SPEED = MAX_SPIDER_SPEED + (10 * difficulty)
+	MAX_SPIDER_DAMAGE = MAX_SPIDER_DAMAGE + (0.1 * difficulty)
+	MAX_SPIDER_HEALTH = MAX_SPIDER_HEALTH + (0.25 * difficulty)
 
 func addNode(source, dest):
 	var source_id = source.get_instance_id()

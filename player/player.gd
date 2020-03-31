@@ -32,22 +32,11 @@ func _ready():
 	default_font.size = 22
 	current_plant = get_node('/root/main/plant/')
 
-func _on_weaponSwitcher_pressed():
-	if current_state == STATE.charging:
-		return
-	var animation_name
-	var part = 0 if current_state == STATE.idle else 1 
-	match current_weapon:
-		globals.PROJECTILE_TYPES.ATTACK:
-			current_weapon = globals.PROJECTILE_TYPES.SUMMON
-			animation_name = 'summon_' + str(part)
-		globals.PROJECTILE_TYPES.SUMMON:
-			current_weapon = globals.PROJECTILE_TYPES.ATTACK
-			animation_name = 'bow_' + str(part)
-
-	$animation.set_animation(animation_name)
-	$animation.set_frame(0)
-	$animation.stop()
+	$pauseScreen.visible = false
+	$resumeRestart.visible = false
+	$resumeRestart.set_process(false)
+	$quit.visible = false
+	$quit.set_process(false)
 
 
 func summonPlant(power, direction):
@@ -82,6 +71,40 @@ func attack(power, direction):
 	get_node('/root/main/').add_child(projectile)
 	$animation.play('attack')
 
+func _on_bow_released():
+	current_weapon = globals.PROJECTILE_TYPES.ATTACK
+	$animation.set_animation('bow_0')
+	$animation.set_frame(0)
+	$animation.stop()
+
+func _on_seed_released():
+	current_weapon = globals.PROJECTILE_TYPES.SUMMON
+	$animation.set_animation('summon_0')
+	$animation.set_frame(0)
+	$animation.stop()
+
+func _on_options_released():
+	get_tree().paused = true
+	$pauseScreen.visible = true
+	$resumeRestart.visible = true
+	$resumeRestart.set_process(true)
+	$quit.visible = true
+	$quit.set_process(true)
+
+func _on_quit_released():
+	get_tree().quit()
+
+func _on_resumeRestart_released():
+	current_state = STATE.idle
+	if get_tree().paused:
+		get_tree().paused = false
+		$pauseScreen.visible = false
+		$resumeRestart.visible = false
+		$resumeRestart.set_process(false)
+		$quit.visible = false
+		$quit.set_process(false)
+	if main.GAME_OVER:
+		get_tree().reload_current_scene()
 
 func pollInput():
 	if Input.is_action_pressed('touch') and current_state != STATE.charging:
