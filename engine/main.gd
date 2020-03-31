@@ -66,9 +66,13 @@ func getNeighbors(node):
 	return plants_graph[node_id].values() if node_id in plants_graph else []
 
 func gameOver():
-	print('game over')
 	GAME_OVER = true
-	player.queue_free()
+	$player/pauseScreen.visible = true
+	$player/pauseScreen/label.set_text('GAME\nOVER')
+	$player/resumeRestart.visible = true
+	$player/resumeRestart.set_process(true)
+	$player/quit.visible = true
+	$player/quit.set_process(true)
 
 func _ready():
 	randomize()

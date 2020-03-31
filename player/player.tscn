@@ -78,12 +78,15 @@ animations = [ {
 "speed": 24.0
 } ]
 
-[sub_resource type="RectangleShape2D" id=3]
+[sub_resource type="RectangleShape2D" id=2]
 extents = Vector2( 85, 60 )
 
-[sub_resource type="DynamicFont" id=4]
+[sub_resource type="DynamicFont" id=3]
 size = 36
 font_data = ExtResource( 48 )
+
+[sub_resource type="CircleShape2D" id=4]
+radius = 110.0
 
 [sub_resource type="CircleShape2D" id=5]
 radius = 110.0
@@ -91,10 +94,7 @@ radius = 110.0
 [sub_resource type="CircleShape2D" id=6]
 radius = 110.0
 
-[sub_resource type="CircleShape2D" id=7]
-radius = 110.0
-
-[sub_resource type="DynamicFont" id=10]
+[sub_resource type="DynamicFont" id=7]
 size = 100
 font_data = ExtResource( 48 )
 
@@ -115,7 +115,10 @@ animation = "bow_0"
 [node name="Camera2D" type="Camera2D" parent="."]
 current = true
 smoothing_enabled = true
-smoothing_speed = 3.0
+drag_margin_left = 0.0
+drag_margin_top = 0.0
+drag_margin_right = 0.0
+drag_margin_bottom = 0.0
 
 [node name="Area2D" type="Area2D" parent="." groups=[
 "detected_by_spawner",
@@ -123,7 +126,7 @@ smoothing_speed = 3.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 position = Vector2( 0, -20 )
-shape = SubResource( 3 )
+shape = SubResource( 2 )
 
 [node name="gui" type="MarginContainer" parent="."]
 margin_left = -79.8714
@@ -134,7 +137,7 @@ margin_bottom = -157.875
 [node name="label" type="Label" parent="gui"]
 margin_right = 242.0
 margin_bottom = 89.0
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = SubResource( 3 )
 custom_colors/font_color = Color( 0.00392157, 0, 0, 1 )
 text = "MANA: 100.0
 SCORE: 0"
@@ -142,19 +145,19 @@ SCORE: 0"
 [node name="bow" type="TouchScreenButton" parent="."]
 position = Vector2( -399.21, 355.586 )
 normal = ExtResource( 49 )
-shape = SubResource( 5 )
+shape = SubResource( 4 )
 action = "use_bow"
 
 [node name="seed" type="TouchScreenButton" parent="."]
 position = Vector2( -156.01, 360.387 )
 normal = ExtResource( 50 )
-shape = SubResource( 6 )
+shape = SubResource( 5 )
 action = "use_seed"
 
 [node name="options" type="TouchScreenButton" parent="."]
 position = Vector2( 82.3901, 361.987 )
 normal = ExtResource( 51 )
-shape = SubResource( 7 )
+shape = SubResource( 6 )
 action = "pause"
 
 [node name="pauseScreen" type="Sprite" parent="."]
@@ -163,12 +166,12 @@ visible = false
 z_index = 2
 texture = ExtResource( 52 )
 
-[node name="Label" type="Label" parent="pauseScreen"]
+[node name="label" type="Label" parent="pauseScreen"]
 margin_left = -270.428
 margin_top = -536.055
 margin_right = 269.572
 margin_bottom = -419.055
-custom_fonts/font = SubResource( 10 )
+custom_fonts/font = SubResource( 7 )
 text = "P A U S E"
 
 [node name="resumeRestart" type="TouchScreenButton" parent="."]
