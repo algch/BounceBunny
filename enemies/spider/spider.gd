@@ -53,8 +53,6 @@ func _ready():
 func handleWeaponCollision(weapon):
 	health -= weapon.damage
 
-	weapon.queue_free()
-
 func updateGui():
 	var message = str(health) + '/' + str(max_health)
 	$gui/container/label.set_text(message)
@@ -237,7 +235,7 @@ func wanderLoop(delta):
 	# how can we handle collisions properly?
 	var collision = move_and_collide(motion)
 	if collision:
-		motion_dir *= -1
+		motion_dir = motion_dir.rotated(HALF_PI*rotation_dir)
 
 
 func behaviorLoop(delta):

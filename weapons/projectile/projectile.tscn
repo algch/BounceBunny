@@ -7,20 +7,22 @@
 extents = Vector2( 4, 24 )
 
 [sub_resource type="Gradient" id=2]
-offsets = PoolRealArray( 0, 0.481481 )
+offsets = PoolRealArray( 0, 0.351852, 0.733333 )
+colors = PoolColorArray( 0.964706, 0.862745, 0.0196078, 1, 0.945098, 0.607843, 0.0156863, 1, 1, 0, 0, 1 )
 
 [sub_resource type="GradientTexture" id=3]
 gradient = SubResource( 2 )
 
 [sub_resource type="ParticlesMaterial" id=4]
-emission_shape = 2
-emission_box_extents = Vector3( 4, 4, 1 )
+emission_shape = 1
+emission_sphere_radius = 8.0
 flag_disable_z = true
+spread = 100.0
 gravity = Vector3( 0, 98, 0 )
 angular_velocity = 0.0
 orbit_velocity = 0.0
 orbit_velocity_random = 0.0
-scale = 4.0
+scale = 10.0
 color_ramp = SubResource( 3 )
 
 [node name="projectile" type="KinematicBody2D" groups=[
@@ -41,7 +43,7 @@ texture = ExtResource( 2 )
 position = Vector2( 0, -22 )
 
 [node name="Particles2D" type="Particles2D" parent="."]
-position = Vector2( -0.667431, 15.084 )
-speed_scale = 2.0
+position = Vector2( 0.745358, -30.7748 )
+speed_scale = 3.0
 fract_delta = false
 process_material = SubResource( 4 )

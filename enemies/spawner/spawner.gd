@@ -53,7 +53,6 @@ func updateGui():
 
 func handleWeaponCollision(weapon):
 	health -= weapon.damage
-	weapon.queue_free()
 
 func _on_health_timer_timeout():
 	health += health_recovery

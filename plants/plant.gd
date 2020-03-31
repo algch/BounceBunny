@@ -53,7 +53,6 @@ func healthLoop():
 
 func handleWeaponCollision(weapon):
 	health -= weapon.damage
-	weapon.queue_free()
 	
 func attack(power):
 	var target = targets[targets.keys()[randi() % targets.size()]]

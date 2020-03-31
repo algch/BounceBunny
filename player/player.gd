@@ -12,6 +12,7 @@ onready var summon_class = preload('res://weapons/summon/summon.tscn')
 onready var main = get_node('/root/main/')
 var CHARGE_WAIT_TIME = 1.0
 var MAX_SHOOT_LENGTH = 200
+var ANIMATION_FRAME_COUNT = 14
 
 enum STATE {
 	idle,
@@ -83,36 +84,25 @@ func attack(power, direction):
 
 
 func pollInput():
-	var RIGHT = int(Input.is_action_pressed('ui_right'))
-	var LEFT = int(Input.is_action_pressed('ui_left'))
-	var DOWN = int(Input.is_action_pressed('ui_down'))
-	var UP = int(Input.is_action_pressed('ui_up'))
-
-	var X = -LEFT + RIGHT
-	var Y = -UP + DOWN
-
-	motion_dir =  Vector2(X, Y)
-
-	if Input.is_action_pressed('touch') and current_state != STATE.charging and not $weaponSwitcher.is_pressed():
+	if Input.is_action_pressed('touch') and current_state != STATE.charging:
 		current_state = STATE.charging
 		shoot_point_start = get_global_mouse_position()
-		pressAnimation()
-		
 
 	if Input.is_action_just_released('touch') and current_state == STATE.charging:
 		var shoot_length = (get_global_mouse_position() - shoot_point_start).length()
 		shoot_length = shoot_length if shoot_length <= MAX_SHOOT_LENGTH else MAX_SHOOT_LENGTH
-		var partial_power = shoot_length/MAX_SHOOT_LENGTH
-		var power = 0.25 + 0.75 * partial_power
+		var power = shoot_length/MAX_SHOOT_LENGTH
+		$animation.set_frame(0)
 
 		current_state = STATE.idle
-		if power >= 0.5:
+		if power >= 0.2:
 			var direction = (shoot_point_start - get_global_mouse_position()).normalized()
 			if current_weapon == globals.PROJECTILE_TYPES.ATTACK:
 				attack(power, direction)
 			if current_weapon == globals.PROJECTILE_TYPES.SUMMON:
 				summonPlant(power, direction)	
-		releaseAnimation()
+
+			releaseAnimation()
 
 func pressAnimation():
 	match current_weapon:
@@ -170,12 +160,16 @@ func aimingLoop():
 	if current_state != STATE.charging:
 		return
 
-	var reference = (shoot_point_start - get_global_mouse_position()).normalized()
-	if reference.length() <= 0.5:
+	var reference = (shoot_point_start - get_global_mouse_position())
+	var partial_power = reference.length()/MAX_SHOOT_LENGTH
+	partial_power = partial_power if partial_power <= 1.0 else 1.0
+	reference = reference.normalized()
+	var frame = floor(partial_power * ANIMATION_FRAME_COUNT)
+	$animation.set_frame(frame)
+	if partial_power <= 0.2:
 		return
 	var angle = reference.angle() + PI/2.0
 	$animation.rotation = angle
-	$weaponSwitcher.rotation = angle
 
 func updateGui():
 	var message = 'MANA: ' + str(mana) + '\nSCORE: ' + str(main.score)
