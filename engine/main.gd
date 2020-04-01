@@ -22,7 +22,16 @@ var MAX_SPIDER_SPEED = INITIAL_MAX_SPIDER_SPEED
 var MAX_SPIDER_DAMAGE = INITIAL_MAX_SPIDER_DAMAGE
 var MAX_SPIDER_HEALTH = INITIAL_MAX_SPIDER_HEALTH
 
+var savegame = File.new()
+var save_path = 'user://savegame.save'
+var initial_save_date = {'highscore': 0}
+
 onready var plants_graph = {}
+
+func create_save():
+	savegame.open(save_path, File.WRITE)
+	savegame.store_var(initial_save_date)
+	savegame.close()
 
 func increaseScore():
 	score += 1
@@ -73,6 +82,18 @@ func getNeighbors(node):
 	var node_id = node.get_instance_id()
 	return plants_graph[node_id].values() if node_id in plants_graph else []
 
+func getHighScore():
+	savegame.open(save_path, File.READ)
+	var save_data = savegame.get_var()
+	savegame.close()
+	return save_data['highscore']
+
+func setHighScore(val):
+	var save_data= {'highscore': val}
+	savegame.open(save_path, File.WRITE)
+	savegame.store_var(save_data)
+	savegame.close()
+
 func gameOver():
 	GAME_OVER = true
 	$player/pauseScreen.visible = true
@@ -82,5 +103,12 @@ func gameOver():
 	$player/quit.visible = true
 	$player/quit.set_process(true)
 
+	if getHighScore() < score:
+		setHighScore(score)
+
 func _ready():
 	randomize()
+	if not savegame.file_exists(save_path):
+		print('created save data')
+		create_save()
+	$player/highScore.set_text('HIGHSCORE: ' + str(getHighScore()))
