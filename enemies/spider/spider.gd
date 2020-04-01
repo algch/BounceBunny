@@ -49,6 +49,7 @@ func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
 	$animation.play('walk')
+	print('spider spawned with speed ', speed)
 
 func handleWeaponCollision(weapon):
 	health -= weapon.damage
@@ -137,9 +138,9 @@ func _on_attackArea_body_entered(body):
 		var body_id = body.get_instance_id()
 		reachable_targets[body_id] = body
 
-		if not current_target:
-			motion_dir = (body.position - position).normalized()
-			current_state = STATE.ATTACK
+		motion_dir = (body.position - position).normalized()
+		current_state = STATE.ATTACK
+		current_target = body
 
 
 func _on_attackArea_body_exited(body):
@@ -150,7 +151,8 @@ func _on_attackArea_body_exited(body):
 		reachable_targets.erase(body_id)
 
 
-func _on_visionArea_body_entered(body):
+func _on_visionArea_area_entered(area):
+	var body = area.get_parent()
 	if body.is_in_group('attacked_by_enemies'):
 		var body_id = body.get_instance_id()
 		visible_targets[body_id] = body
@@ -158,12 +160,21 @@ func _on_visionArea_body_entered(body):
 		if not current_target:
 			motion_dir = (body.position - position).normalized()
 			current_state = STATE.CHASE
+			current_target = body
 
 
-func _on_visionArea_body_exited(body):
+func _on_visionArea_area_exited(area):
+	var body = area.get_parent()
 	var body_id = body.get_instance_id()
 	if current_target and current_target.get_instance_id() == body_id:
 		current_target = null
+		while visible_targets:
+			var target = visible_targets[visible_targets.keys()[0]]
+			if target and is_instance_valid(target) and not target.is_queued_for_deletion():
+				current_target = target
+				break
+			else:
+				visible_targets.erase(target.get_instance_id())
 	if visible_targets.has(body_id):
 		visible_targets.erase(body_id)
 
