@@ -4,7 +4,7 @@ El objetivo de este juego es obtener la mayor cantidad de puntos posibles. Esto 
 
 ## El jardín mágico:
 Cada planta nos dará 1 punto por segundo y existen 3 tipos de plantas:
-+ Azul; Esta planta es la más básica de todas. Es la plantada por default.
++ Azul; Esta planta es la más básica de todas. Es plantada por default y cuesta 20 puntos de mana.
 
 ![azul](https://github.com/algch/jardinolia/blob/master/plants/animations/level_1/Planta_Portal0001.png?raw=true)
 + Verde; Las plantas se hacen verdes cuando tienen 2 o más vecinos. Este tipo de planta es 1.5 veces más resistente y
@@ -15,6 +15,11 @@ poderosa que la planta azul.
 que la planta azul.
 
 ![roja](https://github.com/algch/jardinolia/blob/master/plants/animations/level_3/Attack0001.png?raw=true)
+
+## Frijoles:
+Los frijoles azules y dorados nos ayudan a recuperar mana, nos dan 10 y 20 puntos respectivamente.
+![frijol_azul](https://raw.githubusercontent.com/algch/jardinolia/master/items/mana/animations/mana_1/Semilla_20001.png)
+![frijol_dorado](https://raw.githubusercontent.com/algch/jardinolia/master/items/mana/animations/mana_2/Semilla0001.png)
 
 ## Controles:
 ### Atacar o Plantar:
