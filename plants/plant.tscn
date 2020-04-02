@@ -132,6 +132,7 @@ font_data = ExtResource( 96 )
 [node name="plant" type="StaticBody2D" groups=[
 "affected_by_weapons",
 "attacked_by_enemies",
+"plants",
 ]]
 collision_layer = 3
 collision_mask = 3
@@ -166,7 +167,7 @@ shape = SubResource( 3 )
 [node name="animation" type="AnimatedSprite" parent="."]
 frames = SubResource( 4 )
 animation = "level_1"
-frame = 25
+frame = 31
 playing = true
 
 [node name="gui" type="MarginContainer" parent="."]

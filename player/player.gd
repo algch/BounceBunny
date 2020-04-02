@@ -11,7 +11,8 @@ onready var projectile_class = preload('res://weapons/projectile/projectile.tscn
 onready var summon_class = preload('res://weapons/summon/summon.tscn')
 onready var main = get_node('/root/main/')
 var CHARGE_WAIT_TIME = 1.0
-var MAX_SHOOT_LENGTH = 200
+var MAX_SHOOT_LENGTH = 250
+var MIN_SHOOT_LENGTH = 50
 var ANIMATION_FRAME_COUNT = 14
 
 enum STATE {
@@ -25,7 +26,8 @@ var shoot_point_start = null
 var default_font = DynamicFont.new()
 
 var current_plant = null
-var mana = 100.0
+onready var mana = main.INITIAL_PLAYER_MANA
+onready var damage = main.INITIAL_PLAYER_DAMAGE
 
 func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
@@ -53,7 +55,6 @@ func summonPlant(power, direction):
 	summon.first_neighbor = current_plant
 
 	get_node('/root/main/').add_child(summon)
-	mana -= summon.mana_cost
 
 
 func addMana(increment):
@@ -67,6 +68,7 @@ func attack(power, direction):
 	projectile.direction = direction
 	projectile.power = power
 	projectile.type = globals.PROJECTILE_TYPES.ATTACK
+	projectile.MAX_DAMAGE = damage
 
 	get_node('/root/main/').add_child(projectile)
 	$animation.play('attack')
@@ -123,16 +125,9 @@ func pollInput():
 			if current_weapon == globals.PROJECTILE_TYPES.ATTACK:
 				attack(power, direction)
 			if current_weapon == globals.PROJECTILE_TYPES.SUMMON:
-				summonPlant(power, direction)	
+				summonPlant(power, direction)
 
 			releaseAnimation()
-
-func pressAnimation():
-	match current_weapon:
-		globals.PROJECTILE_TYPES.ATTACK:
-			$animation.play('bow_0')
-		globals.PROJECTILE_TYPES.SUMMON:
-			$animation.play('summon_0')
 
 func releaseAnimation():
 	match current_weapon:
@@ -146,6 +141,7 @@ func setCurrentPlant(plant):
 		main.gameOver()
 	position = plant.position
 	current_plant = plant
+	damage = plant.projectile_damage
 
 func getWeaponString():
 	match current_weapon:
@@ -184,7 +180,9 @@ func aimingLoop():
 		return
 
 	var reference = (shoot_point_start - get_global_mouse_position())
-	var partial_power = reference.length()/MAX_SHOOT_LENGTH
+	if reference.length() < MIN_SHOOT_LENGTH:
+		return
+	var partial_power = (reference.length() - MIN_SHOOT_LENGTH)/MAX_SHOOT_LENGTH
 	partial_power = partial_power if partial_power <= 1.0 else 1.0
 	reference = reference.normalized()
 	var frame = floor(partial_power * ANIMATION_FRAME_COUNT)

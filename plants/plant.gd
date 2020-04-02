@@ -100,10 +100,13 @@ func _draw():
 		if neighbor and is_instance_valid(neighbor) and not neighbor.is_queued_for_deletion():
 			draw_line(Vector2(0, 0), neighbor.position - position, line_color, 2)
 
-func _on_health_timer_timeout():
+func heal():
 	health += health_recovery
 	if health > max_health:
 		health = max_health
+
+func _on_health_timer_timeout():
+	heal()
 	$health_timer.start()
 
 func setAnimation():
@@ -126,16 +129,16 @@ func updateCurrentLevel():
 		max_health = 3.0
 		line_color = Color(0, 0, 1)
 		projectile_damage = 0.5
-	if neighbors_count > 1 and neighbors_count < 5:
+	if neighbors_count > 1 and neighbors_count < 4:
 		current_level = 2
 		max_health = 4.0
 		line_color = Color(0, 1, 0)
-		projectile_damage = 1.0
-	if neighbors_count >= 5:
+		projectile_damage = 1.5
+	if neighbors_count >= 4:
 		current_level = 3
 		max_health = 5.0
 		line_color = Color(1, 0, 0)
-		projectile_damage = 1.5
+		projectile_damage = 2.5
 		
 	if health > max_health:
 		health = max_health

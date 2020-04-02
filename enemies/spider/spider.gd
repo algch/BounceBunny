@@ -49,7 +49,6 @@ func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
 	$animation.play('walk')
-	print('spider spawned with speed ', speed)
 
 func handleWeaponCollision(weapon):
 	health -= weapon.damage
