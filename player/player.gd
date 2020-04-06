@@ -29,6 +29,7 @@ var current_plant = null
 onready var mana = main.INITIAL_PLAYER_MANA
 onready var damage = main.INITIAL_PLAYER_DAMAGE
 
+
 func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
