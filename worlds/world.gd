@@ -8,11 +8,11 @@ func attachNewGraph(graph_id):
 	print('all graphs ', all_graphs)
 
 func removeGraph(graph_id):
-    if graph_id in all_graphs:
+	if graph_id in all_graphs:
 		all_graphs.erase(graph_id)
 
 func addNode(graph_id, source, dest):
-    var plants_graph = all_graphs[graph_id]
+	var plants_graph = all_graphs[graph_id]
 	var source_id = source.get_instance_id()
 	var dest_id = dest.get_instance_id()
 	if source_id in plants_graph:
@@ -21,15 +21,15 @@ func addNode(graph_id, source, dest):
 		plants_graph[source_id] = { dest_id: dest }
 
 func removeNode(graph_id, node):
-    var plants_graph = all_graphs[graph_id]
+	var plants_graph = all_graphs[graph_id]
 	var node_id = node.get_instance_id()
 	for id in plants_graph:
 		if node_id in plants_graph[id]:
 			plants_graph[id].erase(node_id)
-    plants_graph.erase(node_id)
+	plants_graph.erase(node_id)
 
 func removeIfDetached(graph_id, node):
-    var plants_graph = all_graphs[graph_id]
+	var plants_graph = all_graphs[graph_id]
 	var node_id = node.get_instance_id()
 	var queue = [node]
 	var visited = { node_id: true }
@@ -38,6 +38,7 @@ func removeIfDetached(graph_id, node):
 		var current = queue.pop_front()
 		var current_id = current.get_instance_id()
 
+		var player = get_node(graph_id)
 		if current == player.current_plant:
 			return
 
@@ -46,8 +47,9 @@ func removeIfDetached(graph_id, node):
 				queue.append(plants_graph[current_id][id])
 				visited[id] = true
 
-    node.destroy()
+	node.destroy()
 
 func getNeighbors(graph_id, node):
+	var plants_graph = all_graphs[graph_id]
 	var node_id = node.get_instance_id()
-    return plants_graph[node_id].values() if node_id in plants_graph else []
+	return plants_graph[node_id].values() if node_id in plants_graph else []

@@ -1,6 +1,6 @@
 extends 'res://worlds/world.gd'
 
-onready var empty_positions = get_nodes_in_group('start_position')
+onready var empty_positions = get_tree().get_nodes_in_group('start_position')
 
 func _ready():
 	get_tree().connect('network_peer_disconnected', self, '_on_player_disconnected')
