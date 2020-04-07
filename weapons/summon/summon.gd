@@ -11,6 +11,9 @@ func _ready():
 	MAX_SPEED = 600.0
 	._ready()
 
+func init(pos)
+	position = pos
+
 func abortSummon():
 	print('colisionó, no se puede plantar')
 	queue_free()

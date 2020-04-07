@@ -4,11 +4,12 @@ var all_graphs = {}
 # TODO handle player position in its own graph
 
 func attachNewGraph(graph_id):
-    all_graphs[graph_id] = {}
+	all_graphs[graph_id] = {}
+	print('all graphs ', all_graphs)
 
 func removeGraph(graph_id):
     if graph_id in all_graphs:
-        all_graphs.erase(graph_id)
+		all_graphs.erase(graph_id)
 
 func addNode(graph_id, source, dest):
     var plants_graph = all_graphs[graph_id]

@@ -10,10 +10,6 @@ var self_data = { name = '', position = Vector2(0, 0) }
 signal player_disconnected
 signal server_disconnected
 
-func _ready():
-	get_tree().connect('network_peer_disconnected', self, '_on_player_disconnected')
-	get_tree().connect('network_peer_connected', self, '_on_player_connected')
-
 func create_server(player_nickname):
 	self_data.name = player_nickname
 	players[1] = self_data
@@ -22,16 +18,12 @@ func create_server(player_nickname):
 	get_tree().set_network_peer(peer)
 
 func connectToServer(player_nickname, ip_address):
-    self_data.name = player_nickname
-    var mainArena = get_node('/root/mainArena')
+	self_data.name = player_nickname
+	var mainArena = get_node('/root/mainArena')
 	get_tree().connect('connected_to_server', mainArena, '_connected_to_server')
 	var peer = NetworkedMultiplayerENet.new()
 	peer.create_client(ip_address, DEFAULT_PORT)
 	get_tree().set_network_peer(peer)
-
-func _on_player_disconnected(id):
-	players.erase(id)
-
 
 # A function to be used if needed. The purpose is to request all players in the current session.
 remote func _request_players(request_from_id):

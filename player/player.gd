@@ -28,6 +28,7 @@ var default_font = DynamicFont.new()
 var current_plant = null
 onready var mana = main.INITIAL_PLAYER_MANA
 onready var damage = main.INITIAL_PLAYER_DAMAGE
+var name = ''
 
 
 func _ready():
@@ -41,6 +42,9 @@ func _ready():
 	$quit.visible = false
 	$quit.set_process(false)
 
+func init(nickname, start_position):
+	$gui/nickname.text = nickname
+	global_position = start_position
 
 func summonPlant(power, direction):
 	var summon = summon_class.instance()
