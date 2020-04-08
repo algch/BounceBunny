@@ -9,7 +9,7 @@ var WEAPON_RADIUS = 125
 var motion_dir = Vector2(0, 0)
 onready var projectile_class = preload('res://weapons/projectile/projectile.tscn')
 onready var summon_class = preload('res://weapons/summon/summon.tscn')
-onready var main = get_node('/root/main/')
+onready var mainArena = get_node('/root/mainArena/')
 var CHARGE_WAIT_TIME = 1.0
 var MAX_SHOOT_LENGTH = 250
 var MIN_SHOOT_LENGTH = 50
@@ -20,21 +20,19 @@ enum STATE {
 	charging
 }
 var current_state = STATE.idle
-var current_weapon = globals.PROJECTILE_TYPES.ATTACK
+var current_weapon = Globals.PROJECTILE_TYPES.ATTACK
 var shoot_point_start = null
 
 var default_font = DynamicFont.new()
 
 var current_plant = null
-onready var mana = main.INITIAL_PLAYER_MANA
-onready var damage = main.INITIAL_PLAYER_DAMAGE
-var name = ''
+onready var mana = Globals.INITIAL_PLAYER_MANA
+onready var damage = Globals.INITIAL_PLAYER_DAMAGE
 
 
 func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
-	current_plant = get_node('/root/main/plant/')
 
 	$pauseScreen.visible = false
 	$resumeRestart.visible = false
@@ -42,9 +40,10 @@ func _ready():
 	$quit.visible = false
 	$quit.set_process(false)
 
-func init(nickname, start_position):
+func init(nickname, start_position, plant):
 	$gui/nickname.text = nickname
 	global_position = start_position
+	current_plant = plant
 
 func summonPlant(power, direction):
 	var summon = summon_class.instance()
@@ -72,20 +71,20 @@ func attack(power, direction):
 	projectile.position = position + offset
 	projectile.direction = direction
 	projectile.power = power
-	projectile.type = globals.PROJECTILE_TYPES.ATTACK
+	projectile.type = Globals.PROJECTILE_TYPES.ATTACK
 	projectile.MAX_DAMAGE = damage
 
 	get_node('/root/main/').add_child(projectile)
 	$animation.play('attack')
 
 func _on_bow_released():
-	current_weapon = globals.PROJECTILE_TYPES.ATTACK
+	current_weapon = Globals.PROJECTILE_TYPES.ATTACK
 	$animation.set_animation('bow_0')
 	$animation.set_frame(0)
 	$animation.stop()
 
 func _on_seed_released():
-	current_weapon = globals.PROJECTILE_TYPES.SUMMON
+	current_weapon = Globals.PROJECTILE_TYPES.SUMMON
 	$animation.set_animation('summon_0')
 	$animation.set_frame(0)
 	$animation.stop()
@@ -110,7 +109,7 @@ func _on_resumeRestart_released():
 		$resumeRestart.set_process(false)
 		$quit.visible = false
 		$quit.set_process(false)
-	if main.GAME_OVER:
+	if Globals.GAME_OVER:
 		get_tree().reload_current_scene()
 
 func pollInput():
@@ -127,23 +126,23 @@ func pollInput():
 		current_state = STATE.idle
 		if power >= 0.2:
 			var direction = (shoot_point_start - get_global_mouse_position()).normalized()
-			if current_weapon == globals.PROJECTILE_TYPES.ATTACK:
+			if current_weapon == Globals.PROJECTILE_TYPES.ATTACK:
 				attack(power, direction)
-			if current_weapon == globals.PROJECTILE_TYPES.SUMMON:
+			if current_weapon == Globals.PROJECTILE_TYPES.SUMMON:
 				summonPlant(power, direction)
 
 			releaseAnimation()
 
 func releaseAnimation():
 	match current_weapon:
-		globals.PROJECTILE_TYPES.ATTACK:
+		Globals.PROJECTILE_TYPES.ATTACK:
 			$animation.play('bow_1')
-		globals.PROJECTILE_TYPES.SUMMON:
+		Globals.PROJECTILE_TYPES.SUMMON:
 			$animation.play('summon_1')
 
 func setCurrentPlant(plant):
 	if plant.is_queued_for_deletion() or not is_instance_valid(plant):
-		main.gameOver()
+		Globals.gameOver()
 	position = plant.position
 	current_plant = plant
 	damage = plant.projectile_damage
@@ -170,10 +169,10 @@ func _on_animation_finished():
 	var animation_name
 	var part = 0 if current_state == STATE.idle else 1 
 	match current_weapon:
-		globals.PROJECTILE_TYPES.ATTACK:
+		Globals.PROJECTILE_TYPES.ATTACK:
 			animation_name = 'bow_' + str(part)
 			$animation.set_animation(animation_name)
-		globals.PROJECTILE_TYPES.SUMMON:
+		Globals.PROJECTILE_TYPES.SUMMON:
 			animation_name= 'summon_' + str(part)
 			$animation.set_animation(animation_name)
 
@@ -198,7 +197,7 @@ func aimingLoop():
 	$animation.rotation = angle
 
 func updateGui():
-	var message = 'MANA: ' + str(mana) + '\nSCORE: ' + str(main.score)
+	var message = 'MANA: ' + str(mana) + '\nSCORE: ' + str(Globals.score)
 	$gui/label.set_text(message)
 
 func _process(delta):

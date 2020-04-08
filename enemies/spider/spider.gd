@@ -179,7 +179,7 @@ func _on_visionArea_area_exited(area):
 
 
 func leaveLoot():
-	if globals.calculateChance(0.50):
+	if Globals.calculateChance(0.50):
 		var mana = mana_class.instance()
 		mana.position = position
 		get_parent().add_child(mana)

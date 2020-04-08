@@ -1,4 +1,5 @@
-extends 'res://worlds/world.gd'
+# extends 'res://worlds/world.gd'
+extends Node
 
 onready var player = get_node('player')
 var GAME_OVER = false

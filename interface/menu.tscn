@@ -48,7 +48,7 @@ text = "Player name"
 
 [node name="playerName" type="LineEdit" parent="VBoxContainer/HBoxContainer"]
 margin_left = 191.0
-margin_right = 391.0
+margin_right = 249.0
 margin_bottom = 33.0
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
@@ -82,7 +82,7 @@ text = "Server IP address"
 
 [node name="serverAddress" type="LineEdit" parent="VBoxContainer/HBoxContainer3"]
 margin_left = 293.0
-margin_right = 493.0
+margin_right = 351.0
 margin_bottom = 33.0
 
 [node name="HBoxContainer4" type="HBoxContainer" parent="VBoxContainer"]

@@ -16,13 +16,13 @@ _global_script_class_icons={
 [application]
 
 config/name="JARDINOLIA"
-run/main_scene="res://main.tscn"
+run/main_scene="res://interface/menu.tscn"
 config/icon="res://icon.png"
 
 [autoload]
 
-globals="*res://engine/globals.gd"
-network="*res://engine/network.gd"
+Globals="*res://engine/globals.gd"
+Network="*res://engine/network.gd"
 
 [display]
 

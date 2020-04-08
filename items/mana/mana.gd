@@ -17,7 +17,7 @@ func _ready():
 	assignMana()
 
 func assignMana():
-	if globals.calculateChance(0.25):
+	if Globals.calculateChance(0.25):
 		mana = 20
 		$animation.play('mana_2')
 	else:

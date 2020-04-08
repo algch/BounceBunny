@@ -11,7 +11,7 @@ func _ready():
 	MAX_SPEED = 600.0
 	._ready()
 
-func init(pos)
+func init(pos):
 	position = pos
 
 func abortSummon():

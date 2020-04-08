@@ -1,8 +1,8 @@
 extends StaticBody2D
 
-onready var main = get_node('/root/main/')
+onready var main = get_node('/root/mainArena/')
 onready var projectile_class = preload('res://weapons/projectile/projectile.tscn')
-onready var player = get_node('/root/main/player')
+onready var player = get_node('/root/mainArena/player')
 onready var WEAPON_RADIUS = sqrt(pow($collisionShape.shape.extents.x, 2) + pow($collisionShape.shape.extents.y, 2)) + 24
 var targets = {}
 onready var attack_timer = get_node('attack_timer')
@@ -150,7 +150,7 @@ func updateGui():
 	$gui/container/bar.set_value(percentage)
 
 func _process(delta):
-	neighbors = main.getNeighbors(self)
+	neighbors = main.getNeighbors(get_tree().get_network_unique_id(), self)
 	updateCurrentLevel()
 	updateGui()
 	setAnimation()
@@ -159,6 +159,9 @@ func _process(delta):
 func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
+
+func init(pos):
+	position = pos
 
 func _physics_process(delta):
 	healthLoop()

@@ -2,10 +2,48 @@ extends 'res://worlds/world.gd'
 
 onready var empty_positions = get_tree().get_nodes_in_group('start_position')
 
+const DEFAULT_IP = '127.0.0.1'
+const DEFAULT_PORT = 31400
+const MAX_PLAYERS = 5
+
+signal player_disconnected
+signal server_disconnected
+
+var is_server = false
+var player_nickname = ''
+var ip_address = DEFAULT_IP
+
+
+func init(nickname, ip):
+	player_nickname = nickname
+	ip_address = ip
+
 func _ready():
 	get_tree().connect('network_peer_disconnected', self, '_on_player_disconnected')
 	get_tree().connect('network_peer_connected', self, '_on_player_connected')
+	if is_server:
+		create_server()
+	else:
+		connectToServer()
 
+func create_server():
+	var peer = NetworkedMultiplayerENet.new()
+	peer.create_server(DEFAULT_PORT, MAX_PLAYERS)
+	get_tree().set_network_peer(peer)
+	attachNewGraph(1)
+	var plant = load('res://plants/plant.tscn').instance()
+	plant.init(Vector2(200, 200))
+	add_child(plant)
+	var player = load('res://player/player.tscn').instance()
+	player.init('server', Vector2(200, 200), plant)
+	add_child(player)
+	
+
+func connectToServer():
+	get_tree().connect('connected_to_server', self, '_connected_to_server')
+	var peer = NetworkedMultiplayerENet.new()
+	peer.create_client(ip_address, DEFAULT_PORT)
+	get_tree().set_network_peer(peer)
 
 func _connected_to_server(): # triggered on connected_to_server
 	var local_player_id = get_tree().get_network_unique_id()
@@ -21,7 +59,7 @@ remote func _send_player_info(id, all_graphs, pos):
 	new_player.name = str(id)
 	new_player.set_network_master(id)
 	add_child(new_player)
-	new_player.init('jugaor', pos)
+	new_player.init('jugador', pos)
 
 func _on_player_connected(connected_player_id):
 	var local_player_id = get_tree().get_network_unique_id()
