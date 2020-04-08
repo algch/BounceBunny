@@ -22,9 +22,10 @@ var neighbors = []
 var projectile_damage = 0.5
 
 
-func _on_score_timer_timeout():
-	main.increaseScore()
-	$score_timer.start()
+# DOES NOT APPLY TO MULTIPLAYER, CREATE A BASE CLASS POR PLANT WITH NETWORKING FUNCTIONS
+# func _on_score_timer_timeout():
+# 	main.increaseScore()
+# 	$score_timer.start()
 
 func receiveDamage(damage):
 	health -= damage
@@ -91,6 +92,7 @@ func _on_attack_timer_timeout():
 	attack_timer.start()
 
 func _on_teleport_released():
+	print('player', player)
 	if player.current_plant == self:
 		return
 	player.setCurrentPlant(self)

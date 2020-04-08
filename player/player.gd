@@ -58,7 +58,8 @@ func summonPlant(power, direction):
 	summon.power = power
 	summon.first_neighbor = current_plant
 
-	get_node('/root/main/').add_child(summon)
+	# CREATE A BASE CLASS FOR PLAYER, INHERIT TO SOLO AND MULTIPLAYER INSTANCES
+	get_node('/root/mainArena/').add_child(summon)
 
 
 func addMana(increment):
@@ -74,7 +75,8 @@ func attack(power, direction):
 	projectile.type = Globals.PROJECTILE_TYPES.ATTACK
 	projectile.MAX_DAMAGE = damage
 
-	get_node('/root/main/').add_child(projectile)
+	# CREATE A BASE CLASS FOR PLAYER, INHERIT TO SOLO AND MULTIPLAYER INSTANCES
+	get_node('/root/mainArena/').add_child(projectile)
 	$animation.play('attack')
 
 func _on_bow_released():

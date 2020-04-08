@@ -1,7 +1,9 @@
 extends 'res://weapons/weapon.gd'
 
-onready var main = get_node('/root/main/')
-onready var player = get_node('/root/main/player')
+# CREATE A BASE CLASS, INHERIT TO SOLO AND MULTIPLAYER MODES
+
+onready var main = get_node('/root/mainArena/')
+onready var player = get_node('/root/mainArena/player')
 var plant_class = preload('res://plants/plant.tscn')
 var mana_cost = 20.0
 var first_neighbor
@@ -29,10 +31,10 @@ func handleCollision(collider):
 
 func travelEnded():
 	var plant = plant_class.instance()
-	main.addNode(first_neighbor, plant)
-	main.addNode(plant, first_neighbor)
+	main.addNode(get_tree().get_network_unique_id(), first_neighbor, plant)
+	main.addNode(get_tree().get_network_unique_id(), plant, first_neighbor)
 	plant.position = position
-	get_node('/root/main/').add_child(plant)
+	main.add_child(plant)
 	player.mana -= mana_cost
 	queue_free()
 
