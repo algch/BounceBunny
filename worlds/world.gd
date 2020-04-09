@@ -38,7 +38,7 @@ func removeIfDetached(graph_id, node):
 		var current = queue.pop_front()
 		var current_id = current.get_instance_id()
 
-		var player = get_node(graph_id)
+		var player = get_node('/root/mainArena/player/')
 		if current == player.current_plant:
 			return
 

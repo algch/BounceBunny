@@ -2,7 +2,6 @@ extends StaticBody2D
 
 onready var main = get_node('/root/mainArena/')
 onready var projectile_class = preload('res://weapons/projectile/projectile.tscn')
-onready var player = get_node('/root/mainArena/player')
 onready var WEAPON_RADIUS = sqrt(pow($collisionShape.shape.extents.x, 2) + pow($collisionShape.shape.extents.y, 2)) + 24
 var targets = {}
 onready var attack_timer = get_node('attack_timer')
@@ -20,6 +19,7 @@ var current_level = 1
 var line_color = Color(0, 0, 1)
 var neighbors = []
 var projectile_damage = 0.5
+onready var network_id = get_tree().get_network_unique_id()
 
 
 # DOES NOT APPLY TO MULTIPLAYER, CREATE A BASE CLASS POR PLANT WITH NETWORKING FUNCTIONS
@@ -31,10 +31,11 @@ func receiveDamage(damage):
 	health -= damage
 
 func destroy():
+	var player = get_node('/root/mainArena/player')
 	if is_queued_for_deletion():
 		return
 
-	var neighbors = main.getNeighbors(self)
+	var neighbors = main.getNeighbors(network_id, self)
 
 	if self == player.current_plant:
 		if neighbors:
@@ -42,9 +43,9 @@ func destroy():
 		else:
 			main.gameOver()
 
-	main.removeNode(self)
+	main.removeNode(network_id, self)
 	for neighbor in neighbors:
-		main.removeIfDetached(neighbor)
+		main.removeIfDetached(network_id, neighbor)
 
 	queue_free()
 
@@ -92,6 +93,7 @@ func _on_attack_timer_timeout():
 	attack_timer.start()
 
 func _on_teleport_released():
+	var player = get_node('/root/mainArena/player')
 	print('player', player)
 	if player.current_plant == self:
 		return
