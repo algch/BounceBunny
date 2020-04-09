@@ -59,7 +59,7 @@ remote func _send_player_info(id, all_graphs, pos):
 	new_player.name = str(id)
 	new_player.set_network_master(id)
 	add_child(new_player)
-	new_player.init('jugador', pos)
+	new_player.init('jugador', pos, new_plant)
 
 func _on_player_connected(connected_player_id):
 	var local_player_id = get_tree().get_network_unique_id()
