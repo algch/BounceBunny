@@ -80,7 +80,7 @@ remote func _request_player_info(request_from_id, player_id):
 	if get_tree().is_network_server():
 		print('I am a server!')
 		var pos = Vector2(10 + randi()%500, 10 + randi()%500)
-        rpc_id(request_from_id, '_send_player_info', player_id, pos)
+		rpc_id(request_from_id, '_send_player_info', player_id, pos)
 
 func _on_player_disconnected(id):
 	all_graphs.erase(id)
