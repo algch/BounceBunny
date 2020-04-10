@@ -94,7 +94,6 @@ func _on_attack_timer_timeout():
 
 func _on_teleport_released():
 	var player = get_node('/root/mainArena/player')
-	print('player', player)
 	if player.current_plant == self:
 		return
 	player.setCurrentPlant(self)

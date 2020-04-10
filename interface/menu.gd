@@ -13,7 +13,6 @@ func _on_createServer_pressed():
 	if player_name == '':
 		return
 	var mainArena = load('res://worlds/mainArena.tscn').instance()
-	print(mainArena)
 	mainArena.init('server', mainArena.DEFAULT_IP)
 	mainArena.is_server = true # should be in init
 	loadGame(mainArena)
@@ -28,7 +27,6 @@ func _on_joinServer_pressed():
 func loadGame(scene):
 	var root = get_tree().get_root()
 	var menu = root.get_node('menu')
-	print('menu is ', menu)
 	root.remove_child(menu)
 	menu.call_deferred('free')
 	root.add_child(scene)

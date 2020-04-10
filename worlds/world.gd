@@ -5,7 +5,6 @@ var all_graphs = {}
 
 func attachNewGraph(graph_id):
 	all_graphs[graph_id] = {}
-	print('all graphs ', all_graphs)
 
 func removeGraph(graph_id):
 	if graph_id in all_graphs:

@@ -113,6 +113,5 @@ func gameOver():
 func _ready():
 	randomize()
 	if not savegame.file_exists(save_path):
-		print('created save data')
 		create_save()
 	$player/highScore.set_text('HIGHSCORE: ' + str(getHighScore()))
