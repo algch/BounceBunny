@@ -56,7 +56,7 @@ func _connected_to_server(): # on client when connected to server
 	var local_player_id = get_tree().get_network_unique_id()
 	rpc_id(1, 'requestGameState', local_player_id)
 	var pos = available_positions.pop_front().position
-	rpc('registerPlayer', get_tree().get_network_unique_id(), pos)
+	rpc('registerPlayer', get_tree().get_network_unique_id(), pos, available_positions)
 
 remote func requestGameState(requester_id):
 	rset_id(requester_id, 'player_positions', player_positions)
@@ -68,7 +68,7 @@ remote func syncGameState(graphs, player_pos, available_pos):
 	player_positions = player_pos
 	available_positions = available_pos
 
-remotesync func registerPlayer(player_id, pos, pos_list):
+remote func registerPlayer(player_id, pos, pos_list):
 	print('rigistering player...')
 	attachNewGraph(player_id)
 	var plant = load('res://plants/plant.tscn').instance()
