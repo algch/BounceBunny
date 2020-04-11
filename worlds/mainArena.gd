@@ -94,7 +94,7 @@ remotesync func registerPlayer(player_id, pos, pos_list):
 # 	new_player.init('jugador', pos, new_plant)
 
 func _on_player_connected(connected_player_id):
-	print('[' + connected_player_id + '] has connected to server')
+	print('[' + str(onnected_player_id) + '] has connected to server')
 	# var local_player_id = get_tree().get_network_unique_id()
 	# if not get_tree().is_network_server():
 	# 	print('I am a client!')
