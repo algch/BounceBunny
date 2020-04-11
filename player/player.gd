@@ -195,11 +195,3 @@ func aimingLoop():
 func updateGui():
 	var message = 'MANA: ' + str(mana) + '\nSCORE: ' + str(Globals.score)
 	$gui/label.set_text(message)
-
-func _process(delta):
-	updateGui()
-	update()
-
-master func _physics_process(delta):
-	aimingLoop()
-	pollInput()

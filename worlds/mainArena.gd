@@ -166,3 +166,13 @@ func _on_resumeRestart_released():
 	gui.get_node('resumeRestart').set_process(false)
 	gui.get_node('quit').visible = false
 	gui.get_node('quit').set_process(false)
+
+func _process(delta):
+	var player = getLocalPlayerNode()
+	player.updateGui()
+	player.update()
+
+func _physics_process(delta):
+	var player = getLocalPlayerNode()
+	player.aimingLoop()
+	player.pollInput()
