@@ -49,6 +49,8 @@ func removeIfDetached(graph_id, node):
 	node.destroy()
 
 func getNeighbors(graph_id, node):
+	if not graph_id in all_graphs:
+		return []
 	var plants_graph = all_graphs[graph_id]
 	var node_id = node.get_instance_id()
 	return plants_graph[node_id].values() if node_id in plants_graph else []
