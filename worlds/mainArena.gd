@@ -38,7 +38,7 @@ func createServer():
 	var plant = load('res://plants/plant.tscn').instance()
 	plant.init(pos)
 	plant.set_name(str(1))
-	plant.set_network_master(str(1))
+	plant.set_network_master(1)
 	add_child(plant)
 	var player = load('res://player/player.tscn').instance()
 	player.init('server', pos, plant)
@@ -72,8 +72,8 @@ func _connected_to_server(): # on client when connected to server
 	var pos = available_positions.pop_front().position
 	rpc('registerPlayer', get_tree().get_network_unique_id(), pos, available_positions)
 
-remote func requestGameState(graphs, player_pos, available_pos):
-	rpc_id(requester_id, 'syncGameState', graphs, player_pos, available_pos)
+remote func requestGameState(requester_id):
+	rpc_id(requester_id, 'syncGameState', all_graphs, player_positions, available_positions)
 
 remote func syncGameState(graphs, player_pos, available_pos):
 	all_graphs = graphs
