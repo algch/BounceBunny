@@ -1,8 +1,6 @@
 extends 'res://worlds/world.gd'
 
-onready var 
-
-onready sync var available_positions = get_tree().get_nodes_in_group('start_position')
+remote var available_positions
 
 const DEFAULT_IP = '127.0.0.1'
 const DEFAULT_PORT = 31400
@@ -15,7 +13,7 @@ var is_server = false
 var player_nickname = ''
 var ip_address = DEFAULT_IP
 
-sync var player_positions = {}
+remote var player_positions = {}
 
 
 func init(nickname, ip):
@@ -25,6 +23,7 @@ func init(nickname, ip):
 func _ready():
 	get_tree().connect('network_peer_disconnected', self, '_on_player_disconnected')
 	get_tree().connect('network_peer_connected', self, '_on_player_connected')
+	available_positions = get_tree().get_nodes_in_group('start_position')
 	if is_server:
 		createServer()
 	else:
@@ -35,7 +34,7 @@ func createServer():
 	peer.create_server(DEFAULT_PORT, MAX_PLAYERS)
 	get_tree().set_network_peer(peer)
 	attachNewGraph(1)
-	var pos = available_positions.pop_front()
+	var pos = available_positions.pop_front().position
 	var plant = load('res://plants/plant.tscn').instance()
 	plant.init(pos)
 	add_child(plant)
@@ -56,7 +55,7 @@ func _connected_to_server(): # on client when connected to server
 	print('we have connected to server')
 	var local_player_id = get_tree().get_network_unique_id()
 	rpc_id(1, 'requestGameState', local_player_id)
-	var pos = available_positions.pop_front()
+	var pos = available_positions.pop_front().position
 	rpc('registerPlayer', get_tree().get_network_unique_id(), pos)
 
 remote func requestGameState(requester_id):
