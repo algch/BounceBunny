@@ -200,6 +200,6 @@ func _process(delta):
 	updateGui()
 	update()
 
-func _physics_process(delta):
+master func _physics_process(delta):
 	aimingLoop()
 	pollInput()
