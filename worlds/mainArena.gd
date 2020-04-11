@@ -68,12 +68,13 @@ remote func syncGameState(graphs, player_pos, available_pos):
 	player_positions = player_pos
 	available_positions = available_pos
 
-remote func registerPlayer(player_id, pos, pos_list):
+remotesync func registerPlayer(player_id, pos, pos_list):
 	print('rigistering player...')
 	attachNewGraph(player_id)
 	var plant = load('res://plants/plant.tscn').instance()
 	plant.init(pos)
 	add_child(plant)
+	print(plant, ' was added')
 	var player = load('res://player/player.tscn').instance()
 	player.init('server', pos, plant)
 	# add_child(player)
@@ -81,6 +82,9 @@ remote func registerPlayer(player_id, pos, pos_list):
 	if is_network_master():
 		player_positions = pos_list
 	print('player registered')
+	print('player positions ', player_positions)
+	print('all graphs', all_graphs)
+	print('available positions ', available_positions)
 
 # remote func _send_player_info(id, pos): # 3
 # 	attachNewGraph(id)
