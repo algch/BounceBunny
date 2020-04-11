@@ -2,7 +2,7 @@ extends 'res://worlds/world.gd'
 
 onready var 
 
-onready remote var available_positions = get_tree().get_nodes_in_group('start_position')
+onready sync var available_positions = get_tree().get_nodes_in_group('start_position')
 
 const DEFAULT_IP = '127.0.0.1'
 const DEFAULT_PORT = 31400
@@ -15,7 +15,7 @@ var is_server = false
 var player_nickname = ''
 var ip_address = DEFAULT_IP
 
-remote var player_positions = {}
+sync var player_positions = {}
 
 
 func init(nickname, ip):
