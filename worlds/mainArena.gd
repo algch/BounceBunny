@@ -38,7 +38,7 @@ func createServer():
 	var plant = load('res://plants/plant.tscn').instance()
 	plant.init(pos)
 	plant.set_name(str(1))
-	plant.set_network_master(p_id)
+	plant.set_network_master(str(1))
 	add_child(plant)
 	var player = load('res://player/player.tscn').instance()
 	player.init('server', pos, plant)
