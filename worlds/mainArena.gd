@@ -37,7 +37,6 @@ func createServer():
 	get_tree().set_network_peer(peer)
 	var pos = available_positions.pop_front()
 	registerPlayer(1, pos, available_positions)
-	emit_signal('local_player_initialized', getLocalPlayerNode())
 
 func connectToServer(): # 1
 	get_tree().connect('connected_to_server', self, '_connected_to_server')
@@ -45,7 +44,6 @@ func connectToServer(): # 1
 	print('Requesting connection to lobby [' + ip_address + ']')
 	peer.create_client(ip_address, DEFAULT_PORT)
 	get_tree().set_network_peer(peer)
-	emit_signal('local_player_initialized', getLocalPlayerNode())
 
 func _connected_to_server(): # on client when connected to server
 	print('we have connected to server')
@@ -169,10 +167,14 @@ func _on_resumeRestart_released():
 
 func _process(delta):
 	var player = getLocalPlayerNode()
+	if not player:
+		return
 	player.updateGui()
 	player.update()
 
 func _physics_process(delta):
 	var player = getLocalPlayerNode()
+	if not player:
+		return
 	player.aimingLoop()
 	player.pollInput()

@@ -33,6 +33,8 @@ onready var damage = Globals.INITIAL_PLAYER_DAMAGE
 func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
+	if str(get_tree().get_network_unique_id()) == name:
+		get_parent().emit_signal('local_player_initialized', get_parent().getLocalPlayerNode())
 
 func init(nickname, start_position, plant):
 	$gui/nickname.text = nickname
