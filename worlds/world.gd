@@ -1,6 +1,6 @@
 extends Node
 
-var all_graphs = {}
+remote var all_graphs = {}
 # TODO handle player position in its own graph
 
 func attachNewGraph(graph_id):

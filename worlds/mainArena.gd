@@ -1,6 +1,8 @@
 extends 'res://worlds/world.gd'
 
-onready var empty_positions = get_tree().get_nodes_in_group('start_position')
+onready var 
+
+onready remote var available_positions = get_tree().get_nodes_in_group('start_position')
 
 const DEFAULT_IP = '127.0.0.1'
 const DEFAULT_PORT = 31400
@@ -12,6 +14,8 @@ signal server_disconnected
 var is_server = false
 var player_nickname = ''
 var ip_address = DEFAULT_IP
+
+remote var player_positions = {}
 
 
 func init(nickname, ip):
@@ -31,26 +35,51 @@ func createServer():
 	peer.create_server(DEFAULT_PORT, MAX_PLAYERS)
 	get_tree().set_network_peer(peer)
 	attachNewGraph(1)
+	var pos = available_positions.pop_front()
 	var plant = load('res://plants/plant.tscn').instance()
-	plant.init(Vector2(200, 200))
+	plant.init(pos)
 	add_child(plant)
 	var player = load('res://player/player.tscn').instance()
-	player.init('server', Vector2(200, 200), plant)
-	add_child(player)
+	player.init('server', pos, plant)
+	# add_child(player)
+	player_positions[get_tree().get_network_unique_id()] = pos
 	
 
 func connectToServer(): # 1
 	get_tree().connect('connected_to_server', self, '_connected_to_server')
 	var peer = NetworkedMultiplayerENet.new()
-	print('connecting to...', ip_address)
+	print('Requesting connection to lobby [' + ip_address + ']')
 	peer.create_client(ip_address, DEFAULT_PORT)
 	get_tree().set_network_peer(peer)
 
-func _connected_to_server(): # this happens async
+func _connected_to_server(): # on client when connected to server
 	print('we have connected to server')
 	var local_player_id = get_tree().get_network_unique_id()
-	var pos = Vector2(50 + randi()%500, 50 + randi()%500)
-	rpc_id(1, 'printInServer', 'a message from the client')
+	rpc_id(1, 'requestGameState', local_player_id)
+	var pos = available_positions.pop_front()
+	rpc('registerPlayer', get_tree().get_network_unique_id(), pos)
+
+remote func requestGameState(requester_id):
+	rset_id(requester_id, 'player_positions', player_positions)
+	rset_id(requester_id, 'all_graphs', all_graphs)
+	rset_id(requester_id, 'available_positions', available_positions)
+
+remote func syncGameState(graphs, player_pos, available_pos):
+	all_graphs = graphs
+	player_positions = player_pos
+	available_positions = available_pos
+
+remotesync func registerPlayer(player_id, pos, pos_list):
+	attachNewGraph(player_id)
+	var plant = load('res://plants/plant.tscn').instance()
+	plant.init(pos)
+	add_child(plant)
+	var player = load('res://player/player.tscn').instance()
+	player.init('server', pos, plant)
+	# add_child(player)
+	player_positions[get_tree().get_network_unique_id()] = pos
+	if is_network_master():
+		player_positions = pos_list
 
 # remote func _send_player_info(id, pos): # 3
 # 	attachNewGraph(id)
@@ -66,7 +95,7 @@ func _connected_to_server(): # this happens async
 # 	new_player.init('jugador', pos, new_plant)
 
 func _on_player_connected(connected_player_id):
-	print('a player has conected', connected_player_id)
+	print('[' + connected_player_id + '] has connected to server')
 	# var local_player_id = get_tree().get_network_unique_id()
 	# if not get_tree().is_network_server():
 	# 	print('I am a client!')
