@@ -55,6 +55,14 @@ func _connected_to_server(): # on client when connected to server
 	print('we have connected to server')
 	var local_player_id = get_tree().get_network_unique_id()
 	rpc_id(1, 'requestGameState', local_player_id)
+
+	for p_id in player_positions:
+		var plant = load('res://plants/plant.tscn').instance()
+		plant.init(player_positions[p_id])
+		plant.set_name(str(p_id))
+		plant.set_network_master(p_id)
+		add_child(plant)
+		
 	var pos = available_positions.pop_front().position
 	rpc('registerPlayer', get_tree().get_network_unique_id(), pos, available_positions)
 
