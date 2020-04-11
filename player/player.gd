@@ -34,12 +34,6 @@ func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
 
-	$pauseScreen.visible = false
-	$resumeRestart.visible = false
-	$resumeRestart.set_process(false)
-	$quit.visible = false
-	$quit.set_process(false)
-
 func init(nickname, start_position, plant):
 	$gui/nickname.text = nickname
 	global_position = start_position

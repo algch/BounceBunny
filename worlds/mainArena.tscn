@@ -1,7 +1,29 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://worlds/mainArena.gd" type="Script" id=1]
 [ext_resource path="res://tiles/dungeon_tileset.tres" type="TileSet" id=2]
+[ext_resource path="res://engine/camera.gd" type="Script" id=3]
+[ext_resource path="res://player/sprites/3.png" type="Texture" id=4]
+[ext_resource path="res://player/sprites/2.png" type="Texture" id=5]
+[ext_resource path="res://player/sprites/1.png" type="Texture" id=6]
+[ext_resource path="res://player/sprites/pause_screen.png" type="Texture" id=7]
+[ext_resource path="res://player/sprites/5.png" type="Texture" id=8]
+[ext_resource path="res://player/sprites/4.png" type="Texture" id=9]
+
+[sub_resource type="CircleShape2D" id=3]
+radius = 110.0
+
+[sub_resource type="CircleShape2D" id=4]
+radius = 110.0
+
+[sub_resource type="CircleShape2D" id=5]
+radius = 110.0
+
+[sub_resource type="CircleShape2D" id=1]
+radius = 110.0
+
+[sub_resource type="CircleShape2D" id=2]
+radius = 110.0
 
 [node name="mainArena" type="Node"]
 script = ExtResource( 1 )
@@ -31,6 +53,52 @@ position = Vector2( 259.707, 1407.95 )
 ]]
 position = Vector2( 956.595, 1412.67 )
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="camera" type="Camera2D" parent="."]
 current = true
-zoom = Vector2( 5, 5 )
+script = ExtResource( 3 )
+
+[node name="gui" type="Control" parent="camera"]
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="options" type="TouchScreenButton" parent="camera/gui"]
+position = Vector2( 82.3794, 356.977 )
+z_index = 1
+normal = ExtResource( 4 )
+shape = SubResource( 3 )
+
+[node name="seed" type="TouchScreenButton" parent="camera/gui"]
+position = Vector2( -161.326, 360.41 )
+z_index = 1
+normal = ExtResource( 5 )
+shape = SubResource( 4 )
+
+[node name="bow" type="TouchScreenButton" parent="camera/gui"]
+position = Vector2( -401.599, 367.275 )
+z_index = 1
+normal = ExtResource( 6 )
+shape = SubResource( 5 )
+
+[node name="pauseScreen" type="Sprite" parent="camera/gui"]
+visible = false
+z_index = 2
+texture = ExtResource( 7 )
+
+[node name="quit" type="TouchScreenButton" parent="camera/gui"]
+visible = false
+position = Vector2( -13.7299, -319.22 )
+z_index = 2
+normal = ExtResource( 8 )
+shape = SubResource( 1 )
+
+[node name="resumeRestart" type="TouchScreenButton" parent="camera/gui"]
+visible = false
+position = Vector2( -356.977, -308.923 )
+z_index = 2
+normal = ExtResource( 9 )
+shape = SubResource( 2 )
+[connection signal="released" from="camera/gui/options" to="." method="_on_options_released"]
+[connection signal="released" from="camera/gui/seed" to="." method="_on_seed_released"]
+[connection signal="released" from="camera/gui/bow" to="." method="_on_bow_released"]
+[connection signal="released" from="camera/gui/quit" to="." method="_on_quit_released"]
+[connection signal="released" from="camera/gui/resumeRestart" to="." method="_on_resumeRestart_released"]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://interface/menu.gd" type="Script" id=1]
 [ext_resource path="res://fonts/default-font.ttf" type="DynamicFontData" id=2]
@@ -21,6 +21,14 @@ font_data = ExtResource( 2 )
 size = 28
 font_data = ExtResource( 2 )
 
+[sub_resource type="DynamicFont" id=5]
+size = 28
+font_data = ExtResource( 2 )
+
+[sub_resource type="DynamicFont" id=6]
+size = 28
+font_data = ExtResource( 2 )
+
 [node name="menu" type="Control"]
 margin_right = 40.0
 margin_bottom = 40.0
@@ -38,29 +46,31 @@ text = "Start a new game"
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
 margin_top = 63.0
 margin_right = 545.0
-margin_bottom = 96.0
+margin_bottom = 106.0
 
 [node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
+margin_top = 5.0
 margin_right = 187.0
-margin_bottom = 33.0
+margin_bottom = 38.0
 custom_fonts/font = SubResource( 2 )
 text = "Player name"
 
 [node name="playerName" type="LineEdit" parent="VBoxContainer/HBoxContainer"]
 margin_left = 191.0
-margin_right = 249.0
-margin_bottom = 33.0
+margin_right = 405.0
+margin_bottom = 43.0
+custom_fonts/font = SubResource( 3 )
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
-margin_top = 100.0
+margin_top = 110.0
 margin_right = 545.0
-margin_bottom = 420.0
+margin_bottom = 430.0
 
 [node name="Label" type="Label" parent="VBoxContainer/HBoxContainer2"]
 margin_top = 143.0
 margin_right = 221.0
 margin_bottom = 176.0
-custom_fonts/font = SubResource( 3 )
+custom_fonts/font = SubResource( 4 )
 text = "Create Server"
 
 [node name="createServer" type="TextureButton" parent="VBoxContainer/HBoxContainer2"]
@@ -70,25 +80,27 @@ margin_bottom = 320.0
 texture_normal = ExtResource( 3 )
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer"]
-margin_top = 424.0
+margin_top = 434.0
 margin_right = 545.0
-margin_bottom = 457.0
+margin_bottom = 477.0
 
 [node name="Label2" type="Label" parent="VBoxContainer/HBoxContainer3"]
+margin_top = 5.0
 margin_right = 289.0
-margin_bottom = 33.0
-custom_fonts/font = SubResource( 4 )
+margin_bottom = 38.0
+custom_fonts/font = SubResource( 5 )
 text = "Server IP address"
 
 [node name="serverAddress" type="LineEdit" parent="VBoxContainer/HBoxContainer3"]
 margin_left = 293.0
-margin_right = 351.0
-margin_bottom = 33.0
+margin_right = 507.0
+margin_bottom = 43.0
+custom_fonts/font = SubResource( 6 )
 
 [node name="HBoxContainer4" type="HBoxContainer" parent="VBoxContainer"]
-margin_top = 461.0
+margin_top = 481.0
 margin_right = 545.0
-margin_bottom = 621.0
+margin_bottom = 641.0
 
 [node name="joinServer" type="TextureButton" parent="VBoxContainer/HBoxContainer4"]
 margin_right = 160.0

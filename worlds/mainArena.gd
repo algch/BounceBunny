@@ -15,6 +15,7 @@ var ip_address = DEFAULT_IP
 
 remote var player_positions = {}
 
+signal local_player_initialized
 
 func init(nickname, ip):
 	player_nickname = nickname
@@ -34,18 +35,9 @@ func createServer():
 	var peer = NetworkedMultiplayerENet.new()
 	peer.create_server(DEFAULT_PORT, MAX_PLAYERS)
 	get_tree().set_network_peer(peer)
-	attachNewGraph(1)
 	var pos = available_positions.pop_front()
-	var plant = load('res://plants/plant.tscn').instance()
-	plant.init(pos)
-	plant.set_name(str(1))
-	plant.set_network_master(1)
-	add_child(plant)
-	var player = load('res://player/player.tscn').instance()
-	player.init('server', pos, plant)
-	# add_child(player)
-	player_positions[get_tree().get_network_unique_id()] = pos
-	
+	registerPlayer(1, pos, available_positions)
+	emit_signal('local_player_initialized', getLocalPlayerNode())
 
 func connectToServer(): # 1
 	get_tree().connect('connected_to_server', self, '_connected_to_server')
@@ -53,6 +45,7 @@ func connectToServer(): # 1
 	print('Requesting connection to lobby [' + ip_address + ']')
 	peer.create_client(ip_address, DEFAULT_PORT)
 	get_tree().set_network_peer(peer)
+	emit_signal('local_player_initialized', getLocalPlayerNode())
 
 func _connected_to_server(): # on client when connected to server
 	print('we have connected to server')
@@ -76,32 +69,27 @@ remote func syncGameState(graphs, player_pos, available_pos):
 	initPlayers()
 
 func initPlayers():
-	for p_id in player_positions:
-		var plant = load('res://plants/plant.tscn').instance()
-		plant.init(player_positions[p_id])
-		plant.set_name(str(p_id))
-		plant.set_network_master(p_id)
-		add_child(plant)
 	var pos = available_positions.pop_front()
 	rpc('registerPlayer', get_tree().get_network_unique_id(), pos, available_positions)
-		
+	for p_id in player_positions:
+		var p_pos = player_positions[p_id]
+		registerPlayer(p_id, p_pos, available_positions)
 
 remotesync func registerPlayer(player_id, pos, pos_list):
-	print('rigistering player...')
 	attachNewGraph(player_id)
 	var plant = load('res://plants/plant.tscn').instance()
 	plant.init(pos)
-	plant.set_name(str(player_id))
 	plant.set_network_master(player_id)
 	add_child(plant)
 	print(plant, ' was added')
 	var player = load('res://player/player.tscn').instance()
+	player.set_name(str(player_id))
 	player.init('server', pos, plant)
-	# add_child(player)
+	add_child(player)
 	player_positions[get_tree().get_network_unique_id()] = pos
 	if is_network_master():
-		player_positions = pos_list
-	print('player registered')
+		available_positions = pos_list
+	print('[' + str(player_id) + '] has joined.' )
 
 # remote func _send_player_info(id, pos): # 3
 # 	attachNewGraph(id)
@@ -138,3 +126,43 @@ remote func printInServer(message):
 func _on_player_disconnected(id):
 	print('player ', id, ' disconnected')
 	# all_graphs.erase(id)
+
+func getLocalPlayerNode():
+	var player_path = '/root/mainArena/' + str(get_tree().get_network_unique_id())
+	return get_node(player_path)
+
+func getLocalGuiNode():
+	return get_node('/root/mainArena/camera/gui')
+
+func _on_bow_released():
+	var player = getLocalPlayerNode()
+	player.current_weapon = Globals.PROJECTILE_TYPES.ATTACK
+	player.get_node('animation').set_animation('bow_0')
+	player.get_node('animation').set_frame(0)
+	player.get_node('animation').stop()
+
+func _on_seed_released():
+	var player = getLocalPlayerNode()
+	player.current_weapon = Globals.PROJECTILE_TYPES.SUMMON
+	player.get_node('animation').set_animation('summon_0')
+	player.get_node('animation').set_frame(0)
+	player.get_node('animation').stop()
+
+func _on_options_released():
+	var gui = getLocalGuiNode()
+	gui.get_node('pauseScreen').visible = true
+	gui.get_node('resumeRestart').visible = true
+	gui.get_node('resumeRestart').set_process(true)
+	gui.get_node('quit').visible = true
+	gui.get_node('quit').set_process(true)
+
+func _on_quit_released():
+	get_tree().quit()
+
+func _on_resumeRestart_released():
+	var gui = getLocalGuiNode()
+	gui.get_node('pauseScreen').visible = false
+	gui.get_node('resumeRestart').visible = false
+	gui.get_node('resumeRestart').set_process(false)
+	gui.get_node('quit').visible = false
+	gui.get_node('quit').set_process(false)
