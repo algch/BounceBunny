@@ -1,6 +1,6 @@
 extends 'res://worlds/world.gd'
 
-remote var available_positions
+remote var available_positions = []
 
 const DEFAULT_IP = '127.0.0.1'
 const DEFAULT_PORT = 31400
@@ -23,7 +23,8 @@ func init(nickname, ip):
 func _ready():
 	get_tree().connect('network_peer_disconnected', self, '_on_player_disconnected')
 	get_tree().connect('network_peer_connected', self, '_on_player_connected')
-	available_positions = get_tree().get_nodes_in_group('start_position')
+	for pos in get_tree().get_nodes_in_group('start_position'):
+		available_positions.append(pos.position)
 	if is_server:
 		createServer()
 	else:
@@ -34,7 +35,7 @@ func createServer():
 	peer.create_server(DEFAULT_PORT, MAX_PLAYERS)
 	get_tree().set_network_peer(peer)
 	attachNewGraph(1)
-	var pos = available_positions.pop_front().position
+	var pos = available_positions.pop_front()
 	var plant = load('res://plants/plant.tscn').instance()
 	plant.init(pos)
 	plant.set_name(str(1))
@@ -81,7 +82,7 @@ func initPlayers():
 		plant.set_name(str(p_id))
 		plant.set_network_master(p_id)
 		add_child(plant)
-	var pos = available_positions.pop_front().position
+	var pos = available_positions.pop_front()
 	rpc('registerPlayer', get_tree().get_network_unique_id(), pos, available_positions)
 		
 
