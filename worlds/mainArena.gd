@@ -37,6 +37,8 @@ func createServer():
 	var pos = available_positions.pop_front().position
 	var plant = load('res://plants/plant.tscn').instance()
 	plant.init(pos)
+	plant.set_name(str(1))
+	plant.set_network_master(p_id)
 	add_child(plant)
 	var player = load('res://player/player.tscn').instance()
 	player.init('server', pos, plant)
@@ -55,6 +57,10 @@ func _connected_to_server(): # on client when connected to server
 	print('we have connected to server')
 	var local_player_id = get_tree().get_network_unique_id()
 	rpc_id(1, 'requestGameState', local_player_id)
+	print('game satate is synced')
+	print('player positions ', player_positions)
+	print('all graphs', all_graphs)
+	print('available positions ', available_positions)
 
 	for p_id in player_positions:
 		var plant = load('res://plants/plant.tscn').instance()
@@ -66,10 +72,8 @@ func _connected_to_server(): # on client when connected to server
 	var pos = available_positions.pop_front().position
 	rpc('registerPlayer', get_tree().get_network_unique_id(), pos, available_positions)
 
-remote func requestGameState(requester_id):
-	rset_id(requester_id, 'player_positions', player_positions)
-	rset_id(requester_id, 'all_graphs', all_graphs)
-	rset_id(requester_id, 'available_positions', available_positions)
+remote func requestGameState(graphs, player_pos, available_pos):
+	rpc_id(requester_id, 'syncGameState', graphs, player_pos, available_pos)
 
 remote func syncGameState(graphs, player_pos, available_pos):
 	all_graphs = graphs
@@ -92,9 +96,6 @@ remotesync func registerPlayer(player_id, pos, pos_list):
 	if is_network_master():
 		player_positions = pos_list
 	print('player registered')
-	print('player positions ', player_positions)
-	print('all graphs', all_graphs)
-	print('available positions ', available_positions)
 
 # remote func _send_player_info(id, pos): # 3
 # 	attachNewGraph(id)
