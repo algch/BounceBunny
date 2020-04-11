@@ -73,6 +73,8 @@ remotesync func registerPlayer(player_id, pos, pos_list):
 	attachNewGraph(player_id)
 	var plant = load('res://plants/plant.tscn').instance()
 	plant.init(pos)
+	plant.set_name(player_id)
+	plant.set_network_master(player_id)
 	add_child(plant)
 	print(plant, ' was added')
 	var player = load('res://player/player.tscn').instance()
