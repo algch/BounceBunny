@@ -42,7 +42,6 @@ func init(nickname, start_position, plant):
 	current_plant = plant
 
 remotesync func summonPlant(power, direction):
-	rpc('summonPlant', power, direction)
 	var summon = summon_class.instance()
 
 	if mana < summon.mana_cost:
