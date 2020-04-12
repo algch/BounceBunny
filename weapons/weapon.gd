@@ -31,10 +31,8 @@ func _ready():
 	travel_timer.start()
 	add_child(travel_timer)
 
-
 func travelEnded():
     print('NOT IMPLEMENTED')
-
 
 func getTipPosition():
 	var tip_pos = direction * distance_to_tip

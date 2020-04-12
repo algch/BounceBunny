@@ -41,7 +41,8 @@ func init(nickname, start_position, plant):
 	global_position = start_position
 	current_plant = plant
 
-func summonPlant(power, direction):
+remotesync func summonPlant(power, direction):
+	rpc('summonPlant', power, direction)
 	var summon = summon_class.instance()
 
 	if mana < summon.mana_cost:
@@ -61,7 +62,7 @@ func summonPlant(power, direction):
 func addMana(increment):
 	mana += increment
 
-func attack(power, direction):
+remotesync func attack(power, direction):
 	var projectile = projectile_class.instance()
 	var offset = direction * WEAPON_RADIUS
 
@@ -125,9 +126,9 @@ func pollInput():
 		if power >= 0.2:
 			var direction = (shoot_point_start - get_global_mouse_position()).normalized()
 			if current_weapon == Globals.PROJECTILE_TYPES.ATTACK:
-				attack(power, direction)
+				rpc('attack', power, direction)
 			if current_weapon == Globals.PROJECTILE_TYPES.SUMMON:
-				summonPlant(power, direction)
+				rpc('summonPlant', power, direction)
 
 			releaseAnimation()
 
