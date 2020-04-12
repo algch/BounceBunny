@@ -23,9 +23,13 @@ onready var network_id = get_tree().get_network_unique_id()
 
 
 # DOES NOT APPLY TO MULTIPLAYER, CREATE A BASE CLASS POR PLANT WITH NETWORKING FUNCTIONS
-# func _on_score_timer_timeout():
-# 	main.increaseScore()
-# 	$score_timer.start()
+func _on_score_timer_timeout():
+	return # D:
+	main.increaseScore()
+	$score_timer.start()
+
+func getLocalPlayer():
+	return get_node('/root/mainArena/' + str(get_tree().get_network_unique_id()))
 
 func receiveDamage(damage):
 	health -= damage
