@@ -43,7 +43,7 @@ func destroy():
 
 	if self == player.current_plant:
 		if neighbors:
-			player.setCurrentPlant(neighbors[0])
+			player.rpc('setCurrentPlant', neighbors[0])
 		else:
 			main.gameOver()
 
@@ -100,7 +100,7 @@ func _on_teleport_released():
 	var player = getLocalPlayer()
 	if player.current_plant == self:
 		return
-	player.setCurrentPlant(self)
+	player.rpc('setCurrentPlant', self)
 
 func _draw():
 	for neighbor in neighbors:

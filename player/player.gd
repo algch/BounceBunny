@@ -138,7 +138,7 @@ func releaseAnimation():
 		Globals.PROJECTILE_TYPES.SUMMON:
 			$animation.play('summon_1')
 
-func setCurrentPlant(plant):
+remotesync func setCurrentPlant(plant):
 	if plant.is_queued_for_deletion() or not is_instance_valid(plant):
 		Globals.gameOver()
 	position = plant.position
