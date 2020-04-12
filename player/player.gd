@@ -39,7 +39,7 @@ func _ready():
 func init(nickname, start_position, plant):
 	$gui/nickname.text = nickname
 	global_position = start_position
-	current_plant = plant
+	current_plant = plant.get_instance_id()
 
 remotesync func summonPlant(power, direction):
 	var summon = summon_class.instance()
@@ -138,12 +138,13 @@ func releaseAnimation():
 		Globals.PROJECTILE_TYPES.SUMMON:
 			$animation.play('summon_1')
 
-remotesync func setCurrentPlant(plant):
-	if plant.is_queued_for_deletion() or not is_instance_valid(plant):
-		Globals.gameOver()
-	position = plant.position
-	current_plant = plant
-	damage = plant.projectile_damage
+# YA NO PUEDO PASAR UN OBJETO A ESTA FUNCIÓN, SÓLO PUEDO MANDAR PRIMITIVOS
+remotesync func setCurrentPlant(plant_id, pos, dam):
+	# if plant.is_queued_for_deletion() or not is_instance_valid(plant):
+	# 	Globals.gameOver()
+	position = pos
+	current_plant = plant_id
+	damage = dam
 
 func getWeaponString():
 	match current_weapon:

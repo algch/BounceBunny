@@ -41,9 +41,10 @@ func destroy():
 
 	var neighbors = main.getNeighbors(network_id, self)
 
-	if self == player.current_plant:
+	if get_instance_id() == player.current_plant:
 		if neighbors:
-			player.rpc('setCurrentPlant', neighbors[0])
+			var plant = neighbors[0]
+			player.rpc('setCurrentPlant', plant.position, plant.projectile_damage)
 		else:
 			main.gameOver()
 
@@ -98,9 +99,9 @@ func _on_attack_timer_timeout():
 
 func _on_teleport_released():
 	var player = getLocalPlayer()
-	if player.current_plant == self:
+	if player.current_plant == get_instance_id():
 		return
-	player.rpc('setCurrentPlant', self)
+	player.rpc('setCurrentPlant', position, projectile_damage)
 
 func _draw():
 	for neighbor in neighbors:

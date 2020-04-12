@@ -38,7 +38,7 @@ func removeIfDetached(graph_id, node):
 		var current_id = current.get_instance_id()
 
 		var player = get_node('/root/mainArena/player/')
-		if current == player.current_plant:
+		if current_id == player.current_plant:
 			return
 
 		for id in plants_graph[current_id]:
