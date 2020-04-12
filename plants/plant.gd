@@ -35,7 +35,7 @@ func receiveDamage(damage):
 	health -= damage
 
 func destroy():
-	var player = get_node('/root/mainArena/player')
+	var player = getLocalPlayer()
 	if is_queued_for_deletion():
 		return
 
@@ -97,7 +97,7 @@ func _on_attack_timer_timeout():
 	attack_timer.start()
 
 func _on_teleport_released():
-	var player = get_node('/root/mainArena/player')
+	var player = getLocalPlayer()
 	if player.current_plant == self:
 		return
 	player.setCurrentPlant(self)
