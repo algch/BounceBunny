@@ -70,6 +70,8 @@ func initPlayers():
 	var pos = available_positions.pop_front()
 	rpc('registerPlayer', get_tree().get_network_unique_id(), pos, available_positions)
 	for p_id in player_positions:
+		if p_id == get_tree().get_network_unique_id():
+			continue
 		var p_pos = player_positions[p_id]
 		registerPlayer(p_id, p_pos, available_positions)
 
