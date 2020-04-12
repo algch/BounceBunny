@@ -31,12 +31,7 @@ func loadGame(scene):
 	menu.call_deferred('free')
 	root.add_child(scene)
 
-
-# networking 
-
-remote func _send_player_info(id, info):
-	var new_player = load('res://player/Player.tscn').instance()
-	new_player.name = str(id)
-	new_player.set_network_master(id)
-	$'/root/Game/'.add_child(new_player)
-	new_player.init(info.name, info.position, true)
+func _ready():
+	for ip in IP.get_local_addresses():
+		if '192' in ip:
+			$vbox/ip.set_text('your ip is ' + ip)
