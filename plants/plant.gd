@@ -44,7 +44,7 @@ func destroy():
 	if get_instance_id() == player.current_plant:
 		if neighbors:
 			var plant = neighbors[0]
-			player.rpc('setCurrentPlant', plant.position, plant.projectile_damage)
+			player.rpc('setCurrentPlant', plant.get_instance_id(), plant.position, plant.projectile_damage)
 		else:
 			main.gameOver()
 
@@ -101,7 +101,7 @@ func _on_teleport_released():
 	var player = getLocalPlayer()
 	if player.current_plant == get_instance_id():
 		return
-	player.rpc('setCurrentPlant', position, projectile_damage)
+	player.rpc('setCurrentPlant', get_instance_id(), position, projectile_damage)
 
 func _draw():
 	for neighbor in neighbors:
