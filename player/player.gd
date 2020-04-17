@@ -52,7 +52,7 @@ remotesync func summonPlant(power, direction):
 	summon.position = position + offset
 	summon.direction = direction
 	summon.power = power
-	summon.first_neighbor = current_plant
+	summon.first_neighbor_id = current_plant
 
 	# CREATE A BASE CLASS FOR PLAYER, INHERIT TO SOLO AND MULTIPLAYER INSTANCES
 	get_node('/root/mainArena/').add_child(summon)
@@ -111,6 +111,9 @@ func _on_resumeRestart_released():
 		get_tree().reload_current_scene()
 
 func pollInput():
+	if Input.is_action_just_released('test'):
+		print(get_parent().all_graphs)
+
 	if Input.is_action_pressed('touch') and current_state != STATE.charging:
 		current_state = STATE.charging
 		shoot_point_start = get_global_mouse_position()
@@ -138,7 +141,6 @@ func releaseAnimation():
 		Globals.PROJECTILE_TYPES.SUMMON:
 			$animation.play('summon_1')
 
-# YA NO PUEDO PASAR UN OBJETO A ESTA FUNCIÓN, SÓLO PUEDO MANDAR PRIMITIVOS
 remotesync func setCurrentPlant(plant_id, pos, dam):
 	# if plant.is_queued_for_deletion() or not is_instance_valid(plant):
 	# 	Globals.gameOver()

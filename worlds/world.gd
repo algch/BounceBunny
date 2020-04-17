@@ -3,6 +3,10 @@ extends Node
 remote var all_graphs = {}
 # TODO handle player position in its own graph
 
+func getLocalPlayerNode():
+	var player_path = '/root/mainArena/' + str(get_tree().get_network_unique_id())
+	return get_node(player_path)
+
 func attachNewGraph(graph_id):
 	all_graphs[graph_id] = {}
 
@@ -32,7 +36,7 @@ func removeIfDetached(graph_id, node_id):
 	while queue:
 		var current_id = queue.pop_front()
 
-		var player = get_node('/root/mainArena/player/')
+		var player = getLocalPlayerNode()
 		if current_id == player.current_plant:
 			return
 
@@ -44,9 +48,8 @@ func removeIfDetached(graph_id, node_id):
 	var node = instance_from_id(node_id)
 	node.destroy()
 
-func getNeighbors(graph_id, node):
+func getNeighbors(graph_id, node_id):
 	if not graph_id in all_graphs:
 		return []
 	var plants_graph = all_graphs[graph_id]
-	var node_id = node.get_instance_id()
 	return plants_graph[node_id].values() if node_id in plants_graph else []

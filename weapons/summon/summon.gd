@@ -5,7 +5,7 @@ extends 'res://weapons/weapon.gd'
 onready var main = get_node('/root/mainArena/')
 var plant_class = preload('res://plants/plant.tscn')
 var mana_cost = 20.0
-var first_neighbor
+var first_neighbor_id
 
 func getLocalPlayer():
 	return get_node('/root/mainArena/' + str(get_tree().get_network_unique_id()))
@@ -29,14 +29,19 @@ func healPlant(plant):
 func handleCollision(collider):
 	if collider.is_in_group('plants'):
 		healPlant(collider)
+		var player = getLocalPlayer()
+		player.mana -= mana_cost
 	abortSummon()
 
 func travelEnded():
 	var player = getLocalPlayer()
 	var plant = plant_class.instance()
-	main.addNode(get_tree().get_network_unique_id(), first_neighbor, plant)
-	main.addNode(get_tree().get_network_unique_id(), plant, first_neighbor)
+	var network_id = get_tree().get_network_unique_id()
+	var plant_id = plant.get_instance_id()
+	main.addNode(network_id, first_neighbor_id, plant_id)
+	main.addNode(network_id, plant_id, first_neighbor_id)
 	plant.position = position
+	plant.init(position, network_id)
 	main.add_child(plant)
 	player.mana -= mana_cost
 	queue_free()

@@ -19,7 +19,7 @@ var current_level = 1
 var line_color = Color(0, 0, 1)
 var neighbors = []
 var projectile_damage = 0.5
-onready var network_id = get_tree().get_network_unique_id()
+var network_id
 
 
 # DOES NOT APPLY TO MULTIPLAYER, CREATE A BASE CLASS POR PLANT WITH NETWORKING FUNCTIONS
@@ -29,7 +29,8 @@ func _on_score_timer_timeout():
 	$score_timer.start()
 
 func getLocalPlayer():
-	return get_node('/root/mainArena/' + str(get_tree().get_network_unique_id()))
+	print('network_id ', network_id)
+	return get_node('/root/mainArena/' + str(network_id))
 
 func receiveDamage(damage):
 	health -= damage
@@ -39,18 +40,18 @@ func destroy():
 	if is_queued_for_deletion():
 		return
 
-	var neighbors = main.getNeighbors(network_id, self)
+	var neighbors = main.getNeighbors(network_id, get_instance_id())
 
 	if get_instance_id() == player.current_plant:
 		if neighbors:
-			var plant = neighbors[0]
+			var plant = instance_from_id(neighbors[0])
 			player.rpc('setCurrentPlant', plant.get_instance_id(), plant.position, plant.projectile_damage)
 		else:
 			main.gameOver()
 
-	main.removeNode(network_id, self)
-	for neighbor in neighbors:
-		main.removeIfDetached(network_id, neighbor)
+	main.removeNode(network_id, get_instance_id())
+	for neighbor_id in neighbors:
+		main.removeIfDetached(network_id, neighbor_id)
 
 	queue_free()
 
@@ -158,7 +159,7 @@ func updateGui():
 	$gui/container/bar.set_value(percentage)
 
 func _process(delta):
-	neighbors = main.getNeighbors(get_tree().get_network_unique_id(), self)
+	neighbors = main.getNeighbors(network_id, get_instance_id())
 	updateCurrentLevel()
 	updateGui()
 	setAnimation()
@@ -168,8 +169,10 @@ func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
 
-func init(pos):
+func init(pos, net_id):
+	print('received net id ', net_id)
 	position = pos
+	network_id = net_id
 
 func _physics_process(delta):
 	healthLoop()
