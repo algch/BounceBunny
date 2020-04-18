@@ -17,12 +17,12 @@ var health_recovery = 0.2
 var default_font = DynamicFont.new()
 var current_level = 1
 var line_color = Color(0, 0, 1)
-var neighbors = []
+var neighbor_ids = []
 var projectile_damage = 0.5
 var network_id
 
 
-# DOES NOT APPLY TO MULTIPLAYER, CREATE A BASE CLASS POR PLANT WITH NETWORKING FUNCTIONS
+# DOES NOT APPLY TO MULTIPLAYER, CREATE A BASE CLASS PER PLANT WITH NETWORKING FUNCTIONS
 func _on_score_timer_timeout():
 	return # D:
 	main.increaseScore()
@@ -40,17 +40,17 @@ func destroy():
 	if is_queued_for_deletion():
 		return
 
-	var neighbors = main.getNeighbors(network_id, get_instance_id())
+	var neighbor_ids = main.getneighbor_ids(network_id, get_instance_id())
 
 	if get_instance_id() == player.current_plant:
-		if neighbors:
-			var plant = instance_from_id(neighbors[0])
+		if neighbor_ids:
+			var plant = instance_from_id(neighbor_ids[0])
 			player.rpc('setCurrentPlant', plant.get_instance_id(), plant.position, plant.projectile_damage)
 		else:
 			main.gameOver()
 
 	main.removeNode(network_id, get_instance_id())
-	for neighbor_id in neighbors:
+	for neighbor_id in neighbor_ids:
 		main.removeIfDetached(network_id, neighbor_id)
 
 	queue_free()
@@ -105,7 +105,8 @@ func _on_teleport_released():
 	player.rpc('setCurrentPlant', get_instance_id(), position, projectile_damage)
 
 func _draw():
-	for neighbor in neighbors:
+	for neighbor_id in neighbor_ids:
+		var neighbor = instance_from_id(neighbor_id)
 		if neighbor and is_instance_valid(neighbor) and not neighbor.is_queued_for_deletion():
 			draw_line(Vector2(0, 0), neighbor.position - position, line_color, 2)
 
@@ -132,18 +133,18 @@ func setAnimation():
 				$animation.play('level_3')
 
 func updateCurrentLevel():
-	var neighbors_count = len(neighbors)
-	if neighbors_count <= 1:
+	var neighbor_ids_count = len(neighbor_ids)
+	if neighbor_ids_count <= 1:
 		current_level = 1
 		max_health = 3.0
 		line_color = Color(0, 0, 1)
 		projectile_damage = 0.5
-	if neighbors_count > 1 and neighbors_count < 4:
+	if neighbor_ids_count > 1 and neighbor_ids_count < 4:
 		current_level = 2
 		max_health = 4.0
 		line_color = Color(0, 1, 0)
 		projectile_damage = 1.5
-	if neighbors_count >= 4:
+	if neighbor_ids_count >= 4:
 		current_level = 3
 		max_health = 5.0
 		line_color = Color(1, 0, 0)
@@ -159,7 +160,7 @@ func updateGui():
 	$gui/container/bar.set_value(percentage)
 
 func _process(delta):
-	neighbors = main.getNeighbors(network_id, get_instance_id())
+	neighbor_ids = main.getNeighborIds(network_id, get_instance_id())
 	updateCurrentLevel()
 	updateGui()
 	setAnimation()
