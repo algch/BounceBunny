@@ -57,6 +57,7 @@ func destroy():
 	queue_free()
 
 func healthLoop():
+	# TODO if this happens in the server instance, then do destroy, don't do it otherwise
 	if health <= 0:
 		destroy()
 
@@ -162,7 +163,6 @@ func updateGui():
 	$gui/container/bar.set_value(percentage)
 
 func _process(delta):
-	# TODO take this out of _process and just update the value when neeeded
 	updateGui()
 	setAnimation()
 	update()

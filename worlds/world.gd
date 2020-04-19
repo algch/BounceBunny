@@ -4,7 +4,6 @@ var plant_class = preload('res://plants/plant.tscn')
 
 remote var all_graphs = {}
 var server_2_local = {}
-# TODO handle player position in its own graph
 
 func getLocalPlayerNode():
 	var player_path = '/root/mainArena/' + str(get_tree().get_network_unique_id())
