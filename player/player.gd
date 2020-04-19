@@ -39,6 +39,7 @@ func _ready():
 func init(nickname, start_position, plant):
 	$gui/nickname.text = nickname
 	global_position = start_position
+	# TODO use server plant_id instead
 	current_plant = plant.get_instance_id()
 
 remotesync func summonPlant(power, direction):

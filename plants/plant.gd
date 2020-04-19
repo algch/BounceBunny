@@ -20,6 +20,7 @@ var line_color = Color(0, 0, 1)
 var neighbor_ids = []
 var projectile_damage = 0.5
 var network_id
+var server_instance_id
 
 
 # DOES NOT APPLY TO MULTIPLAYER, CREATE A BASE CLASS PER PLANT WITH NETWORKING FUNCTIONS
@@ -40,7 +41,7 @@ func destroy():
 	if is_queued_for_deletion():
 		return
 
-	var neighbor_ids = main.getneighbor_ids(network_id, get_instance_id())
+	var neighbor_ids = main.getNeighborIds(network_id, get_instance_id())
 
 	if get_instance_id() == player.current_plant:
 		if neighbor_ids:
@@ -105,6 +106,7 @@ func _on_teleport_released():
 	player.rpc('setCurrentPlant', get_instance_id(), position, projectile_damage)
 
 func _draw():
+	draw_string(default_font, Vector2(0, -200), str(get_instance_id()), Color(1, 0, 0.8))
 	for neighbor_id in neighbor_ids:
 		var neighbor = instance_from_id(neighbor_id)
 		if neighbor and is_instance_valid(neighbor) and not neighbor.is_queued_for_deletion():
@@ -160,7 +162,7 @@ func updateGui():
 	$gui/container/bar.set_value(percentage)
 
 func _process(delta):
-	neighbor_ids = main.getNeighborIds(network_id, get_instance_id())
+	neighbor_ids = main.getNeighborIds(network_id, server_instance_id)
 	updateCurrentLevel()
 	updateGui()
 	setAnimation()
@@ -169,11 +171,12 @@ func _process(delta):
 func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
+	set_network_master(network_id)
 
-func init(pos, net_id):
-	print('received net id ', net_id)
+func init(pos, net_id, server_id):
 	position = pos
 	network_id = net_id
+	server_instance_id = server_id
 
 func _physics_process(delta):
 	healthLoop()

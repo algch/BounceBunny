@@ -14,6 +14,7 @@ var player_nickname = ''
 var ip_address = DEFAULT_IP
 
 remote var player_positions = {}
+var first_plant_id
 
 signal local_player_initialized
 
@@ -56,14 +57,15 @@ func _connected_to_server(): # on client when connected to server
 
 remote func requestGameState(requester_id):
 	print('game state requested')
-	rpc_id(requester_id, 'syncGameState', all_graphs, player_positions, available_positions)
+	rpc_id(requester_id, 'initGameState', all_graphs, player_positions, available_positions, first_plant_id)
 
-remote func syncGameState(graphs, player_pos, available_pos):
+remote func initGameState(graphs, player_pos, available_pos, first_id):
 	print('synced state receivd')
 	print(graphs, player_pos, available_pos)
 	all_graphs = graphs
 	player_positions = player_pos
 	available_positions = available_pos
+	first_plant_id = first_id
 	initPlayers()
 
 func initPlayers():
@@ -78,7 +80,9 @@ func initPlayers():
 remotesync func registerPlayer(player_id, pos, pos_list):
 	attachNewGraph(player_id)
 	var plant = load('res://plants/plant.tscn').instance()
-	plant.init(pos, player_id)
+	if get_tree().is_network_server():
+		first_plant_id = plant.get_instance_id()
+	plant.init(pos, player_id, first_plant_id)
 	plant.set_network_master(player_id)
 	add_child(plant)
 	var player = load('res://player/player.tscn').instance()
@@ -91,37 +95,11 @@ remotesync func registerPlayer(player_id, pos, pos_list):
 		available_positions = pos_list
 	print('[' + str(player_id) + '] has joined.' )
 
-# remote func _send_player_info(id, pos): # 3
-# 	attachNewGraph(id)
-# 	print('remote _send_player_info')
-# 	print(id, all_graphs, pos)
-# 	var new_plant = load('res://plants/plant.tscn').instance()
-# 	add_child(new_plant)
-# 	new_plant.init(pos)
-# 	var new_player = load('res://player/player.tscn').instance()
-# 	new_player.name = str(id)
-# 	new_player.set_network_master(id)
-# 	add_child(new_player)
-# 	new_player.init('jugador', pos, new_plant)
-
 func _on_player_connected(connected_player_id):
 	print('[' + str(connected_player_id) + '] has connected to server')
-	# var local_player_id = get_tree().get_network_unique_id()
-	# if not get_tree().is_network_server():
-	# 	print('I am a client!')
-	# 	rpc_id(1, 'printInServer', 'a message from the client')
-		# rpc_id(1, '_request_player_info', local_player_id, connected_player_id)
 
 remote func printInServer(message):
 	print(message)
-
-# remote func _request_player_info(request_from_id, player_id):
-# 	print('_request_player_info ', request_from_id, player_id)
-# 	if get_tree().is_network_server():
-# 		print('I am a server!')
-# 		var pos = Vector2(10 + randi()%500, 10 + randi()%500)
-# 		print('calling _send_player_info to ', request_from_id)
-# 		rpc_id(request_from_id, '_send_player_info', player_id, pos)
 
 func _on_player_disconnected(id):
 	print('player ', id, ' disconnected')

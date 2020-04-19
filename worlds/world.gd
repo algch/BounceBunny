@@ -1,5 +1,7 @@
 extends Node
 
+var plant_class = preload('res://plants/plant.tscn')
+
 remote var all_graphs = {}
 # TODO handle player position in its own graph
 
@@ -14,12 +16,45 @@ func removeGraph(graph_id):
 	if graph_id in all_graphs:
 		all_graphs.erase(graph_id)
 
-func addNode(graph_id, source, dest):
+func addServerNode(plant_id, neighbor_id):
+	var network_id = get_tree().get_network_unique_id()
+	var plants_graph = all_graphs[network_id]
+	if neighbor_id in plants_graph:
+		plants_graph[neighbor_id][plant_id] = plant_id
+	else:
+		plants_graph[neighbor_id] = { plant_id: plant_id }
+
+	if plant_id in plants_graph:
+		plants_graph[plant_id][neighbor_id] = neighbor_id
+	else:
+		plants_graph[plant_id] = { neighbor_id: neighbor_id }
+
+remote func addClientNode(server_plant_id, server_neighbor_id, pos):
+	var network_id = get_tree().get_network_unique_id()
+	var plants_graph = all_graphs[network_id]
+
+	var plant = plant_class.instance()
+	var local_plant_id = plant.get_instance_id()
+	plant.init(pos, network_id, server_plant_id)
+	get_node('/root/mainArena').add_child(plant)
+	
+	if server_neighbor_id in plants_graph:
+		plants_graph[server_neighbor_id][server_plant_id] = local_plant_id
+	else:
+		plants_graph[server_neighbor_id] = { server_plant_id: local_plant_id }
+
+	var player = Globals.getLocalPlayer()
+	if server_plant_id in plants_graph:
+		plants_graph[server_plant_id][server_neighbor_id] = player.current_plant
+	else:
+		plants_graph[server_plant_id] = { server_neighbor_id: player.current_plant }
+
+func addNode(graph_id, source, dest, dest_instance):
 	var plants_graph = all_graphs[graph_id]
 	if source in plants_graph:
-		plants_graph[source][dest] = dest
+		plants_graph[source][dest] = dest_instance
 	else:
-		plants_graph[source] = { dest: dest }
+		plants_graph[source] = { dest: dest_instance }
 
 func removeNode(graph_id, node_id):
 	var plants_graph = all_graphs[graph_id]
@@ -52,4 +87,8 @@ func getNeighborIds(graph_id, node_id):
 	if not graph_id in all_graphs:
 		return []
 	var plants_graph = all_graphs[graph_id]
-	return plants_graph[node_id].values() if node_id in plants_graph else []
+	if node_id in plants_graph:
+		var neighbors = plants_graph[node_id].values()
+		neighbors.sort()
+		return neighbors
+	return []

@@ -74,3 +74,6 @@ func gameOver():
 
     if getHighScore() < score:
         setHighScore(score)
+
+func getLocalPlayer():
+    return get_node('/root/mainArena/' + str(get_tree().get_unique_network_id()))

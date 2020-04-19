@@ -34,17 +34,20 @@ func handleCollision(collider):
 	abortSummon()
 
 func travelEnded():
-	var player = getLocalPlayer()
-	var plant = plant_class.instance()
-	var network_id = get_tree().get_network_unique_id()
-	var plant_id = plant.get_instance_id()
-	main.addNode(network_id, first_neighbor_id, plant_id)
-	main.addNode(network_id, plant_id, first_neighbor_id)
-	plant.position = position
-	plant.init(position, network_id)
-	main.add_child(plant)
-	player.mana -= mana_cost
 	queue_free()
+	if not get_tree().is_network_server():
+		return
+
+	var player = getLocalPlayer()
+	player.mana -= mana_cost
+
+	var network_id = get_tree().get_network_unique_id()
+	var plant = plant_class.instance()
+	var plant_id = plant.get_instance_id()
+	main.addServerNode(plant_id, first_neighbor_id)
+	plant.init(position, network_id, plant_id)
+	main.add_child(plant)
+	main.rpc('addClientNode', plant_id, first_neighbor_id, position)
 
 func _physics_process(delta):
 	var motion = direction * speed * delta
