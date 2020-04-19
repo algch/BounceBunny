@@ -172,7 +172,7 @@ func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
 	set_network_master(int(network_id))
-	print('plant ' + str(get_instance_id()) + ' net id ' + network_id)
+	print('plant ' + str(get_instance_id()) + ' net id ' + str(network_id))
 
 func init(pos, net_id, server_id):
 	position = pos
