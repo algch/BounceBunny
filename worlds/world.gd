@@ -3,6 +3,7 @@ extends Node
 var plant_class = preload('res://plants/plant.tscn')
 
 remote var all_graphs = {}
+var server_2_local = {}
 # TODO handle player position in its own graph
 
 func getLocalPlayerNode():
@@ -26,6 +27,14 @@ func addServerNode(player, pos):
 	plant.init(pos, player.get_name(), plant_id)
 	add_child(plant)
 
+	server_2_local[neighbor_id] = neighbor_id
+	server_2_local[plant_id] = plant_id
+	print('server 2 local ', server_2_local)
+
+	var neighbor_plant = instance_from_id(neighbor_id)
+	neighbor_plant.addNeighbor(plant)
+	plant.addNeighbor(neighbor_plant)
+
 	var plants_graph = all_graphs[graph_id]
 	if neighbor_id in plants_graph:
 		plants_graph[neighbor_id][plant_id] = plant_id
@@ -43,17 +52,26 @@ remote func addClientNode(graph_id, server_plant_id, server_neighbor_id, pos):
 	print('addClientNode graph_id ', graph_id)
 	var plants_graph = all_graphs[graph_id]
 
+	var player = Globals.getLocalPlayer()
+
 	var plant = plant_class.instance()
 	var local_plant_id = plant.get_instance_id()
 	plant.init(pos, graph_id, server_plant_id)
 	add_child(plant)
+
+	server_2_local[server_neighbor_id] = player.current_plant
+	server_2_local[server_plant_id] = local_plant_id
+	print('server 2 local ', server_2_local)
+
+	var neighbor_plant = instance_from_id(player.current_plant)
+	neighbor_plant.addNeighbor(plant)
+	plant.addNeighbor(neighbor_plant)
 	
 	if server_neighbor_id in plants_graph:
 		plants_graph[server_neighbor_id][server_plant_id] = local_plant_id
 	else:
 		plants_graph[server_neighbor_id] = { server_plant_id: local_plant_id }
 
-	var player = Globals.getLocalPlayer()
 	if server_plant_id in plants_graph:
 		plants_graph[server_plant_id][server_neighbor_id] = player.current_plant
 	else:

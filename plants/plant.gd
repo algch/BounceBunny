@@ -163,16 +163,14 @@ func updateGui():
 
 func _process(delta):
 	# TODO take this out of _process and just update the value when neeeded
-	neighbor_ids = main.getNeighborIds(network_id, server_instance_id)
-	print('neighbor ids ', str(neighbor_ids))
-	updateCurrentLevel()
 	updateGui()
 	setAnimation()
 	update()
 
 func addNeighbor(neighbor):
-	# create a list of neighbors and add this neighbor to it
+	neighbor_ids.append(neighbor.get_instance_id())
 	updateCurrentLevel()
+	print(str(get_instance_id()) + 'neighbor ids ', neighbor_ids)
 
 func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
@@ -182,7 +180,7 @@ func _ready():
 
 func init(pos, net_id, server_id):
 	position = pos
-	network_id = net_id
+	network_id = int(net_id)
 	server_instance_id = server_id
 
 func _physics_process(delta):
