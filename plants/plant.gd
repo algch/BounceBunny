@@ -162,11 +162,17 @@ func updateGui():
 	$gui/container/bar.set_value(percentage)
 
 func _process(delta):
+	# TODO take this out of _process and just update the value when neeeded
 	neighbor_ids = main.getNeighborIds(network_id, server_instance_id)
+	print('neighbor ids ', str(neighbor_ids))
 	updateCurrentLevel()
 	updateGui()
 	setAnimation()
 	update()
+
+func addNeighbor(neighbor):
+	# create a list of neighbors and add this neighbor to it
+	updateCurrentLevel()
 
 func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
