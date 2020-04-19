@@ -35,6 +35,7 @@ func handleCollision(collider):
 	abortSummon()
 
 func travelEnded():
+	print('travel ended')
 	queue_free()
 	if not get_tree().is_network_server():
 		return
@@ -47,6 +48,7 @@ func travelEnded():
 	var plant_id = plant.get_instance_id()
 	plant.init(position, network_id, plant_id)
 	main.add_child(plant)
+	# esto no se está llamando en el client ¿Por qué?
 	main.addServerNode(summoner_id, plant_id, first_neighbor_id)
 	main.rpc('addClientNode', summoner_id, plant_id, first_neighbor_id, position)
 
