@@ -16,10 +16,9 @@ func removeGraph(graph_id):
 	if graph_id in all_graphs:
 		all_graphs.erase(graph_id)
 
-func addServerNode(plant_id, neighbor_id):
-	var network_id = get_tree().get_network_unique_id()
-	print('addServerNode network_id ', network_id)
-	var plants_graph = all_graphs[network_id]
+func addServerNode(graph_id, plant_id, neighbor_id):
+	print('addServerNode graph_id ', graph_id)
+	var plants_graph = all_graphs[graph_id]
 	if neighbor_id in plants_graph:
 		plants_graph[neighbor_id][plant_id] = plant_id
 	else:
@@ -30,14 +29,13 @@ func addServerNode(plant_id, neighbor_id):
 	else:
 		plants_graph[plant_id] = { neighbor_id: neighbor_id }
 
-remote func addClientNode(server_plant_id, server_neighbor_id, pos):
-	var network_id = get_tree().get_network_unique_id()
-	print('addClientNode network_id ', network_id)
-	var plants_graph = all_graphs[network_id]
+remote func addClientNode(graph_id, server_plant_id, server_neighbor_id, pos):
+	print('addClientNode graph_id ', graph_id)
+	var plants_graph = all_graphs[graph_id]
 
 	var plant = plant_class.instance()
 	var local_plant_id = plant.get_instance_id()
-	plant.init(pos, network_id, server_plant_id)
+	plant.init(pos, graph_id, server_plant_id)
 	get_node('/root/mainArena').add_child(plant)
 	
 	if server_neighbor_id in plants_graph:

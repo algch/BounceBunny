@@ -54,6 +54,7 @@ remotesync func summonPlant(power, direction):
 	summon.direction = direction
 	summon.power = power
 	summon.first_neighbor_id = current_plant
+	summon.summoner_id = int(get_name())
 
 	# CREATE A BASE CLASS FOR PLAYER, INHERIT TO SOLO AND MULTIPLAYER INSTANCES
 	get_node('/root/mainArena/').add_child(summon)

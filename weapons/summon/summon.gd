@@ -6,6 +6,7 @@ onready var main = get_node('/root/mainArena/')
 var plant_class = preload('res://plants/plant.tscn')
 var mana_cost = 20.0
 var first_neighbor_id
+var summoner_id
 
 func getLocalPlayer():
 	return get_node('/root/mainArena/' + str(get_tree().get_network_unique_id()))
@@ -44,10 +45,10 @@ func travelEnded():
 	var network_id = get_tree().get_network_unique_id()
 	var plant = plant_class.instance()
 	var plant_id = plant.get_instance_id()
-	main.addServerNode(plant_id, first_neighbor_id)
 	plant.init(position, network_id, plant_id)
 	main.add_child(plant)
-	main.rpc('addClientNode', plant_id, first_neighbor_id, position)
+	main.addServerNode(summoner_id, plant_id, first_neighbor_id)
+	main.rpc('addClientNode', summoner_id, plant_id, first_neighbor_id, position)
 
 func _physics_process(delta):
 	var motion = direction * speed * delta
