@@ -8,8 +8,8 @@ var mana_cost = 20.0
 var first_neighbor_id
 var summoner_id
 
-func getLocalPlayer():
-	return get_node('/root/mainArena/' + str(get_tree().get_network_unique_id()))
+func getLocalSummoner():
+	return get_node('/root/mainArena/' + str(summoner_id))
 
 func _ready():
 	MAX_TRAVEL_TIME = 0.25
@@ -30,7 +30,7 @@ func healPlant(plant):
 func handleCollision(collider):
 	if collider.is_in_group('plants'):
 		healPlant(collider)
-		var player = getLocalPlayer()
+		var player = getLocalSummoner()
 		player.mana -= mana_cost
 	abortSummon()
 
@@ -40,17 +40,11 @@ func travelEnded():
 	if not get_tree().is_network_server():
 		return
 
-	var player = getLocalPlayer()
+	var player = getLocalSummoner()
+	# TODO create remote function to decrease mana
 	player.mana -= mana_cost
 
-	var network_id = get_tree().get_network_unique_id()
-	var plant = plant_class.instance()
-	var plant_id = plant.get_instance_id()
-	plant.init(position, network_id, plant_id)
-	main.add_child(plant)
-	# esto no se está llamando en el client ¿Por qué?
-	main.addServerNode(summoner_id, plant_id, first_neighbor_id)
-	main.rpc('addClientNode', summoner_id, plant_id, first_neighbor_id, position)
+	main.addServerNode(player, position)
 
 func _physics_process(delta):
 	var motion = direction * speed * delta

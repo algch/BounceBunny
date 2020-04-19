@@ -16,8 +16,16 @@ func removeGraph(graph_id):
 	if graph_id in all_graphs:
 		all_graphs.erase(graph_id)
 
-func addServerNode(graph_id, plant_id, neighbor_id):
+func addServerNode(player, pos):
+	var graph_id = int(player.get_name())
 	print('addServerNode graph_id ', graph_id)
+	var neighbor_id = player.current_plant
+
+	var plant = plant_class.instance()
+	var plant_id = plant.get_instance_id()
+	plant.init(pos, player.get_name(), plant_id)
+	add_child(plant)
+
 	var plants_graph = all_graphs[graph_id]
 	if neighbor_id in plants_graph:
 		plants_graph[neighbor_id][plant_id] = plant_id
@@ -29,6 +37,8 @@ func addServerNode(graph_id, plant_id, neighbor_id):
 	else:
 		plants_graph[plant_id] = { neighbor_id: neighbor_id }
 
+	rpc('addClientNode', graph_id, plant_id, neighbor_id, pos)
+
 remote func addClientNode(graph_id, server_plant_id, server_neighbor_id, pos):
 	print('addClientNode graph_id ', graph_id)
 	var plants_graph = all_graphs[graph_id]
@@ -36,7 +46,7 @@ remote func addClientNode(graph_id, server_plant_id, server_neighbor_id, pos):
 	var plant = plant_class.instance()
 	var local_plant_id = plant.get_instance_id()
 	plant.init(pos, graph_id, server_plant_id)
-	get_node('/root/mainArena').add_child(plant)
+	add_child(plant)
 	
 	if server_neighbor_id in plants_graph:
 		plants_graph[server_neighbor_id][server_plant_id] = local_plant_id
