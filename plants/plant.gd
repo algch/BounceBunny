@@ -171,7 +171,7 @@ func _process(delta):
 func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
-	set_network_master(network_id)
+	set_network_master(int(network_id))
 
 func init(pos, net_id, server_id):
 	position = pos
