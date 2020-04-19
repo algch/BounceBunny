@@ -18,6 +18,7 @@ func removeGraph(graph_id):
 
 func addServerNode(plant_id, neighbor_id):
 	var network_id = get_tree().get_network_unique_id()
+	print('addServerNode network_id ', network_id)
 	var plants_graph = all_graphs[network_id]
 	if neighbor_id in plants_graph:
 		plants_graph[neighbor_id][plant_id] = plant_id
@@ -31,6 +32,7 @@ func addServerNode(plant_id, neighbor_id):
 
 remote func addClientNode(server_plant_id, server_neighbor_id, pos):
 	var network_id = get_tree().get_network_unique_id()
+	print('addClientNode network_id ', network_id)
 	var plants_graph = all_graphs[network_id]
 
 	var plant = plant_class.instance()
