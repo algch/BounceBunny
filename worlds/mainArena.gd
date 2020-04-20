@@ -83,12 +83,13 @@ remotesync func registerPlayer(player_id, pos, pos_list):
 	if get_tree().is_network_server():
 		first_plant_id = plant.get_instance_id()
 	plant.init(pos, player_id, first_plant_id)
+	plant.set_name(first_plant_id)
 	plant.set_network_master(player_id)
 	add_child(plant)
 	var player = load('res://player/player.tscn').instance()
 	player.set_network_master(player_id)
 	player.set_name(str(player_id))
-	player.init('server', pos, plant)
+	player.init('server', pos, first_plant_id)
 	add_child(player)
 	player_positions[get_tree().get_network_unique_id()] = pos
 	if is_network_master():

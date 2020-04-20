@@ -24,6 +24,7 @@ func addServerNode(player, pos):
 	var plant = plant_class.instance()
 	var plant_id = plant.get_instance_id()
 	plant.init(pos, player.get_name(), plant_id)
+	plant.set_name(str(plant_id))
 	add_child(plant)
 
 	server_2_local[neighbor_id] = neighbor_id
@@ -56,6 +57,7 @@ remote func addClientNode(graph_id, server_plant_id, server_neighbor_id, pos):
 	var plant = plant_class.instance()
 	var local_plant_id = plant.get_instance_id()
 	plant.init(pos, graph_id, server_plant_id)
+	plant.set_name(local_plant_id)
 	add_child(plant)
 
 	server_2_local[server_neighbor_id] = player.current_plant

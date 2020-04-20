@@ -36,7 +36,7 @@ func getLocalPlayer():
 func receiveDamage(damage):
 	health -= damage
 
-func destroy():
+remotesync func destroy():
 	var player = getLocalPlayer()
 	if is_queued_for_deletion():
 		return
@@ -46,7 +46,7 @@ func destroy():
 	if get_instance_id() == player.current_plant:
 		if neighbor_ids:
 			var plant = instance_from_id(neighbor_ids[0])
-			player.rpc('setCurrentPlant', plant.get_instance_id(), plant.position, plant.projectile_damage)
+			player.rpc('setCurrentPlant', server_instance_id, plant.position, plant.projectile_damage)
 		else:
 			main.gameOver()
 
@@ -58,8 +58,10 @@ func destroy():
 
 func healthLoop():
 	# TODO if this happens in the server instance, then do destroy, don't do it otherwise
+	if not get_tree().is_network_server():
+		return
 	if health <= 0:
-		destroy()
+		rpc('destroy')
 
 func handleWeaponCollision(weapon):
 	health -= weapon.damage
@@ -104,7 +106,7 @@ func _on_teleport_released():
 	var player = getLocalPlayer()
 	if player.current_plant == get_instance_id():
 		return
-	player.rpc('setCurrentPlant', get_instance_id(), position, projectile_damage)
+	player.rpc('setCurrentPlant', server_instance_id, position, projectile_damage)
 
 func _draw():
 	draw_string(default_font, Vector2(0, -200), str(get_instance_id()), Color(1, 0, 0.8))
