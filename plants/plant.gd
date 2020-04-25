@@ -184,6 +184,7 @@ func init(pos, net_id, server_id):
 	position = pos
 	network_id = int(net_id)
 	server_instance_id = server_id
+	set_name(str(server_id))
 
 func _physics_process(delta):
 	healthLoop()
