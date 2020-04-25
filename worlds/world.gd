@@ -57,13 +57,14 @@ remote func addClientNode(graph_id, server_plant_id, server_neighbor_id, pos):
 	var plant = plant_class.instance()
 	var local_plant_id = plant.get_instance_id()
 	plant.init(pos, graph_id, server_plant_id)
-	plant.set_name(local_plant_id)
+	plant.set_name(str(local_plant_id))
 	add_child(plant)
 
 	server_2_local[server_neighbor_id] = player.current_plant
 	server_2_local[server_plant_id] = local_plant_id
 	print('server 2 local ', server_2_local)
 
+	# SOMETHING VERY WEIRD IS HAPPENING HERE
 	var neighbor_plant = instance_from_id(player.current_plant)
 	neighbor_plant.addNeighbor(plant)
 	plant.addNeighbor(neighbor_plant)

@@ -57,7 +57,6 @@ remotesync func destroy():
 	queue_free()
 
 func healthLoop():
-	# TODO if this happens in the server instance, then do destroy, don't do it otherwise
 	if not get_tree().is_network_server():
 		return
 	if health <= 0:
@@ -103,6 +102,7 @@ func _on_attack_timer_timeout():
 	attack_timer.start()
 
 func _on_teleport_released():
+	# TODO this should only be executed if player is the owner of the plant
 	var player = getLocalPlayer()
 	if player.current_plant == get_instance_id():
 		return

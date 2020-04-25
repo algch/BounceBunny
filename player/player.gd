@@ -39,7 +39,6 @@ func _ready():
 func init(nickname, start_position, server_plant_id):
 	$gui/nickname.text = nickname
 	global_position = start_position
-	# TODO use server plant_id instead
 	current_plant = server_plant_id
 
 remotesync func summonPlant(power, direction):
@@ -73,7 +72,7 @@ remotesync func attack(power, direction):
 	projectile.type = Globals.PROJECTILE_TYPES.ATTACK
 	projectile.MAX_DAMAGE = damage
 
-	# CREATE A BASE CLASS FOR PLAYER, INHERIT TO SOLO AND MULTIPLAYER INSTANCES
+	# TODO CREATE A BASE CLASS FOR PLAYER, INHERIT TO SOLO AND MULTIPLAYER INSTANCES
 	get_node('/root/mainArena/').add_child(projectile)
 	$animation.play('attack')
 

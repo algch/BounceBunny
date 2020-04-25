@@ -41,6 +41,7 @@ func travelEnded():
 		return
 
 	var player = getLocalSummoner()
+	print('summoner ', str(summoner_id), ' is planting...')
 	# TODO create remote function to decrease mana
 	player.mana -= mana_cost
 

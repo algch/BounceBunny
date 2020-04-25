@@ -41,7 +41,7 @@ position = Vector2( 255.072, 191.55 )
 [node name="p2" type="Position2D" parent="." groups=[
 "start_position",
 ]]
-position = Vector2( 960.617, 194.863 )
+position = Vector2( 535.444, 186.142 )
 
 [node name="p3" type="Position2D" parent="." groups=[
 "start_position",
