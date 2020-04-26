@@ -37,6 +37,7 @@ func receiveDamage(damage):
 	health -= damage
 
 remotesync func destroy():
+	print('destroying plant ', str(get_instance_id()))
 	var player = getLocalPlayer()
 	if is_queued_for_deletion():
 		return
