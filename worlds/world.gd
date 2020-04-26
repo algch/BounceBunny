@@ -18,7 +18,6 @@ func removeGraph(graph_id):
 
 func addServerNode(player, pos):
 	var graph_id = int(player.get_name())
-	print('addServerNode graph_id ', graph_id)
 	var neighbor_id = player.current_plant
 
 	var plant = plant_class.instance()
@@ -28,7 +27,6 @@ func addServerNode(player, pos):
 
 	server_2_local[neighbor_id] = neighbor_id
 	server_2_local[plant_id] = plant_id
-	print('server 2 local ', server_2_local)
 
 	var neighbor_plant = instance_from_id(neighbor_id)
 	neighbor_plant.addNeighbor(plant)
@@ -48,7 +46,6 @@ func addServerNode(player, pos):
 	rpc('addClientNode', graph_id, plant_id, neighbor_id, pos)
 
 remote func addClientNode(graph_id, server_plant_id, server_neighbor_id, pos):
-	print('addClientNode graph_id ', graph_id)
 	var plants_graph = all_graphs[graph_id]
 
 	var player = Globals.getLocalPlayer()

@@ -50,10 +50,6 @@ func _connected_to_server(): # on client when connected to server
 	print('we have connected to server')
 	var local_player_id = get_tree().get_network_unique_id()
 	rpc_id(1, 'requestGameState', local_player_id)
-	print('game satate is synced')
-	print('player positions ', player_positions)
-	print('all graphs', all_graphs)
-	print('available positions ', available_positions)
 
 remote func requestGameState(requester_id):
 	print('game state requested')
@@ -83,13 +79,12 @@ remotesync func registerPlayer(player_id, pos, pos_list):
 	if get_tree().is_network_server():
 		first_plant_id = plant.get_instance_id()
 	plant.init(pos, player_id, first_plant_id)
-	plant.set_name(str(first_plant_id))
+	# what should be the plant name?? check this!
 	plant.set_network_master(player_id)
 	add_child(plant)
 	var player = load('res://player/player.tscn').instance()
 	player.set_network_master(player_id)
-	player.set_name(str(player_id))
-	player.init('server', pos, first_plant_id)
+	player.init('server', pos, plant.get_instance_id())
 	add_child(player)
 	player_positions[get_tree().get_network_unique_id()] = pos
 	if is_network_master():
