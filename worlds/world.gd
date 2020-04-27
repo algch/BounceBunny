@@ -45,7 +45,7 @@ func addServerNode(player, pos):
 
 	rpc('addClientNode', graph_id, plant_id, neighbor_id, pos)
 
-remote func addClientNode(graph_id, server_plant_id, server_neighbor_id, pos):
+remote func addClientNode(graph_id, server_plant_id, server_neighbor_id, pos): # AHHHHHHHHHHHHHHHGGGHHHHH!!!
 	var plants_graph = all_graphs[graph_id]
 
 	var player = Globals.getLocalPlayer()
@@ -57,10 +57,9 @@ remote func addClientNode(graph_id, server_plant_id, server_neighbor_id, pos):
 
 	server_2_local[server_neighbor_id] = player.current_plant
 	server_2_local[server_plant_id] = local_plant_id
-	print('server 2 local ', server_2_local)
 
-	# SOMETHING VERY WEIRD IS HAPPENING HERE
-	print('player current plant ', str(player.current_plant))
+	# BUG >>> seems player.current_plant is wrong in client
+	print('DEBUGG player current plant ', str(player.current_plant))
 	var neighbor_plant = instance_from_id(int(player.current_plant))
 	neighbor_plant.addNeighbor(plant)
 	plant.addNeighbor(neighbor_plant)

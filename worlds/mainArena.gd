@@ -14,7 +14,7 @@ var player_nickname = ''
 var ip_address = DEFAULT_IP
 
 remote var player_positions = {}
-var first_plant_id
+var player_data = {}
 
 signal local_player_initialized
 
@@ -37,7 +37,7 @@ func createServer():
 	peer.create_server(DEFAULT_PORT, MAX_PLAYERS)
 	get_tree().set_network_peer(peer)
 	var pos = available_positions.pop_front()
-	registerPlayer(1, pos, available_positions)
+	registerPlayerInServer(1, pos)
 
 func connectToServer(): # 1
 	get_tree().connect('connected_to_server', self, '_connected_to_server')
@@ -47,39 +47,37 @@ func connectToServer(): # 1
 	get_tree().set_network_peer(peer)
 
 func _connected_to_server(): # on client when connected to server
-	print('we have connected to server')
 	var local_player_id = get_tree().get_network_unique_id()
 	rpc_id(1, 'requestGameState', local_player_id)
 
-remote func requestGameState(requester_id):
-	print('game state requested')
-	rpc_id(requester_id, 'initGameState', all_graphs, player_positions, available_positions, first_plant_id)
-
-remote func initGameState(graphs, player_pos, available_pos, first_id):
-	print('synced state receivd')
-	print(graphs, player_pos, available_pos)
-	all_graphs = graphs
-	player_positions = player_pos
-	available_positions = available_pos
-	first_plant_id = first_id
-	initPlayers()
-
-func initPlayers():
+remote func requestGameState(requester_id): # TODO rename function
 	var pos = available_positions.pop_front()
-	rpc('registerPlayer', get_tree().get_network_unique_id(), pos, available_positions)
-	for p_id in player_positions:
-		if p_id == get_tree().get_network_unique_id():
-			continue
-		var p_pos = player_positions[p_id]
-		registerPlayer(p_id, p_pos, available_positions)
+	registerPlayerInServer(requester_id, pos)
+	rpc('initGameState', all_graphs, player_data)
 
-remotesync func registerPlayer(player_id, pos, pos_list):
+remote func initGameState(graphs, p_data): # TODO rename function
+	print(graphs, p_data)
+	all_graphs = graphs
+	for p_id in p_data:
+		if not p_id in player_data:
+			player_data[p_id] = p_data[p_id]
+			initLocalPlayer(p_id, player_data[p_id])
+
+func initLocalPlayer(p_id, p_data):
+	attachNewGraph(p_id)
+	var plant = load('res://plants/plant.tscn').instance()
+	plant.init(p_data['position'], p_id, p_data['initial_plant'])
+	plant.set_network_master(p_id)
+	add_child(plant)
+	var player = load('res://player/player.tscn').instance()
+	player.init('server', p_data['position'], plant.get_instance_id(), p_id)
+	player.set_network_master(p_id)
+	add_child(player)
+
+func registerPlayerInServer(player_id, pos):
 	attachNewGraph(player_id)
 	var plant = load('res://plants/plant.tscn').instance()
-	if get_tree().is_network_server():
-		first_plant_id = plant.get_instance_id()
-	plant.init(pos, player_id, first_plant_id)
-	# what should be the plant name?? check this!
+	plant.init(pos, player_id, plant.get_instance_id())
 	plant.set_network_master(player_id)
 	add_child(plant)
 	var player = load('res://player/player.tscn').instance()
@@ -87,8 +85,10 @@ remotesync func registerPlayer(player_id, pos, pos_list):
 	player.init('server', pos, plant.get_instance_id(), player_id)
 	add_child(player)
 	player_positions[get_tree().get_network_unique_id()] = pos
-	if is_network_master():
-		available_positions = pos_list
+	player_data[player_id] = {
+		'position': pos,
+		'initial_plant': plant.get_instance_id(),
+	}
 	print('[' + str(player_id) + '] has joined.' )
 
 func _on_player_connected(connected_player_id):

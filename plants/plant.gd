@@ -110,7 +110,10 @@ func _on_teleport_released():
 	player.rpc('setCurrentPlant', server_instance_id, position, projectile_damage)
 
 func _draw():
-	draw_string(default_font, Vector2(0, -200), str(get_instance_id()), Color(1, 0, 0.8))
+	draw_rect(Rect2(Vector2(-20, -210), Vector2(220, 100)), Color(0, 0, 0))
+	draw_string(default_font, Vector2(0, -190), 'server id ' + str(server_instance_id), Color(1, 0, 0.8))
+	draw_string(default_font, Vector2(0, -160), 'local  id ' + str(get_instance_id()), Color(1, 0, 0.8))
+	draw_string(default_font, Vector2(0, -130), 'neighbors  ' + str(neighbor_ids), Color(1, 0, 0.8))
 	for neighbor_id in neighbor_ids:
 		var neighbor = instance_from_id(neighbor_id)
 		if neighbor and is_instance_valid(neighbor) and not neighbor.is_queued_for_deletion():
@@ -173,19 +176,18 @@ func _process(delta):
 func addNeighbor(neighbor):
 	neighbor_ids.append(neighbor.get_instance_id())
 	updateCurrentLevel()
-	print(str(get_instance_id()) + 'neighbor ids ', neighbor_ids)
-
-func _ready():
-	default_font.font_data = load('res://fonts/default-font.ttf')
-	default_font.size = 22
-	set_network_master(int(network_id))
-	print('plant ' + str(get_instance_id()) + ' net id ' + str(network_id))
 
 func init(pos, net_id, server_id):
 	position = pos
 	network_id = int(net_id)
 	server_instance_id = server_id
 	set_name(str(server_id))
+
+func _ready():
+	default_font.font_data = load('res://fonts/default-font.ttf')
+	default_font.size = 22
+	set_network_master(int(network_id))
+	print('plant ' + str(get_instance_id()) + ' net id ' + str(network_id))
 
 func _physics_process(delta):
 	healthLoop()
