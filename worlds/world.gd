@@ -45,7 +45,7 @@ func addServerNode(player, pos):
 
 	rpc('addClientNode', graph_id, plant_id, neighbor_id, pos)
 
-remote func addClientNode(graph_id, server_plant_id, server_neighbor_id, pos): # AHHHHHHHHHHHHHHHGGGHHHHH!!!
+remote func addClientNode(graph_id, server_plant_id, server_neighbor_id, pos):
 	var plants_graph = all_graphs[graph_id]
 
 	# var player = Globals.getLocalPlayer()
@@ -56,20 +56,13 @@ remote func addClientNode(graph_id, server_plant_id, server_neighbor_id, pos): #
 	plant.init(pos, graph_id, server_plant_id)
 	add_child(plant)
 
-	server_2_local[server_neighbor_id] = player.current_plant
-	server_2_local[server_plant_id] = local_plant_id
-
 	var neighbor_plant = instance_from_id(int(player.current_plant))
 	neighbor_plant.addNeighbor(plant)
 	plant.addNeighbor(neighbor_plant)
 
-	print('>>>>>>>> DEBUG addClientNode')
-	print('graph id ', str(graph_id))
-	print('server plant id ', str(server_plant_id))
-	print('server neighbor id ', str(server_neighbor_id))
-	print('local plant id ', str(local_plant_id))
-	print('local neighbor id ', str(neighbor_plant.get_instance_id()))
-	
+	server_2_local[server_neighbor_id] = neighbor_plant.get_instance_id()
+	server_2_local[server_plant_id] = local_plant_id
+
 	if server_neighbor_id in plants_graph:
 		plants_graph[server_neighbor_id][server_plant_id] = local_plant_id
 	else:

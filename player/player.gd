@@ -143,12 +143,12 @@ func releaseAnimation():
 		Globals.PROJECTILE_TYPES.SUMMON:
 			$animation.play('summon_1')
 
-remotesync func setCurrentPlant(plant_id, pos, dam):
+remotesync func setCurrentPlant(server_plant_id, pos, dam):
 	# if plant.is_queued_for_deletion() or not is_instance_valid(plant):
 	# 	Globals.gameOver()
 	position = pos
-	current_plant = plant_id
 	damage = dam
+	current_plant = get_parent().server_2_local[server_plant_id]
 
 func getWeaponString():
 	match current_weapon:
