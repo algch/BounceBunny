@@ -63,8 +63,14 @@ func healthLoop():
 	if health <= 0:
 		rpc('destroy')
 
+remote func setHealth(new_health):
+	health = new_health
+
 func handleWeaponCollision(weapon):
+	if not get_tree().is_network_server():
+		return
 	health -= weapon.damage
+	rpc('setHealth', health)
 	
 func attack(power):
 	var target = targets[targets.keys()[randi() % targets.size()]]

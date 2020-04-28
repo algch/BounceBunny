@@ -73,9 +73,6 @@ remote func addClientNode(graph_id, server_plant_id, server_neighbor_id, pos):
 	else:
 		plants_graph[server_plant_id] = { server_neighbor_id: player.current_plant }
 
-	print('GRAPH ', plants_graph)
-	print('>>>>>>>> DEBUG END')
-
 func addNode(graph_id, source, dest, dest_instance):
 	var plants_graph = all_graphs[graph_id]
 	if source in plants_graph:
