@@ -48,7 +48,8 @@ func addServerNode(player, pos):
 remote func addClientNode(graph_id, server_plant_id, server_neighbor_id, pos): # AHHHHHHHHHHHHHHHGGGHHHHH!!!
 	var plants_graph = all_graphs[graph_id]
 
-	var player = Globals.getLocalPlayer()
+	# var player = Globals.getLocalPlayer()
+	var player = get_node('/root/mainArena/' + str(graph_id))
 
 	var plant = plant_class.instance()
 	var local_plant_id = plant.get_instance_id()
