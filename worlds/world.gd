@@ -58,11 +58,16 @@ remote func addClientNode(graph_id, server_plant_id, server_neighbor_id, pos): #
 	server_2_local[server_neighbor_id] = player.current_plant
 	server_2_local[server_plant_id] = local_plant_id
 
-	# BUG >>> seems player.current_plant is wrong in client
-	print('DEBUGG player current plant ', str(player.current_plant))
 	var neighbor_plant = instance_from_id(int(player.current_plant))
 	neighbor_plant.addNeighbor(plant)
 	plant.addNeighbor(neighbor_plant)
+
+	print('>>>>>>>> DEBUG addClientNode')
+	print('graph id ', str(graph_id))
+	print('server plant id ', str(server_plant_id))
+	print('server neighbor id ', str(server_neighbor_id))
+	print('local plant id ', str(local_plant_id))
+	print('local neighbor id ', str(neighbor_plant.get_instance_id()))
 	
 	if server_neighbor_id in plants_graph:
 		plants_graph[server_neighbor_id][server_plant_id] = local_plant_id
@@ -73,6 +78,9 @@ remote func addClientNode(graph_id, server_plant_id, server_neighbor_id, pos): #
 		plants_graph[server_plant_id][server_neighbor_id] = player.current_plant
 	else:
 		plants_graph[server_plant_id] = { server_neighbor_id: player.current_plant }
+
+	print('GRAPH ', plants_graph)
+	print('>>>>>>>> DEBUG END')
 
 func addNode(graph_id, source, dest, dest_instance):
 	var plants_graph = all_graphs[graph_id]
