@@ -158,6 +158,9 @@ func getWeaponString():
 			return 'summon'
 
 func _draw():
+	draw_rect(Rect2(Vector2(-40, 40), Vector2(260, 60)), Color(0, 0, 0))
+	draw_string(default_font, Vector2(-30, 60), 'local name     ' + str(get_name()), Color(0.8, 0, 1))
+	draw_string(default_font, Vector2(-30, 80), 'current plant  ' + str(current_plant), Color(0.8, 0, 1))
 	if current_state != STATE.charging:
 		return
 	draw_circle(
