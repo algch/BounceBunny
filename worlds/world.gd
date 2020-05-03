@@ -87,10 +87,10 @@ func removeNode(graph_id, node_id):
 			plants_graph[id].erase(node_id)
 	plants_graph.erase(node_id)
 
-func removeIfDetached(graph_id, node_id):
+func removeIfDetached(graph_id, server_node_id):
 	var plants_graph = all_graphs[graph_id]
-	var queue = [node_id]
-	var visited = { node_id: true }
+	var queue = [server_node_id]
+	var visited = { server_node_id: true }
  
 	while queue:
 		var current_id = queue.pop_front()
@@ -104,7 +104,8 @@ func removeIfDetached(graph_id, node_id):
 				queue.append(plants_graph[current_id][id])
 				visited[id] = true
 
-	var node = instance_from_id(node_id)
+	var local_node_id = server_2_local[server_node_id]
+	var node = instance_from_id(local_node_id)
 	node.destroy()
 
 func getNeighborIds(graph_id, node_id):

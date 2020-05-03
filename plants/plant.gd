@@ -48,9 +48,12 @@ func destroy():
 		else:
 			main.gameOver()
 
-	main.removeNode(network_id, get_instance_id())
+	main.removeNode(network_id, server_instance_id)
+	# NEIGHBOR IDS ARE THE LOCAL IDS !!!
 	for neighbor_id in neighbor_ids:
-		main.removeIfDetached(network_id, neighbor_id)
+		# this method is expecting server ids
+		var neighbor_server_id = instance_from_node(int(neighbor_id)).get_instance_id()
+		main.removeIfDetached(network_id, neighbor_server_id)
 
 	queue_free()
 
