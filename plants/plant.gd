@@ -36,13 +36,10 @@ func getLocalPlayer():
 func receiveDamage(damage):
 	health -= damage
 
-remotesync func destroy():
-	print('destroying plant ', str(get_instance_id()))
+func destroy():
 	var player = getLocalPlayer()
 	if is_queued_for_deletion():
 		return
-
-	var neighbor_ids = main.getNeighborIds(network_id, get_instance_id())
 
 	if get_instance_id() == player.current_plant:
 		if neighbor_ids:
@@ -61,7 +58,7 @@ func healthLoop():
 	if not get_tree().is_network_server():
 		return
 	if health <= 0:
-		rpc('destroy')
+		destroy()
 
 remote func setHealth(new_health):
 	health = new_health
