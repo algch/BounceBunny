@@ -52,7 +52,7 @@ func destroy():
 	# NEIGHBOR IDS ARE THE LOCAL IDS !!!
 	for neighbor_id in neighbor_ids:
 		# this method is expecting server ids
-		var neighbor_server_id = instance_from_id(int(neighbor_id)).get_instance_id()
+		var neighbor_server_id = instance_from_id(int(neighbor_id)).server_instance_id
 		main.removeIfDetached(network_id, neighbor_server_id)
 
 	queue_free()
@@ -193,7 +193,6 @@ func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
 	set_network_master(int(network_id))
-	print('plant ' + str(get_instance_id()) + ' net id ' + str(network_id))
 
 func _physics_process(delta):
 	healthLoop()
