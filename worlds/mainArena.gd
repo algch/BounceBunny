@@ -70,7 +70,7 @@ func initLocalPlayer(p_id, p_data):
 	plant.set_network_master(p_id)
 	add_child(plant)
 	var player = load('res://player/player.tscn').instance()
-	player.init('server', p_data['position'], plant.get_instance_id(), p_id)
+	player.init('server', p_data['position'], plant.get_instance_id(), p_data['initial_plant'], p_id)
 	player.set_network_master(p_id)
 	add_child(player)
 
@@ -82,7 +82,7 @@ func registerPlayerInServer(player_id, pos):
 	add_child(plant)
 	var player = load('res://player/player.tscn').instance()
 	player.set_network_master(player_id)
-	player.init('server', pos, plant.get_instance_id(), player_id)
+	player.init('server', pos, plant.get_instance_id(), plant.get_instance_id(), player_id)
 	add_child(player)
 	player_positions[get_tree().get_network_unique_id()] = pos
 	player_data[player_id] = {

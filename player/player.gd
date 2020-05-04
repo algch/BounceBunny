@@ -37,10 +37,11 @@ func _ready():
 	if str(get_tree().get_network_unique_id()) == name:
 		get_parent().emit_signal('local_player_initialized', get_parent().getLocalPlayerNode())
 
-func init(nickname, start_position, local_plant_id, network_id):
+func init(nickname, start_position, local_plant_id, server_plant_id, network_id):
 	$gui/nickname.text = nickname
 	global_position = start_position
 	current_plant = local_plant_id
+	current_plant_server = server_plant_id
 	set_name(str(network_id))
 
 remotesync func summonPlant(power, direction):
