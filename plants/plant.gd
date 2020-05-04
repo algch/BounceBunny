@@ -56,7 +56,7 @@ func destroy():
 	rpc('kill')
 	# TODO check if gamover
 
-remotesync func kill()
+remotesync func kill():
 	queue_free()
 
 remotesync func refreshNeighbors():
