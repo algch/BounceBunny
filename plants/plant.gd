@@ -30,7 +30,6 @@ func _on_score_timer_timeout():
 	$score_timer.start()
 
 func getLocalPlayer():
-	print('network_id ', network_id)
 	return get_node('/root/mainArena/' + str(network_id))
 
 func receiveDamage(damage):
@@ -41,21 +40,28 @@ func destroy():
 	if is_queued_for_deletion():
 		return
 
-	if get_instance_id() == player.current_plant:
+	if server_instance_id == player.current_plant_server:
 		if neighbor_ids:
 			var plant = instance_from_id(neighbor_ids[0])
-			player.rpc('setCurrentPlant', server_instance_id, plant.position, plant.projectile_damage)
-		else:
-			main.gameOver()
+			player.rpc('setCurrentPlant', plant.server_instance_id, plant.position, plant.projectile_damage)
 
-	main.removeNode(network_id, server_instance_id)
-	# NEIGHBOR IDS ARE THE LOCAL IDS !!!
+	main.rpc('removeNode', network_id, server_instance_id)
 	for neighbor_id in neighbor_ids:
-		# this method is expecting server ids
-		var neighbor_server_id = instance_from_id(int(neighbor_id)).server_instance_id
-		main.removeIfDetached(network_id, neighbor_server_id)
+		var neighbor = instance_from_id(int(neighbor_id))
+		neighbor.rpc('refreshNeighbors')
+		var is_detached = main.isDetached(network_id, neighbor.server_instance_id)
+		if is_detached:
+			neighbor.destroy()
 
+	rpc('kill')
+	# TODO check if gamover
+
+remotesync kill()
 	queue_free()
+
+remotesync func refreshNeighbors():
+	neighbor_ids = main.getNeighborIds(network_id, server_instance_id)
+	updateCurrentLevel()
 
 func healthLoop():
 	if not get_tree().is_network_server():

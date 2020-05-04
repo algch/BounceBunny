@@ -26,6 +26,7 @@ var shoot_point_start = null
 var default_font = DynamicFont.new()
 
 var current_plant = null
+var current_plant_server = null
 onready var mana = Globals.INITIAL_PLAYER_MANA
 onready var damage = Globals.INITIAL_PLAYER_DAMAGE
 
@@ -36,10 +37,10 @@ func _ready():
 	if str(get_tree().get_network_unique_id()) == name:
 		get_parent().emit_signal('local_player_initialized', get_parent().getLocalPlayerNode())
 
-func init(nickname, start_position, server_plant_id, network_id):
+func init(nickname, start_position, local_plant_id, network_id):
 	$gui/nickname.text = nickname
 	global_position = start_position
-	current_plant = server_plant_id
+	current_plant = local_plant_id
 	set_name(str(network_id))
 
 remotesync func summonPlant(power, direction):
@@ -146,9 +147,11 @@ func releaseAnimation():
 remotesync func setCurrentPlant(server_plant_id, pos, dam):
 	# if plant.is_queued_for_deletion() or not is_instance_valid(plant):
 	# 	Globals.gameOver()
+	print('players new plant is ', server_plant_id)
 	position = pos
 	damage = dam
 	current_plant = get_parent().server_2_local[server_plant_id]
+	current_plant_server = server_plant_id
 
 func getWeaponString():
 	match current_weapon:

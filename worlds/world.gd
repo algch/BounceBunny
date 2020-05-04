@@ -80,12 +80,31 @@ func addNode(graph_id, source, dest, dest_instance):
 	else:
 		plants_graph[source] = { dest: dest_instance }
 
-func removeNode(graph_id, node_id):
+remotesync func removeNode(graph_id, node_id):
 	var plants_graph = all_graphs[graph_id]
 	for id in plants_graph:
 		if node_id in plants_graph[id]:
 			plants_graph[id].erase(node_id)
 	plants_graph.erase(node_id)
+
+func isDetached(graph_id, server_node_id):
+	var plants_graph = all_graphs[graph_id]
+	var queue = [server_node_id]
+	var visited = { server_node_id: true }
+ 
+	while queue:
+		var current_id = queue.pop_front()
+
+		var player = get_node('/root/mainArena/' + str(graph_id))
+		if current_id == player.current_plant_server:
+			return false
+
+		for id in plants_graph[current_id]:
+			if not id in visited:
+				queue.append(plants_graph[current_id][id])
+				visited[id] = true
+
+	return true
 
 func removeIfDetached(graph_id, server_node_id):
 	var plants_graph = all_graphs[graph_id]
