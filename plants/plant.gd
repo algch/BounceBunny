@@ -12,7 +12,7 @@ enum STATE {
 var current_state = STATE.idle
 var DEFAULT_POWER = 0.5
 var max_health = 3.0
-var health = max_health
+var health = 2.0
 var health_recovery = 0.2
 var default_font = DynamicFont.new()
 var current_level = 1
@@ -21,6 +21,7 @@ var neighbor_ids = []
 var projectile_damage = 0.5
 var network_id
 var server_instance_id
+
 
 
 # DOES NOT APPLY TO MULTIPLAYER, CREATE A BASE CLASS PER PLANT WITH NETWORKING FUNCTIONS
@@ -57,6 +58,8 @@ func destroy():
 	# TODO check if gamover
 
 remotesync func kill():
+	if not neighbor_ids and network_id == get_tree().get_network_unique_id():
+		get_tree().quit()
 	queue_free()
 
 remotesync func refreshNeighbors():
@@ -115,21 +118,28 @@ func _on_attack_timer_timeout():
 	attack_timer.start()
 
 func _on_teleport_released():
-	# TODO this should only be executed if player is the owner of the plant
 	var player = getLocalPlayer()
+
 	if player.current_plant == get_instance_id():
+		return
+
+	if network_id != get_tree().get_network_unique_id():
 		return
 	player.rpc('setCurrentPlant', server_instance_id, position, projectile_damage)
 
-func _draw():
+func drawDebug():
 	draw_rect(Rect2(Vector2(-20, -210), Vector2(220, 100)), Color(0, 0, 0))
 	draw_string(default_font, Vector2(0, -190), 'server id ' + str(server_instance_id), Color(1, 0, 0.8))
 	draw_string(default_font, Vector2(0, -160), 'local  id ' + str(get_instance_id()), Color(1, 0, 0.8))
 	draw_string(default_font, Vector2(0, -130), 'neighbors  ' + str(neighbor_ids), Color(1, 0, 0.8))
+
+func _draw():
+	if Globals.debug_mode:
+		drawDebug()
 	for neighbor_id in neighbor_ids:
 		var neighbor = instance_from_id(neighbor_id)
-		if neighbor and is_instance_valid(neighbor) and not neighbor.is_queued_for_deletion():
-			draw_line(Vector2(0, 0), neighbor.position - position, line_color, 2)
+		if neighbor and is_instance_valid(neighbor) and neighbor.current_level >= current_level:
+			draw_line(Vector2(0, 0), neighbor.position - position, line_color, 5)
 
 func heal():
 	health += health_recovery
@@ -154,19 +164,16 @@ func setAnimation():
 				$animation.play('level_3')
 
 func updateCurrentLevel():
-	var neighbor_ids_count = len(neighbor_ids)
-	if neighbor_ids_count <= 1:
-		current_level = 1
+	current_level = len(neighbor_ids)
+	if current_level == 1:
 		max_health = 3.0
 		line_color = Color(0, 0, 1)
 		projectile_damage = 0.5
-	if neighbor_ids_count > 1 and neighbor_ids_count < 4:
-		current_level = 2
+	if current_level == 2:
 		max_health = 4.0
 		line_color = Color(0, 1, 0)
 		projectile_damage = 1.5
-	if neighbor_ids_count >= 4:
-		current_level = 3
+	if current_level == 3:
 		max_health = 5.0
 		line_color = Color(1, 0, 0)
 		projectile_damage = 2.5

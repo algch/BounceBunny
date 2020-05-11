@@ -36,6 +36,9 @@ func _ready():
 	default_font.size = 22
 	if str(get_tree().get_network_unique_id()) == name:
 		get_parent().emit_signal('local_player_initialized', get_parent().getLocalPlayerNode())
+	if get_name() == str(get_tree().get_network_unique_id()):
+		print(get_name(), ' ', str(get_tree().get_network_unique_id()))
+		$camera.make_current()
 
 func init(nickname, start_position, local_plant_id, server_plant_id, network_id):
 	$gui/nickname.text = nickname
@@ -79,48 +82,13 @@ remotesync func attack(power, direction):
 	get_node('/root/mainArena/').add_child(projectile)
 	$animation.play('attack')
 
-func _on_bow_released():
-	current_weapon = Globals.PROJECTILE_TYPES.ATTACK
-	$animation.set_animation('bow_0')
-	$animation.set_frame(0)
-	$animation.stop()
-
-func _on_seed_released():
-	current_weapon = Globals.PROJECTILE_TYPES.SUMMON
-	$animation.set_animation('summon_0')
-	$animation.set_frame(0)
-	$animation.stop()
-
-func _on_options_released():
-	get_tree().paused = true
-	$pauseScreen.visible = true
-	$resumeRestart.visible = true
-	$resumeRestart.set_process(true)
-	$quit.visible = true
-	$quit.set_process(true)
-
-func _on_quit_released():
-	get_tree().quit()
-
-func _on_resumeRestart_released():
-	current_state = STATE.idle
-	if get_tree().paused:
-		get_tree().paused = false
-		$pauseScreen.visible = false
-		$resumeRestart.visible = false
-		$resumeRestart.set_process(false)
-		$quit.visible = false
-		$quit.set_process(false)
-	if Globals.GAME_OVER:
-		get_tree().reload_current_scene()
+func _on_trigger_pressed():
+	shoot_point_start = get_global_mouse_position()
+	current_state = STATE.charging
 
 func pollInput():
 	if Input.is_action_just_released('test'):
 		print(get_parent().all_graphs)
-
-	if Input.is_action_pressed('touch') and current_state != STATE.charging:
-		current_state = STATE.charging
-		shoot_point_start = get_global_mouse_position()
 
 	if Input.is_action_just_released('touch') and current_state == STATE.charging:
 		var shoot_length = (get_global_mouse_position() - shoot_point_start).length()
@@ -161,10 +129,14 @@ func getWeaponString():
 		1:
 			return 'summon'
 
-func _draw():
+func drawDebug():
 	draw_rect(Rect2(Vector2(-350, 0), Vector2(260, 60)), Color(0, 0, 0))
 	draw_string(default_font, Vector2(-330, 20), 'local name     ' + str(get_name()), Color(0.8, 0, 1))
 	draw_string(default_font, Vector2(-330, 40), 'current plant  ' + str(current_plant), Color(0.8, 0, 1))
+
+func _draw():
+	if Globals.debug_mode:
+		drawDebug()
 	if current_state != STATE.charging:
 		return
 	draw_circle(

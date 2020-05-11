@@ -80,6 +80,8 @@ func registerPlayerInServer(player_id, pos):
 	plant.init(pos, player_id, plant.get_instance_id())
 	plant.set_network_master(player_id)
 	add_child(plant)
+	var player_class = load('res://player/player.tscn')
+	print('player class ', player_class)
 	var player = load('res://player/player.tscn').instance()
 	player.set_network_master(player_id)
 	player.init('server', pos, plant.get_instance_id(), plant.get_instance_id(), player_id)
@@ -99,14 +101,17 @@ remote func printInServer(message):
 
 func _on_player_disconnected(id):
 	print('player ', id, ' disconnected')
-	# all_graphs.erase(id)
+	var loser = get_node('/root/mainArena/' + str(id))
+	if loser:
+		loser.queue_free()
+	all_graphs.erase(id)
 
 func getLocalPlayerNode():
 	var player_path = '/root/mainArena/' + str(get_tree().get_network_unique_id())
 	return get_node(player_path)
 
 func getLocalGuiNode():
-	return get_node('/root/mainArena/camera/gui')
+	return get_node('/root/mainArena/canvas/gui')
 
 func _on_bow_released():
 	var player = getLocalPlayerNode()
@@ -126,9 +131,7 @@ func _on_options_released():
 	var gui = getLocalGuiNode()
 	gui.get_node('pauseScreen').visible = true
 	gui.get_node('resumeRestart').visible = true
-	gui.get_node('resumeRestart').set_process(true)
 	gui.get_node('quit').visible = true
-	gui.get_node('quit').set_process(true)
 
 func _on_quit_released():
 	get_tree().quit()
@@ -137,9 +140,7 @@ func _on_resumeRestart_released():
 	var gui = getLocalGuiNode()
 	gui.get_node('pauseScreen').visible = false
 	gui.get_node('resumeRestart').visible = false
-	gui.get_node('resumeRestart').set_process(false)
 	gui.get_node('quit').visible = false
-	gui.get_node('quit').set_process(false)
 
 func _process(delta):
 	var player = getLocalPlayerNode()

@@ -1,6 +1,5 @@
-[gd_scene load_steps=53 format=2]
+[gd_scene load_steps=54 format=2]
 
-[ext_resource path="res://player/player.gd" type="Script" id=1]
 [ext_resource path="res://player/animations/seed/Player_Seed0005.png" type="Texture" id=2]
 [ext_resource path="res://player/animations/seed/Player_Seed0006.png" type="Texture" id=3]
 [ext_resource path="res://player/animations/seed/Player_Seed0007.png" type="Texture" id=4]
@@ -48,12 +47,13 @@
 [ext_resource path="res://player/animations/attack/Player0024.png" type="Texture" id=46]
 [ext_resource path="res://player/animations/attack/Player0025.png" type="Texture" id=47]
 [ext_resource path="res://fonts/default-font.ttf" type="DynamicFontData" id=48]
+[ext_resource path="res://player/player.gd" type="Script" id=55]
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
-"frames": [ ExtResource( 2 ), ExtResource( 3 ), ExtResource( 4 ), ExtResource( 5 ), ExtResource( 6 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 10 ), ExtResource( 11 ), ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 15 ), ExtResource( 16 ), ExtResource( 17 ), ExtResource( 18 ), ExtResource( 19 ) ],
+"frames": [ ExtResource( 34 ), ExtResource( 39 ), ExtResource( 40 ), ExtResource( 41 ), ExtResource( 42 ), ExtResource( 43 ), ExtResource( 44 ), ExtResource( 45 ), ExtResource( 46 ), ExtResource( 47 ) ],
 "loop": true,
-"name": "summon_1",
+"name": "bow_1",
 "speed": 24.0
 }, {
 "frames": [ ExtResource( 20 ), ExtResource( 21 ), ExtResource( 22 ), ExtResource( 23 ), ExtResource( 24 ), ExtResource( 25 ), ExtResource( 26 ), ExtResource( 27 ), ExtResource( 28 ), ExtResource( 29 ), ExtResource( 30 ), ExtResource( 31 ), ExtResource( 32 ), ExtResource( 33 ), ExtResource( 34 ) ],
@@ -66,9 +66,9 @@ animations = [ {
 "name": "summon_0",
 "speed": 8.0
 }, {
-"frames": [ ExtResource( 34 ), ExtResource( 39 ), ExtResource( 40 ), ExtResource( 41 ), ExtResource( 42 ), ExtResource( 43 ), ExtResource( 44 ), ExtResource( 45 ), ExtResource( 46 ), ExtResource( 47 ) ],
+"frames": [ ExtResource( 2 ), ExtResource( 3 ), ExtResource( 4 ), ExtResource( 5 ), ExtResource( 6 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 10 ), ExtResource( 11 ), ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 15 ), ExtResource( 16 ), ExtResource( 17 ), ExtResource( 18 ), ExtResource( 19 ) ],
 "loop": true,
-"name": "bow_1",
+"name": "summon_1",
 "speed": 24.0
 } ]
 
@@ -79,13 +79,16 @@ extents = Vector2( 85, 60 )
 size = 36
 font_data = ExtResource( 48 )
 
-[sub_resource type="DynamicFont" id=10]
+[sub_resource type="DynamicFont" id=4]
 size = 50
 font_data = ExtResource( 48 )
 
+[sub_resource type="CircleShape2D" id=10]
+radius = 50.0
+
 [node name="player" type="Position2D"]
 z_index = 1
-script = ExtResource( 1 )
+script = ExtResource( 55 )
 
 [node name="animation" type="AnimatedSprite" parent="."]
 frames = SubResource( 1 )
@@ -123,6 +126,17 @@ margin_left = -90.2951
 margin_top = -618.934
 margin_right = 86.7049
 margin_bottom = -546.934
-custom_fonts/font = SubResource( 10 )
+custom_fonts/font = SubResource( 4 )
 custom_colors/font_color = Color( 0, 0, 0, 1 )
+
+[node name="camera" type="Camera2D" parent="."]
+drag_margin_left = 0.0
+drag_margin_top = 0.0
+drag_margin_right = 0.0
+drag_margin_bottom = 0.0
+
+[node name="trigger" type="TouchScreenButton" parent="."]
+position = Vector2( -47, -53 )
+shape = SubResource( 10 )
 [connection signal="animation_finished" from="animation" to="." method="_on_animation_finished"]
+[connection signal="pressed" from="trigger" to="." method="_on_trigger_pressed"]

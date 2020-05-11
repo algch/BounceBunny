@@ -10,6 +10,8 @@ enum PROJECTILE_TYPES {
     SUMMON,
 }
 
+var debug_mode = false
+
 var GAME_OVER = false
 var score = 0
 
