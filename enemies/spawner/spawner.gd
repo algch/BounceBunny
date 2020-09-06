@@ -161,6 +161,7 @@ func wanderLoop(delta):
 
 
 func behaviorLoop(delta):
+	return
 	match current_state:
 		STATE.WANDER:
 			wanderLoop(delta)

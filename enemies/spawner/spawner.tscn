@@ -47,7 +47,7 @@ margin_bottom = -59.6646
 
 [node name="container" type="HBoxContainer" parent="gui"]
 margin_right = 284.0
-margin_bottom = 40.0
+margin_bottom = 39.0
 
 [node name="label" type="Label" parent="gui/container"]
 margin_top = 10.0
@@ -59,7 +59,7 @@ text = "20.0/20.0"
 [node name="bar" type="TextureProgress" parent="gui/container"]
 margin_left = 94.0
 margin_right = 284.0
-margin_bottom = 40.0
+margin_bottom = 39.0
 value = 100.0
 texture_under = ExtResource( 4 )
 texture_progress = ExtResource( 5 )

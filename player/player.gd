@@ -1,7 +1,9 @@
-extends Position2D
+extends KinematicBody2D
 
 var SPEED = 500
-var direction = Vector2(0, 0)
+var direction = Vector2(0, 0) setget set_direction, get_direction
+var health = 5.0
+var should_move = false
 
 var TYPE = 'player'
 
@@ -29,6 +31,15 @@ var default_font = DynamicFont.new()
 var current_plant = null
 var mana = 100.0
 
+signal damage_received(current_health)
+
+func set_direction(dir : Vector2):
+	direction = dir
+	$animation.rotation = dir.angle() + PI/2
+
+func get_direction():
+	return direction
+
 func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
@@ -41,22 +52,21 @@ func _ready():
 	$quit.set_process(false)
 
 
-func summonPlant(power, direction):
+func summonPlant(power, dir):
 	var summon = summon_class.instance()
 
 	if mana < summon.mana_cost:
 		return
 
-	var offset = direction * WEAPON_RADIUS
+	var offset = dir * WEAPON_RADIUS
 
 	summon.position = position + offset
-	summon.direction = direction
+	summon.direction = dir
 	summon.power = power
 	summon.first_neighbor = current_plant
 
 	get_node('/root/main/').add_child(summon)
 	mana -= summon.mana_cost
-
 
 func addMana(increment):
 	mana += increment
@@ -108,27 +118,6 @@ func _on_resumeRestart_released():
 	if main.GAME_OVER:
 		get_tree().reload_current_scene()
 
-func pollInput():
-	if Input.is_action_pressed('touch') and current_state != STATE.charging:
-		current_state = STATE.charging
-		shoot_point_start = get_global_mouse_position()
-
-	if Input.is_action_just_released('touch') and current_state == STATE.charging:
-		var shoot_length = (get_global_mouse_position() - shoot_point_start).length()
-		shoot_length = shoot_length if shoot_length <= MAX_SHOOT_LENGTH else MAX_SHOOT_LENGTH
-		var power = shoot_length/MAX_SHOOT_LENGTH
-		$animation.set_frame(0)
-
-		current_state = STATE.idle
-		if power >= 0.2:
-			var direction = (shoot_point_start - get_global_mouse_position()).normalized()
-			if current_weapon == globals.PROJECTILE_TYPES.ATTACK:
-				attack(power, direction)
-			if current_weapon == globals.PROJECTILE_TYPES.SUMMON:
-				summonPlant(power, direction)
-
-			releaseAnimation()
-
 func pressAnimation():
 	match current_weapon:
 		globals.PROJECTILE_TYPES.ATTACK:
@@ -170,20 +159,13 @@ func _on_animation_finished():
 	$animation.set_frame(0)
 	$animation.stop()
 
-func aimingLoop():
-	if current_state != STATE.charging:
+func _physics_process(_delta):
+	if not should_move:
 		return
 
-	var reference = (shoot_point_start - get_global_mouse_position())
-	var partial_power = reference.length()/MAX_SHOOT_LENGTH
-	partial_power = partial_power if partial_power <= 1.0 else 1.0
-	reference = reference.normalized()
-	var frame = floor(partial_power * ANIMATION_FRAME_COUNT)
-	$animation.set_frame(frame)
-	if partial_power <= 0.2:
-		return
-	var angle = reference.angle() + PI/2.0
-	$animation.rotation = angle
+	var motion = direction * SPEED
+	var _res = move_and_slide(motion)
 
-func _physics_process(delta):
-	position += direction * SPEED * delta
+func receiveDamage(damage):
+	health -= damage
+	emit_signal("damage_received", health)

@@ -15,3 +15,6 @@ func action_selector_right():
 
 func _on_swipeDetector_swipe_canceled(position_start : Vector2):
 	print("swipe canceled")
+
+func _on_TextureButton_pressed():
+	print("pause")

@@ -17,21 +17,22 @@ func _action(event):
 		globals.ACTIONS.MOVE:
 			_handle_move_action(event)
 		globals.ACTIONS.ATTACK:
-			_handle_attack_action(event)
+			_handle_shoot(event)
 		globals.ACTIONS.PLANT:
-			pass
+			_handle_shoot(event)
 
 func _handle_move_action(event):
 	if event.is_action("touch") or recalculate_move:
 		var direction = (get_global_mouse_position() - Vector2(360, 630)).normalized()
 		player.direction = direction
+		player.should_move = true
 		recalculate_move = true
 
 	if event.is_action_released('touch'):
-		player.direction = Vector2(0, 0)
 		recalculate_move = false
+		player.should_move = false
 
-func _handle_attack_action(event):
+func _handle_shoot(event):
 	if event.is_action_pressed('touch') and player.current_state != player.STATE.charging:
 		player.current_state = player.STATE.charging
 		player.shoot_point_start = get_global_mouse_position()

@@ -12,8 +12,8 @@ func _ready():
 
 func travelEnded():
 	var plant = plant_class.instance()
-	main.addNode(first_neighbor, plant)
-	main.addNode(plant, first_neighbor)
+	# main.addNode(first_neighbor, plant)
+	# main.addNode(plant, first_neighbor)
 	plant.position = position
 	get_node('/root/main/').add_child(plant)
 	queue_free()

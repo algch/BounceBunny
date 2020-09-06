@@ -1,11 +1,24 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://fonts/default-font.ttf" type="DynamicFontData" id=1]
 [ext_resource path="res://gui/gui.gd" type="Script" id=2]
 [ext_resource path="res://engine/swipeDetector.tscn" type="PackedScene" id=3]
 [ext_resource path="res://engine/inputHandler.tscn" type="PackedScene" id=4]
+[ext_resource path="res://gui/sprites/options_button.png" type="Texture" id=5]
 
 [sub_resource type="DynamicFont" id=1]
+size = 36
+font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=2]
+size = 36
+font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=3]
+size = 36
+font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=4]
 size = 36
 font_data = ExtResource( 1 )
 
@@ -15,24 +28,59 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="label" type="Label" parent="."]
-margin_left = 110.695
-margin_top = 1178.04
-margin_right = 352.695
-margin_bottom = 1267.04
-custom_fonts/font = SubResource( 1 )
-custom_colors/font_color = Color( 0.00392157, 0, 0, 1 )
-text = "MOVE"
+[node name="inputHandler" parent="." instance=ExtResource( 4 )]
+
+[node name="swipeDetector" parent="." instance=ExtResource( 3 )]
+margin_top = 1080.0
+margin_bottom = 1280.0
+
+[node name="TextureButton" type="TextureButton" parent="."]
+margin_left = 540.0
+margin_top = 1080.0
+margin_right = 720.0
+margin_bottom = 1280.0
+texture_normal = ExtResource( 5 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="swipeDetector" parent="." instance=ExtResource( 3 )]
-anchor_top = 12.056
-anchor_bottom = 12.056
-margin_top = 1080.0
-margin_bottom = 1280.0
+[node name="topDisplay" type="HBoxContainer" parent="."]
+anchor_right = 1.0
+margin_bottom = 43.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="inputHandler" parent="." instance=ExtResource( 4 )]
+[node name="label1" type="Label" parent="topDisplay"]
+margin_right = 176.0
+margin_bottom = 43.0
+custom_fonts/font = SubResource( 1 )
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+text = "HEALTH: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="health" type="Label" parent="topDisplay"]
+margin_left = 180.0
+margin_right = 246.0
+margin_bottom = 43.0
+custom_fonts/font = SubResource( 2 )
+text = "5.0"
+
+[node name="label2" type="Label" parent="topDisplay"]
+margin_left = 250.0
+margin_right = 426.0
+margin_bottom = 43.0
+custom_fonts/font = SubResource( 3 )
+text = "ACTION: "
+
+[node name="action" type="Label" parent="topDisplay"]
+margin_left = 430.0
+margin_right = 518.0
+margin_bottom = 43.0
+custom_fonts/font = SubResource( 4 )
+text = "MOVE"
 [connection signal="swipe" from="swipeDetector" to="." method="_on_swipeDetector_swipe"]
 [connection signal="swipe_canceled" from="swipeDetector" to="." method="_on_swipeDetector_swipe_canceled"]
+[connection signal="pressed" from="TextureButton" to="." method="_on_TextureButton_pressed"]

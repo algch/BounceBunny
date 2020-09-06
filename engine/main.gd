@@ -122,7 +122,24 @@ func _on_gui_action_changed(change_dir):
 	elif action_index > available_actions.size() - 1:
 		action_index = 0
 	selected_action = action_index
-	$CanvasLayer/gui/label.set_text(str(selected_action))
+	if get_selected_action() == globals.ACTIONS.ATTACK:
+		$player.current_weapon = globals.PROJECTILE_TYPES.ATTACK
+	if get_selected_action() == globals.ACTIONS.PLANT:
+		$player.current_weapon = globals.PROJECTILE_TYPES.SUMMON
+	$CanvasLayer/gui/topDisplay/action.set_text(get_selected_action_as_string())
 
 func get_selected_action():
 	return available_actions[selected_action]
+
+func get_selected_action_as_string():
+	match get_selected_action():
+		globals.ACTIONS.MOVE:
+			return "MOVE"
+		globals.ACTIONS.ATTACK:
+			return "ATTACK"
+		globals.ACTIONS.PLANT:
+			return "PLANT"
+	return ""
+
+func _on_player_damage_received(current_health):
+	$CanvasLayer/gui/topDisplay/health.set_text(str(current_health))
