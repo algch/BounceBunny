@@ -22,6 +22,9 @@ var MAX_SPIDER_SPEED = INITIAL_MAX_SPIDER_SPEED
 var MAX_SPIDER_DAMAGE = INITIAL_MAX_SPIDER_DAMAGE
 var MAX_SPIDER_HEALTH = INITIAL_MAX_SPIDER_HEALTH
 
+var available_actions = [globals.ACTIONS.MOVE, globals.ACTIONS.ATTACK, globals.ACTIONS.PLANT]
+var selected_action : = 0
+
 var savegame = File.new()
 var save_path = 'user://savegame.save'
 var initial_save_date = {'highscore': 0}
@@ -109,6 +112,17 @@ func gameOver():
 func _ready():
 	randomize()
 	if not savegame.file_exists(save_path):
-		print('created save data')
 		create_save()
 	$player/highScore.set_text('HIGHSCORE: ' + str(getHighScore()))
+
+func _on_gui_action_changed(change_dir):
+	var action_index = selected_action + change_dir
+	if action_index < 0:
+		action_index = available_actions.size() - 1
+	elif action_index > available_actions.size() - 1:
+		action_index = 0
+	selected_action = action_index
+	$CanvasLayer/gui/label.set_text(str(selected_action))
+
+func get_selected_action():
+	return available_actions[selected_action]

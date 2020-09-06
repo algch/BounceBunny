@@ -1,10 +1,12 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://engine/main.gd" type="Script" id=1]
 [ext_resource path="res://tiles/dungeon_tileset.tres" type="TileSet" id=2]
 [ext_resource path="res://plants/plant.tscn" type="PackedScene" id=3]
 [ext_resource path="res://player/player.tscn" type="PackedScene" id=4]
 [ext_resource path="res://enemies/spawner/spawner.tscn" type="PackedScene" id=5]
+[ext_resource path="res://engine/swipeDetector.tscn" type="PackedScene" id=6]
+[ext_resource path="res://gui/gui.tscn" type="PackedScene" id=7]
 
 [node name="main" type="Node"]
 script = ExtResource( 1 )
@@ -33,3 +35,10 @@ position = Vector2( 2200, 250 )
 
 [node name="spawner4" parent="." instance=ExtResource( 5 )]
 position = Vector2( 2200, 1350 )
+
+[node name="swipeDetector" parent="." instance=ExtResource( 6 )]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="gui" parent="CanvasLayer" instance=ExtResource( 7 )]
+[connection signal="action_changed" from="CanvasLayer/gui" to="." method="_on_gui_action_changed"]

@@ -1,6 +1,7 @@
 extends Position2D
 
 var SPEED = 500
+var direction = Vector2(0, 0)
 
 var TYPE = 'player'
 
@@ -20,6 +21,7 @@ enum STATE {
 }
 var current_state = STATE.idle
 var current_weapon = globals.PROJECTILE_TYPES.ATTACK
+var selected_action = globals.ACTIONS.MOVE
 var shoot_point_start = null
 
 var default_font = DynamicFont.new()
@@ -123,7 +125,7 @@ func pollInput():
 			if current_weapon == globals.PROJECTILE_TYPES.ATTACK:
 				attack(power, direction)
 			if current_weapon == globals.PROJECTILE_TYPES.SUMMON:
-				summonPlant(power, direction)	
+				summonPlant(power, direction)
 
 			releaseAnimation()
 
@@ -154,17 +156,6 @@ func getWeaponString():
 		1:
 			return 'summon'
 
-func _draw():
-	if current_state != STATE.charging:
-		return
-	draw_circle(
-		shoot_point_start - position,
-		(get_global_mouse_position() - shoot_point_start).length(),
-		Color(1, 1, 1, 0.25)
-	)
-	var color = Color(1, 1, 1) if (get_global_mouse_position() - shoot_point_start).length() < MAX_SHOOT_LENGTH else Color(1, 0, 0)
-	draw_line(Vector2(0, 0), shoot_point_start - get_global_mouse_position(), color, 4.0)
-
 func _on_animation_finished():
 	var animation_name
 	var part = 0 if current_state == STATE.idle else 1 
@@ -194,14 +185,5 @@ func aimingLoop():
 	var angle = reference.angle() + PI/2.0
 	$animation.rotation = angle
 
-func updateGui():
-	var message = 'MANA: ' + str(mana) + '\nSCORE: ' + str(main.score)
-	$gui/label.set_text(message)
-
-func _process(delta):
-	updateGui()
-	update()
-
 func _physics_process(delta):
-	aimingLoop()
-	pollInput()
+	position += direction * SPEED * delta
