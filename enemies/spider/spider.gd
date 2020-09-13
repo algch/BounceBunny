@@ -263,3 +263,6 @@ func behaviorLoop(delta):
 func _physics_process(delta):
 	healthLoop()
 	behaviorLoop(delta)
+
+func apply_effect(effect, time):
+	print("applied effect ", effect, " for ", time, " seconds")

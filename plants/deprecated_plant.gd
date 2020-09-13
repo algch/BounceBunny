@@ -18,9 +18,11 @@ var health_recovery = 0.2
 var default_font = DynamicFont.new()
 var current_level = 1
 var line_color = Color(0, 0, 1)
-var neighbors = []
 var projectile_damage = 0.5
+var ready_for_development = false
+var type = null
 
+signal display_menu(plant)
 
 func _on_score_timer_timeout():
 	main.increaseScore()
@@ -32,18 +34,6 @@ func receiveDamage(damage):
 func destroy():
 	if is_queued_for_deletion():
 		return
-
-	var neighbors = main.getNeighbors(self)
-
-	if self == player.current_plant:
-		if neighbors:
-			player.setCurrentPlant(neighbors[0])
-		else:
-			main.gameOver()
-
-	main.removeNode(self)
-	for neighbor in neighbors:
-		main.removeIfDetached(neighbor)
 
 	queue_free()
 
@@ -90,16 +80,6 @@ func _on_attack_timer_timeout():
 	attack(0.5)
 	attack_timer.start()
 
-func _on_teleport_released():
-	if player.current_plant == self:
-		return
-	player.setCurrentPlant(self)
-
-func _draw():
-	for neighbor in neighbors:
-		if neighbor and is_instance_valid(neighbor) and not neighbor.is_queued_for_deletion():
-			draw_line(Vector2(0, 0), neighbor.position - position, line_color, 2)
-
 func _on_health_timer_timeout():
 	health += health_recovery
 	if health > max_health:
@@ -119,36 +99,13 @@ func setAnimation():
 			if 'level_3' != current_animation:
 				$animation.play('level_3')
 
-func updateCurrentLevel():
-	var neighbors_count = len(neighbors)
-	if neighbors_count <= 1:
-		current_level = 1
-		max_health = 3.0
-		line_color = Color(0, 0, 1)
-		projectile_damage = 0.5
-	if neighbors_count > 1 and neighbors_count < 5:
-		current_level = 2
-		max_health = 4.0
-		line_color = Color(0, 1, 0)
-		projectile_damage = 1.0
-	if neighbors_count >= 5:
-		current_level = 3
-		max_health = 5.0
-		line_color = Color(1, 0, 0)
-		projectile_damage = 1.5
-		
-	if health > max_health:
-		health = max_health
-
 func updateGui():
 	var message = str(health) + '/' + str(max_health)
 	$gui/container/label.set_text(message)
 	var percentage = 100 * (health/max_health)
 	$gui/container/bar.set_value(percentage)
 
-func _process(delta):
-	neighbors = main.getNeighbors(self)
-	updateCurrentLevel()
+func _process(_delta):
 	updateGui()
 	setAnimation()
 	update()
@@ -156,6 +113,39 @@ func _process(delta):
 func _ready():
 	default_font.font_data = load('res://fonts/default-font.ttf')
 	default_font.size = 22
+	var gui = get_node("/root/main/CanvasLayer/gui")
+	var _result = connect("display_menu", gui, "display_plant_menu")
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	healthLoop()
+	state_loop()
+
+func state_loop():
+	if not type:
+		return
+
+	
+	# DEVELOP STATE MACHINE
+
+func _on_development_timer_timeout():
+	ready_for_development = true
+	print("lista")
+	$development_timer.stop()
+
+func _on_plantMenu_released():
+	if not ready_for_development:
+		return
+
+	emit_signal("display_menu", self)
+
+func develop(selected_type):
+	ready_for_development = false
+	type = selected_type
+	update_animation()
+
+func update_animation():
+	match type:
+		globals.PLANT_TYPES.SPIKES:
+			print("updated animation to spike")
+		globals.PLANT_TYPES.POISON:
+			print("updated animation to posion")

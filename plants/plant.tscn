@@ -1,6 +1,6 @@
-[gd_scene load_steps=104 format=2]
+[gd_scene load_steps=107 format=2]
 
-[ext_resource path="res://plants/plant.gd" type="Script" id=1]
+[ext_resource path="res://plants/Plant.gd" type="Script" id=1]
 [ext_resource path="res://plants/animations/level_3/Attack0001.png" type="Texture" id=2]
 [ext_resource path="res://plants/animations/level_3/Attack0002.png" type="Texture" id=3]
 [ext_resource path="res://plants/animations/level_3/Attack0003.png" type="Texture" id=4]
@@ -98,6 +98,9 @@
 [ext_resource path="res://fonts/default-font.ttf" type="DynamicFontData" id=96]
 [ext_resource path="res://plants/gui/lifebar_bg.png" type="Texture" id=97]
 [ext_resource path="res://plants/gui/lifebar_fill.png" type="Texture" id=98]
+[ext_resource path="res://plants/type_handlers/Sprout.gd" type="Script" id=99]
+[ext_resource path="res://plants/type_handlers/Poison.gd" type="Script" id=100]
+[ext_resource path="res://plants/type_handlers/Arrows.gd" type="Script" id=101]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 60, 60 )
@@ -105,10 +108,7 @@ extents = Vector2( 60, 60 )
 [sub_resource type="CircleShape2D" id=2]
 radius = 160.0
 
-[sub_resource type="RectangleShape2D" id=3]
-extents = Vector2( 40, 40 )
-
-[sub_resource type="SpriteFrames" id=4]
+[sub_resource type="SpriteFrames" id=3]
 animations = [ {
 "frames": [ ExtResource( 2 ), ExtResource( 3 ), ExtResource( 4 ), ExtResource( 5 ), ExtResource( 6 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 9 ), ExtResource( 10 ), ExtResource( 11 ), ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 15 ), ExtResource( 16 ), ExtResource( 17 ), ExtResource( 18 ), ExtResource( 19 ), ExtResource( 20 ), ExtResource( 21 ), ExtResource( 22 ), ExtResource( 23 ), ExtResource( 24 ), ExtResource( 25 ), ExtResource( 26 ), ExtResource( 27 ), ExtResource( 28 ), ExtResource( 29 ), ExtResource( 30 ), ExtResource( 31 ) ],
 "loop": true,
@@ -126,8 +126,11 @@ animations = [ {
 "speed": 24.0
 } ]
 
-[sub_resource type="DynamicFont" id=5]
+[sub_resource type="DynamicFont" id=4]
 font_data = ExtResource( 96 )
+
+[sub_resource type="CircleShape2D" id=5]
+radius = 60.0
 
 [node name="plant" type="StaticBody2D" groups=[
 "affected_by_weapons",
@@ -147,26 +150,13 @@ shape = SubResource( 1 )
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource( 2 )
 
-[node name="score_timer" type="Timer" parent="."]
-autostart = true
-
-[node name="attack_timer" type="Timer" parent="."]
+[node name="CooldownTimer" type="Timer" parent="."]
 wait_time = 0.25
 
-[node name="health_timer" type="Timer" parent="."]
-wait_time = 2.0
-autostart = true
-
-[node name="teleport" type="TouchScreenButton" parent="." groups=[
-"affected_by_weapons",
-"attacked_by_enemies",
-]]
-shape = SubResource( 3 )
-
 [node name="animation" type="AnimatedSprite" parent="."]
-frames = SubResource( 4 )
+frames = SubResource( 3 )
 animation = "level_1"
-frame = 25
+frame = 5
 playing = true
 
 [node name="gui" type="MarginContainer" parent="."]
@@ -174,6 +164,9 @@ margin_left = -62.3445
 margin_top = -110.813
 margin_right = 333.655
 margin_bottom = -56.8135
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="container" type="HBoxContainer" parent="gui"]
 margin_right = 395.0
@@ -183,7 +176,7 @@ margin_bottom = 53.0
 margin_top = 17.0
 margin_right = 70.0
 margin_bottom = 36.0
-custom_fonts/font = SubResource( 5 )
+custom_fonts/font = SubResource( 4 )
 text = "3.0/3.0"
 valign = 1
 
@@ -194,9 +187,24 @@ margin_bottom = 53.0
 value = 100.0
 texture_under = ExtResource( 97 )
 texture_progress = ExtResource( 98 )
+
+[node name="MenuButton" type="TouchScreenButton" parent="."]
+position = Vector2( -60, -60 )
+shape = SubResource( 5 )
+
+[node name="Types" type="Node" parent="."]
+
+[node name="Sprout" type="Node" parent="Types"]
+script = ExtResource( 99 )
+
+[node name="Poison" type="Node" parent="Types"]
+script = ExtResource( 100 )
+
+[node name="Arrows" type="Node" parent="Types"]
+script = ExtResource( 101 )
+
+[node name="Spikes" type="Node" parent="Types"]
 [connection signal="body_entered" from="Area2D" to="." method="_on_Area2D_body_entered"]
 [connection signal="body_exited" from="Area2D" to="." method="_on_Area2D_body_exited"]
-[connection signal="timeout" from="score_timer" to="." method="_on_score_timer_timeout"]
-[connection signal="timeout" from="attack_timer" to="." method="_on_attack_timer_timeout"]
-[connection signal="timeout" from="health_timer" to="." method="_on_health_timer_timeout"]
-[connection signal="released" from="teleport" to="." method="_on_teleport_released"]
+[connection signal="timeout" from="CooldownTimer" to="." method="_on_attack_timer_timeout"]
+[connection signal="released" from="MenuButton" to="." method="_on_MenuButton_released"]

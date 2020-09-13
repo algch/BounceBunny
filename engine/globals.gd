@@ -16,6 +16,20 @@ enum PROJECTILE_TYPES {
     SUMMON,
 }
 
+enum PLANT_TYPES {
+    SPROUT,
+    POISON,
+    SPIKES,
+    ARROWS,
+}
+
+enum EFFECTS {
+    POISONED,
+}
+
+const PLANT_GROWTH_TIME = 5.0
+const MAX_PLANT_HEALTH = 3.0
+
 func calculateChance(probability):
     return randf() <= probability
 
