@@ -19,11 +19,8 @@ onready var type_2_handler = {
 }
 var health = globals.MAX_PLANT_HEALTH
 
-signal display_menu(plant)
 
 func _ready():
-	var gui = get_node("/root/main/CanvasLayer/gui")
-	var _result = connect("display_menu", gui, "display_plant_menu")
 	begin_growth()
 
 func _physics_process(_delta):
@@ -59,8 +56,7 @@ func _on_MenuButton_released():
 	if not should_show_menu:
 		return
 
-	print("signal emitted")
-	emit_signal("display_menu", self)
+	display_plant_menu()
 
 func convert_to_type(selected_type):
 	should_show_menu = false
@@ -103,3 +99,19 @@ func _on_Area2D_body_exited(body):
 
 func receiveDamage(damage):
 	health -= damage
+
+func display_plant_menu():
+	$CanvasLayer/Menu.visible = true
+
+func _on_spikes_pressed():
+	_develop_plant(globals.PLANT_TYPES.SPIKES)
+
+func _on_poison_pressed():
+	_develop_plant(globals.PLANT_TYPES.POISON)
+
+func _on_arrows_pressed():
+	_develop_plant(globals.PLANT_TYPES.ARROWS)
+
+func _develop_plant(plant_type):
+	convert_to_type(plant_type)
+	$CanvasLayer/Menu.visible = false
