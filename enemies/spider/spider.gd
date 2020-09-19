@@ -30,13 +30,10 @@ enum STATE {
 }
 var current_state = STATE.WANDER
 var is_attacking = false
-
-
+var current_effect = {}
 
 var default_font = DynamicFont.new()
 var DIRECTION_CHANGE_INTERVAL = 3.0
-
-
 
 func _ready():
 	randomize()
@@ -51,7 +48,11 @@ func _ready():
 	$animation.play('walk')
 
 func handleWeaponCollision(weapon):
-	health -= weapon.damage
+	receive_damage(weapon.damage)
+
+func receive_damage(received_damage):
+	health -= received_damage
+	updateGui()
 
 func updateGui():
 	var message = str(health) + '/' + str(max_health)
@@ -265,4 +266,29 @@ func _physics_process(delta):
 	behaviorLoop(delta)
 
 func apply_effect(effect, time):
-	print("applied effect ", effect, " for ", time, " seconds")
+	current_effect = {
+		"name": effect,
+		"damage": 0.5,
+		"end_time": time,
+		"start_time": 0.0,
+	}
+	$EffectTimer.start()
+	print("effect applied")
+
+func reset_effects():
+	current_effect = {}
+
+func _on_EffectTimer_timeout():
+	var effect = current_effect.get("name", null)
+	match effect:
+		globals.EFFECTS.POISONED:
+			var effect_damage = current_effect.get("damage")
+			receive_damage(effect_damage)
+			print("spider received posion damage!!")
+			current_effect["start_time"] = current_effect.get("start_time") + $EffectTimer.wait_time
+
+			if current_effect.get("start_time") >= current_effect.get("end_time"):
+				reset_effects()
+				$EffectTimer.stop()
+				return
+			$EffectTimer.start()

@@ -112,8 +112,12 @@ margin_bottom = 40.0
 value = 100.0
 texture_under = ExtResource( 40 )
 texture_progress = ExtResource( 41 )
+
+[node name="EffectTimer" type="Timer" parent="."]
+wait_time = 0.5
 [connection signal="body_entered" from="attackArea" to="." method="_on_attackArea_body_entered"]
 [connection signal="body_exited" from="attackArea" to="." method="_on_attackArea_body_exited"]
 [connection signal="area_entered" from="visionArea" to="." method="_on_visionArea_area_entered"]
 [connection signal="area_exited" from="visionArea" to="." method="_on_visionArea_area_exited"]
 [connection signal="animation_finished" from="animation" to="." method="_on_animation_animation_finished"]
+[connection signal="timeout" from="EffectTimer" to="." method="_on_EffectTimer_timeout"]
